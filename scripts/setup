@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+PROJECT_ROOT=`cd "$(dirname ${0})"/../ && pwd`
+
+# add project directory to python sys.path - allows importing modules from the local project directory
+export PYTHONPATH=${PROJECT_ROOT} 
+VIRTUALENV_DIR=${PROJECT_ROOT}/venv
+
+# setup virtualenv & basic package management dependencies
+if [ ! -d ${VIRTUALENV_DIR} ]; then
+    command -v pyenv &> /dev/null
+    if [ $? -eq 0 ]; then
+        py39="$(pyenv versions --bare | grep '3.9' | sort -nr | head -1 &> /dev/null)"
+        if [ $? -eq 0 ]; then
+            pyenv local "${py39}"
+        fi
+    fi
+    python -m venv ${VIRTUALENV_DIR}
+    pip install -U pip wheel setuptools
+fi
+
+# activate virtualenv
+source ${VIRTUALENV_DIR}/bin/activate
