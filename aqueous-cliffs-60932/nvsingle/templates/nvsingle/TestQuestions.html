@@ -1,0 +1,20 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Test questions
+{% endblock %}
+
+{% block content %}
+
+    <p>Please answer the questions below. They will test how well you have understood the instructions.</p>
+
+    {% formfield player.qu1 with label="If you order 45 units, what is the cost of your order? (in pence)" %}
+    {% formfield player.qu2 with label="If you order 50 units and demand turns out to be 55 units, what is your profit? (in pence)" %}
+    {% formfield player.qu3 with label="What is the likelihood that demand is 60 units or less? (in %)" %}
+
+    {% next_button %}
+    {% include Constants.profitcalculator %}
+    {% include Constants.instructions_template %}
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+    <h3 class="panel-sub-heading">
+        Instructions
+    </h3>
+
+    <p>
+        You represent a firm that sells products from an inventory to
+        customers. Your only task is to make one decision during each round: how large to make your
+        inventory. Below we explain how you make your decision and how the profits are determined.
+    </p>
+
+    <p><b>Inventory and demand.</b>
+        Your inventory size is determined by the size of the blue circle. The larger you make the circle, the larger your inventory.
+        The numerical value of your inventory size is a whole number between 1 and 300. You can think of this value as the number of
+        products that you stock.
+
+        <p>You can only sell the inventory that is demanded from you. Demand is determined after you have set your inventory size.
+        Like inventory, demand is a value between 1 and 300.
+        You can think of demand as the number of customers who visit your inventory to buy your products.</p>
+
+        <p>If your inventory is not large enough to satisfy all demand, some customers will leave your inventory empty handed. On
+        the other hand, if your inventory is larger than demand, you will have leftover products which do not bring you any profit. You cannot
+        use the leftovers in the next periods.</p>
+
+        <p>Demand is determined as the size of the demand circle, randomly drawn each round, numerically as a whole number between 1 and 300.
+        Each value of demand has an equal probability of occurring. Each random draw of demand is independent of previous draws.</p>
+
+        <p>You will know demand only after you have set your inventory circle size.</p>
+
+    <p>
+        <b>Revenue.</b>
+        Your revenue will be determined by how much of your inventory you are able to sell to your customers. If the demand circle is larger
+        than your inventory circle, then your revenue is determined only by your inventory circle. If the
+        demand circle is smaller than your inventory circle, then your revenue is determined only by the size of the demand circle.
+        Numerically, the customers will pay you 12 pence per each unit that is sold from the inventory.
+    </p>
+
+    <p>
+        For example, if your inventory circle size is 40, but your demand circle size is 60, then the extra demand of 20 will not be satisfied.
+        In this case your revenue is 12 × 40 = 480 p. If the demand circle size turns out to be 30 instead of 60,
+        your revenue is 12 × 30 = 360 p, and your leftover inventory is 10.
+    </p>
+
+    <p>
+        <b>Ordering cost.</b>
+        You have to pay {{ costparam }} pence for each unit that you order to the inventory. Note that due to the randomness of demand,
+        it may be that your ordering cost will be higher than your revenue, resulting into losses.
+    </p>
+
+    <p>
+        <b>Profit.</b> Your profit is calculated by subtracting ordering cost from revenue. Measured in pence (£ 1/100),
+        profit is therefore:
+    </p>
+
+    <ul>
+        If demand circle is smaller than inventory circle: <strong>12 × [demand] &minus; {{ costparam }} × [inventory]</strong><br>
+        If demand circle is larger than inventory circle: <strong>12 × [inventory] &minus; {{ costparam }} × [inventory]</strong><br>
+    </ul>
+
+    <p>
+        If lossess occur, these will be subtracted from your baseline reward.
+    </p>
+
+    {% if iswelcomepage %}
+        <p>
+        <b>Monetary reward.</b> You will be paid the average of the two profits that you get from this part and Part III,
+        where you will be making a decision in a similar situation. For example, if your profit in this part is 90 pence
+        and in Part III, 120 pence, your monetary reward is (0.90 + 1.20)/2 = £1.05. This will be added to your reward from Part I.
+        </p>
+        <p>
+        For your convenience, these instructions will remain available to you on all subsequent screens of this part of the study.
+        </p>
+    {% endif %}
+
+</div>

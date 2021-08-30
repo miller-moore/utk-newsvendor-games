@@ -1,0 +1,71 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Results
+{% endblock %}
+
+{% block content %}
+
+    <center>
+
+    <table class="table table-test" style="width:400px; margin-bottom:10px">
+
+        <tr>
+            <td>&nbsp;</td>
+            <td>Your firm</td>
+            <td>Other firm</td>
+        </tr>
+
+        <tr>
+            <td>Order:</td>
+            <td align="center"> {{ q1 }}</td>
+            <td align="center"> {{ q2 }}</td>
+        </tr>
+
+        <tr>
+            <td>Initial allocation:</td>
+            <td align="center">{{ d1 }}</td>
+            <td align="center">{{ d2 }}</td>
+        </tr>
+
+        <tr>
+            <td>Reallocation from other:</td>
+            <td align="center">{{ realloc }}</td>
+            <td align="center">{{ realloc2 }}</td>
+        </tr>
+
+        <tr>
+            <td>Effective demand:</td>
+            <td align="center"> {{ efd1 }} </td>
+            <td align="center"> {{ efd2 }} </td>
+        </tr>
+
+        <tr>
+            <td>Revenue:</td>
+            <td align="center">{{ revenue }} p</td>
+            <td align="center">{{ othrevenue }} p</td>
+        </tr>
+
+        <tr>
+            <td>Cost:</td>
+            <td align="center">{{ cost }} p</td>
+            <td align="center">{{ othcost }} p</td>
+        </tr>
+
+        <tr>
+            <td><b>Profit:</b></td>
+            <td align="center"><b>{{ payoff }} p</b></td>
+            <td align="center"><b>{{ othpayoff }} p</b></td>
+        </tr>
+
+    </table>
+
+    {% next_button %}
+
+    </center>
+
+    {% include Constants.profitcalculator_template %}
+    {% include Constants.instructions_template %}
+
+{% endblock %}

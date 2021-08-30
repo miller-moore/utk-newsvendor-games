@@ -1,0 +1,26 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+
+    {% if margin == 'high' %}
+        Part 2 begins
+    {% else %}
+        That was it!
+    {% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+    {% if margin == 'high' %}
+        <p>
+            Now the unit cost is increased to 9. Please use the profit calculator to see how this affects your total profit.
+        </p>
+        {% next_button %}
+    {% else %}
+        Thanks for playing!
+    {% endif %}
+
+
+{% endblock %}

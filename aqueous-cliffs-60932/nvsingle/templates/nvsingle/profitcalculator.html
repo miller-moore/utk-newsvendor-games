@@ -1,0 +1,71 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+<h3>Profit calculator</h3>
+<center>
+<table>
+    <tr>
+        <td>
+            Order:
+        </td>
+        <td>
+            <input type="text" name="q" size="5">
+        </td>
+        <td>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </td>
+        <td>
+            Demand:
+        </td>
+        <td>
+            <input type="text" name="d" size="5">
+        </td>
+        <td>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </td>
+        <td>
+            <input type="button" id="submit_button" value="Calculate">
+        </td>
+    </tr>
+</table>
+</center>
+
+
+{% block scripts %}
+<script>
+function calc() {
+    var q, d;
+
+    q = document.getElementsByName("q")[0].value;
+    d = document.getElementsByName("d")[0].value;
+
+    if (!isNaN(q) & !isNaN(d) & q>=1 & q<=100 & d>=1 & d<=100) {
+
+        if (q < d) {
+            revenue = "Revenue: ".concat(4*q);
+            profit = "\nProfit: ".concat(4*q-2*q);
+        } else {
+            revenue = "Revenue: ".concat(4*d);
+            profit = "\nProfit: ".concat(4*d-2*q);
+        }
+
+        cost = "\nCost: ".concat(2*q);
+        total = revenue.concat(cost,profit);
+
+        alert(total);
+
+    } else {
+
+        alert("Check your input");
+    }
+}
+
+window.onload = function () {
+    document.getElementById("submit_button").onclick = calc;
+};
+</script>
+{% endblock %}
+
+</div>
+

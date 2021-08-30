@@ -1,0 +1,157 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Surveys for the workshop
+{% endblock %}
+
+{% block content %}
+
+    <p>Name, email, consent, then allport & rei in different pages</p>
+    {% formfield player.name with label="Name" %}
+    {% formfield player.email with label="Email" %}
+
+    <h2>Part I</h2>
+
+    <p>A number of controversial statements or questions with two alternative answers are given below. Indicate your personal preferences by writing appropriate figures in the dropdown boxes. Some of the alternatives may appear equally attractive or unattractive to you. Nevertheless, please attempt to choose the alternative that is relatively more acceptable to you. For each question you have three points (1,2,3) that you may distribute in any of the following combinations:</p>
+    <ul>(a) 0, (b) 3<br>(a) 1, (b) 2<br>(a) 2, (b) 1<br>(a) 3, (b) 0</ul>
+    <p>Do not choose any combination of numbers except one of these four. There is no time limit, but do not linger over any one question or statement, and do not leave out any of the questions unless you find it really impossible to make a decision.</p>
+
+    <table border="1">
+        <tr><td><b> </b></td><td>&nbsp;</td><td><center><b>(a)</b></center></td><td><center><b>(b)</b></center></td></tr>
+        <tr><td><b>The main object of scientific research should be the discovery of truth rather than its practical applications. (a)Yes; (b)No.</b></td><td>&nbsp;</td><td>{% formfield player.q1a with label=""%}</td><td>{% formfield player.q1b with label=""%}</td></tr>
+
+<tr><td><b>Taking the Bible or the Koran as a whole, one should regard it from the point of view of its beautiful mythology and literary style, rather than it as a spiritual revelation? (a)Yes; (b)No.</b></td><td>&nbsp;</td><td>{% formfield player.q2a with label=""%}</td><td>{% formfield player.q2b with label=""%}</td></tr>
+<tr><td><b>Which of the following individuals do you think should be judged as contributing more to the progress of the human race? (a) Aristotle; (b) Abraham Lincoln.</b></td><td>&nbsp;</td><td>{% formfield player.q3a with label=""%}</td><td>{% formfield player.q3b with label=""%}</td></tr>
+<tr><td><b>Assuming that you have a sufficient ability, would you prefer to be: (a) a banker; (b) a politician?</b></td><td>&nbsp;</td><td>{% formfield player.q4a with label=""%}</td><td>{% formfield player.q4b with label=""%}</td></tr>
+<tr><td><b>Do you think it is justifiable for great artists, such as Beethoven, Wagner and Byron to be selfish and negligent of the feelings of others? (a) Yes; (b) No.</b></td><td>&nbsp;</td><td>{% formfield player.q5a with label=""%}</td><td>{% formfield player.q5b with label=""%}</td></tr>
+<tr><td><b>Which of the following branches of study do you expect will prove more important for the human race? (a) mathematics; (b) theology.</b></td><td>&nbsp;</td><td>{% formfield player.q6a with label=""%}</td><td>{% formfield player.q6b with label=""%}</td></tr>
+<tr><td><b>Which would you consider the more important function of modern leaders? (a) to bring about the accomplishment of practical goals; (b) to encourage followers to take a greater interest in the rights of others.</b></td><td>&nbsp;</td><td>{% formfield player.q7a with label=""%}</td><td>{% formfield player.q7b with label=""%}</td></tr>
+<tr><td><b>When witnessing a gorgeous ceremony (ecclesiastical or academic, induction into office, etc.), are you more impressed: (a) by the colour and pageantry of the occasion itself; (b) by the influence and strength of the group?</b></td><td>&nbsp;</td><td>{% formfield player.q8a with label=""%}</td><td>{% formfield player.q8b with label=""%}</td></tr>
+<tr><td><b>Which of these character traits do you consider the more desirable? (a) high ideals and reverence; (b) unselfishness and sympathy. </b></td><td>&nbsp;</td><td>{% formfield player.q9a with label=""%}</td><td>{% formfield player.q9b with label=""%}</td></tr>
+<tr><td><b>If you were a university professor and had the necessary ability, would you prefer to teach: (a) poetry; (b) chemistry and physics?</b></td><td>&nbsp;</td><td>{% formfield player.q10a with label=""%}</td><td>{% formfield player.q10b with label=""%}</td></tr>
+<tr><td><b>If you should see the following news items with headlines of equal size in your morning paper, which would you read more attentively? (a) LEADERS OF DIFFERENT GROUPS TO CONSULT ON RECONCILIATION; (b) GREAT IMPROVEMENTS IN MARKET CONDITIONS.</b></td><td>&nbsp;</td><td>{% formfield player.q11a with label=""%}</td><td>{% formfield player.q11b with label=""%}</td></tr>
+<tr><td><b>Under circumstances similar to those of Question 11? (a) SUPREME COURT RENDERS A DECISION; (b) NEW SCIENTIFIC THEORY ANNOUNCED.</b></td><td>&nbsp;</td><td>{% formfield player.q12a with label=""%}</td><td>{% formfield player.q12b with label=""%}</td></tr>
+<tr><td><b>When you visit a cathedral, synagogue or mosque are you more impressed by a pervading sense of reverence and worship than by the architectural features and beauty? (a) Yes; (b) No.</b></td><td>&nbsp;</td><td>{% formfield player.q13a with label=""%}</td><td>{% formfield player.q13b with label=""%}</td></tr>
+<tr><td><b>Assuming that you have sufficient leisure time, would you prefer to use it: (a) developing your mastery of a favourite skill; (b) doing volunteer social or public service work?</b></td><td>&nbsp;</td><td>{% formfield player.q14a with label=""%}</td><td>{% formfield player.q14b with label=""%}</td></tr>
+<tr><td><b>At an exposition, do you chiefly like to go to the buildings where you can see: (a) new manufactured products; (b) scientific (e.g., chemical) apparatus</b></td><td>&nbsp;</td><td>{% formfield player.q15a with label=""%}</td><td>{% formfield player.q15b with label=""%}</td></tr>
+<tr><td><b>If you had the opportunity, and if nothing of the kind existed in the community where you live, would you prefer to found: (a) a debating society or forum; (b) a classical orchestra?</b></td><td>&nbsp;</td><td>{% formfield player.q16a with label=""%}</td><td>{% formfield player.q16b with label=""%}</td></tr>
+<tr><td><b>The aim of religious institutions at the present time should be: (a) to bring out altruistic and charitable tendencies; (b) to encourage spiritual worship and a sense of communion with the highest.</b></td><td>&nbsp;</td><td>{% formfield player.q17a with label=""%}</td><td>{% formfield player.q17b with label=""%}</td></tr>
+<tr><td><b>If you had some time to spend in a waiting room and there were only two magazines to choose from, would you prefer: (a) SCIENTIFIC AGE; (b) ARTS AND DECORATIONS?</b></td><td>&nbsp;</td><td>{% formfield player.q18a with label=""%}</td><td>{% formfield player.q18b with label=""%}</td></tr>
+<tr><td><b>Would you prefer to hear a series of lectures on: (a) the comparative merits of the forms of government in Britain and the United States; (b) The development of the great religious faiths?</b></td><td>&nbsp;</td><td>{% formfield player.q19a with label=""%}</td><td>{% formfield player.q19b with label=""%}</td></tr>
+<tr><td><b>Which of the following would you consider the more important function of education? (a) Its preparation for practical achievement and financial reward; (b) its preparation for participation in community activities and aiding less fortunate persons.</b></td><td>&nbsp;</td><td>{% formfield player.q20a with label=""%}</td><td>{% formfield player.q20b with label=""%}</td></tr>
+<tr><td><b>Are you more interested in reading accounts of the lives and works of individuals such as: (a) Indira Gandhi, Theodore Roosevelt, and Winston Churchill; (b) Ayn Rand, Jean-Paul Sartre, and Immanuel Kant?</b></td><td>&nbsp;</td><td>{% formfield player.q21a with label=""%}</td><td>{% formfield player.q21b with label=""%}</td></tr>
+<tr><td><b>Are our modern industrial and scientific developments signs of a greater degree of civilisation than those attained by any previous society, the Greeks for example? (a) Yes; (b) No.</b></td><td>&nbsp;</td><td>{% formfield player.q22a with label=""%}</td><td>{% formfield player.q22b with label=""%}</td></tr>
+<tr><td><b>If you were engaged in an industrial organisation (and assuming salaries were to be equal), would you prefer to work: (a) as a counselor for employees; (b) in an administrative position</b></td><td>&nbsp;</td><td>{% formfield player.q23a with label=""%}</td><td>{% formfield player.q23b with label=""%}</td></tr>
+<tr><td><b>Given your choice between two books to read, are you more likely to select: (a) THE STORY OF RELIGION IN AMERICA; (b) THE STORY OF INDUSTRY IN AMERICA?</b></td><td>&nbsp;</td><td>{% formfield player.q24a with label=""%}</td><td>{% formfield player.q24b with label=""%}</td></tr>
+<tr><td><b>Would modern society benefit more from: (a) more concern for the rights and welfare of citizens; (b) greater knowledge of the fundamental laws of human behaviour?</b></td><td>&nbsp;</td><td>{% formfield player.q25a with label=""%}</td><td>{% formfield player.q25b with label=""%}</td></tr>
+<tr><td><b>Suppose you were in a position to help raise standards of living, or to mold public opinion. Would you prefer to influence: (a) standards of living; (b) public opinion?</b></td><td>&nbsp;</td><td>{% formfield player.q26a with label=""%}</td><td>{% formfield player.q26b with label=""%}</td></tr>
+<tr><td><b>Would you prefer to hear a series of popular lectures on: (a) the progress of social work in your part of the country; (b) contemporary painters?</b></td><td>&nbsp;</td><td>{% formfield player.q27a with label=""%}</td><td>{% formfield player.q27b with label=""%}</td></tr>
+<tr><td><b>All the evidence that has been impartially accumulated goes to show that the universe has evolved to its present state in accordance with natural principles, so that there is no necessity to assume a first cause, cosmic purpose, or God behind it. (a) I agree with this statement; (b) I disagree.</b></td><td>&nbsp;</td><td>{% formfield player.q28a with label=""%}</td><td>{% formfield player.q28b with label=""%}</td></tr>
+<tr><td><b>In a paper, such as the New York Sunday Times, are you more likely to read: (a) the real estate sections and the account of the stock market; (b) the section on art galleries and exhibitions?</b></td><td>&nbsp;</td><td>{% formfield player.q29a with label=""%}</td><td>{% formfield player.q29b with label=""%}</td></tr>
+<tr><td><b>Would you consider it more important for your child to secure training in: (a) religion; (b) athletics?</b></td><td>&nbsp;</td><td>{% formfield player.q30a with label=""%}</td><td>{% formfield player.q30b with label=""%}</td></tr>
+
+    </table>
+
+<br>
+    <h2>Part II</h2>
+
+    <p>Each of the following situations or questions is followed by four possible attitudes or answers. Arrange these answers in the order of your personal preference by choosing, in the appropriate box at right, a score of 4, 3, 2, or 1. To the statement you prefer most give 4, to the statement that is second most attractive 3, and so on. You may think of answers which would be preferable from your point of view to any of those listed. It is necessary, however, that you make your selection from the alternatives presented, and arrange all four in order of their desirability, guessing when your preferences are not distinct. If you find it really impossible to state your preference, you may omit the question. Be sure not to assign more than one 4, one 3, etc, for each question</p>
+
+    <table border="1">
+        <tr><td><b>1. Do you think that a good government should aim chiefly at -- (Remember to give your first choice 4, etc.)</b></td><td> </td></tr>
+        <tr><td><b>a. more aid for the poor, sick, and old</b></td><td>{% formfield player.qq1a with label=""%}</td></tr>
+        <tr><td><b>b. the development of manufacturing and trade</b></td><td>{% formfield player.qq1b with label=""%}</td></tr>
+        <tr><td><b>c. introducing highest ethical principles into its policies and diplomacy</b></td><td>{% formfield player.qq1c with label=""%}</td></tr>
+        <tr><td><b>d. establishing a position of prestige and respect among nations</b></td><td>{% formfield player.qq1d with label=""%}</td></tr>
+        <tr><td>&nbsp;</td><td></td></tr>
+        <tr><td><b>2. In your opinion, can a person who works in business all week best spend Sunday in --</b></td><td> </td></tr>
+        <tr><td><b>a. educating himself/herself by reading serious books</b></td><td>{% formfield player.qq2a with label=""%}</td></tr>
+        <tr><td><b>b. trying to win at competitive sports</b></td><td>{% formfield player.qq2b with label=""%}</td></tr>
+        <tr><td><b>c. going to an orchestral concert</b></td><td>{% formfield player.qq2c with label=""%}</td></tr>
+        <tr><td><b>d. hearing a really good sermon</b></td><td>{% formfield player.qq2d with label=""%}</td></tr>
+        <tr><td>&nbsp;</td><td></td></tr>
+        <tr><td><b>3. If you could influence the educational policies of the public schools of some city, would you undertake --</b></td><td> </td></tr>
+        <tr><td><b>a. to promote the study and participation in music and the fine arts</b></td><td>{% formfield player.qq3a with label=""%}</td></tr>
+        <tr><td><b>b. to stimulate the study of social problems</b></td><td>{% formfield player.qq3b with label=""%}</td></tr>
+        <tr><td><b>c. to provide additional laboratory facilities</b></td><td>{% formfield player.qq3c with label=""%}</td></tr>
+        <tr><td><b>d. to increase the practical value of courses</b></td><td>{% formfield player.qq3d with label=""%}</td></tr>
+        <tr><td>&nbsp;</td><td></td></tr>
+        <tr><td><b>4. Do you prefer to develop a friendship with people who --</b></td><td> </td></tr>
+<tr><td><b>a. are efficient, industrious and of a practical turn of mind</b></td><td>{% formfield player.qq4a with label=""%}</td></tr>
+<tr><td><b>b. are seriously interested in thinking out their attitude toward life as a whole</b></td><td>{% formfield player.qq4b with label=""%}</td></tr>
+<tr><td><b>c. possess qualities of leadership and organizing ability</b></td><td>{% formfield player.qq4c with label=""%}</td></tr>
+<tr><td><b>d. show artistic and emotional sensitivity</b></td><td>{% formfield player.qq4d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>5. If you lived in a small town and had more than enough income for your needs, would you prefer to --</b></td><td> </td></tr>
+<tr><td><b>a. apply it productively to assist commercial and industrial development</b></td><td>{% formfield player.qq5a with label=""%}</td></tr>
+<tr><td><b>b. help to advance the activities of local religious groups</b></td><td>{% formfield player.qq5b with label=""%}</td></tr>
+<tr><td><b>c. give it for the development of scientific research in your locality</b></td><td>{% formfield player.qq5c with label=""%}</td></tr>
+<tr><td><b>d. give it to the Family Welfare Society</b></td><td>{% formfield player.qq5d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>6. When you go to the theater, do you, as a rule, enjoy most --</b></td><td> </td></tr>
+<tr><td><b>a. plays that treat the lives of great individuals</b></td><td>{% formfield player.qq6a with label=""%}</td></tr>
+<tr><td><b>b. ballets, operas, or similar artistic performances</b></td><td>{% formfield player.qq6b with label=""%}</td></tr>
+<tr><td><b>c. plays that have a theme of human suffering and love</b></td><td>{% formfield player.qq6c with label=""%}</td></tr>
+<tr><td><b>d. dramas that highlight the dilemmas and paradoxes of life</b></td><td>{% formfield player.qq6d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>7. Assuming that you are a person with the necessary ability, and that the salary for each of the following occupations is the same, would you prefer to be a --</b></td><td> </td></tr>
+<tr><td><b>a. mathematician</b></td><td>{% formfield player.qq7a with label=""%}</td></tr>
+<tr><td><b>b. sales manager</b></td><td>{% formfield player.qq7b with label=""%}</td></tr>
+<tr><td><b>c. member of the clergy (priest/minister/rabbi etc.)</b></td><td>{% formfield player.qq7c with label=""%}</td></tr>
+<tr><td><b>d. politician</b></td><td>{% formfield player.qq7d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>8. If you had sufficient leisure and money, would you prefer to --</b></td><td> </td></tr>
+<tr><td><b>a. make a collection of fine sculptures or paintings</b></td><td>{% formfield player.qq8a with label=""%}</td></tr>
+<tr><td><b>b. establish a center for the care and training of the disabled</b></td><td>{% formfield player.qq8b with label=""%}</td></tr>
+<tr><td><b>c. aim at a senatorship, or a seat in the Cabinet</b></td><td>{% formfield player.qq8c with label=""%}</td></tr>
+<tr><td><b>d. establish a business or financial enterprise of your own</b></td><td>{% formfield player.qq8d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>9. At an evening discussion with close friends, are you more interested when the conversation concerns --</b></td><td> </td></tr>
+<tr><td><b>a. the meaning of life</b></td><td>{% formfield player.qq9a with label=""%}</td></tr>
+<tr><td><b>b. developments in science</b></td><td>{% formfield player.qq9b with label=""%}</td></tr>
+<tr><td><b>c. literature</b></td><td>{% formfield player.qq9c with label=""%}</td></tr>
+<tr><td><b>d. poverty and social amelioration</b></td><td>{% formfield player.qq9d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>10. Which of the following would you prefer to do during part of your next summer vacation (if your ability and other conditions would permit) --</b></td><td> </td></tr>
+<tr><td><b>a. write and publish an original biological essay or article</b></td><td>{% formfield player.qq10a with label=""%}</td></tr>
+<tr><td><b>b. stay in some secluded part of the country where you can appreciate fine scenery</b></td><td>{% formfield player.qq10b with label=""%}</td></tr>
+<tr><td><b>c. enter a local tennis or other athletic tournament</b></td><td>{% formfield player.qq10c with label=""%}</td></tr>
+<tr><td><b>d. get experience in some new line of business</b></td><td>{% formfield player.qq10d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>11. Do great exploits and adventures of discovery such as Columbus's, Magellan's, and Earhart's seem to you significant because --</b></td><td> </td></tr>
+<tr><td><b>a. they demonstrate the ability of human beings to overcome the difficult forces of nature</b></td><td>{% formfield player.qq11a with label=""%}</td></tr>
+<tr><td><b>b. they add to our knowledge of geography, meteorology, oceanography, etc.</b></td><td>{% formfield player.qq11b with label=""%}</td></tr>
+<tr><td><b>c. they weld human interests and international feelings throughout the world</b></td><td>{% formfield player.qq11c with label=""%}</td></tr>
+<tr><td><b>d. they contribute each in a small way to an ultimate understanding of the universe</b></td><td>{% formfield player.qq11d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>12. Should one guide one's conduct according to, or develop one's chief loyalties toward --</b></td><td> </td></tr>
+<tr><td><b>a. one's religious faith</b></td><td>{% formfield player.qq12a with label=""%}</td></tr>
+<tr><td><b>b. ideals of beauty</b></td><td>{% formfield player.qq12b with label=""%}</td></tr>
+<tr><td><b>c. one's occupational organization and associates</b></td><td>{% formfield player.qq12c with label=""%}</td></tr>
+<tr><td><b>d. ideals of charity</b></td><td>{% formfield player.qq12d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>13. To what extent do the following famous persons interest you --</b></td><td> </td></tr>
+<tr><td><b>a. Mother Theresa</b></td><td>{% formfield player.qq13a with label=""%}</td></tr>
+<tr><td><b>b. General Colin Powell</b></td><td>{% formfield player.qq13b with label=""%}</td></tr>
+<tr><td><b>c. Bill Gates</b></td><td>{% formfield player.qq13c with label=""%}</td></tr>
+<tr><td><b>d. Marie Curie</b></td><td>{% formfield player.qq13d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>14. In choosing a spouse/life-time companion, would you prefer someone who --</b></td><td> </td></tr>
+<tr><td><b>a. is successful in his/her profession, commanding admiration from others</b></td><td>{% formfield player.qq14a with label=""%}</td></tr>
+<tr><td><b>b. likes to help people</b></td><td>{% formfield player.qq14b with label=""%}</td></tr>
+<tr><td><b>c. is fundamentally spiritual in his/her attitudes towards life</b></td><td>{% formfield player.qq14c with label=""%}</td></tr>
+<tr><td><b>d. is gifted along artistic lines</b></td><td>{% formfield player.qq14d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td><b>15. Viewing Leonardo da Vinci's picture, "The Last Supper," would you tend to think of it --</b></td><td> </td></tr>
+<tr><td><b>a. as expressing the highest spiritual aspirations and emotions</b></td><td>{% formfield player.qq15a with label=""%}</td></tr>
+<tr><td><b>b. as one of the most priceless and irreplaceable pictures ever painted</b></td><td>{% formfield player.qq15b with label=""%}</td></tr>
+<tr><td><b>c. in relation to Leonardo's versatility and its place in history</b></td><td>{% formfield player.qq15c with label=""%}</td></tr>
+<tr><td><b>d. The quintessence of harmony and design</b></td><td>{% formfield player.qq15d with label=""%}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+    </table>
+
+<br>
+    {% next_button %}
+
+{% endblock %}

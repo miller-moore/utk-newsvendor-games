@@ -1,0 +1,60 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Your decision (round {{roundnumber}})
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'global/matrix.css' %}" />
+
+    <style>
+        .highlight-row-on-hover:hover td {
+            background-color: #fcf8e3;
+        }
+
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="form-group required">
+        {% if isfirstround %}
+        <p> </p>
+        {% else %}
+        <p>Your decision in the previous round was <b>{{prevdecision}}</b> and your partner's decision was <b>{{prevothdecision}}</b>.</p>
+        {% endif %}
+        <table class="table table-bordered text-center" style="width: auto; margin: auto">
+            <tr>
+                <th colspan="2" rowspan="2"></th>
+                <th colspan="3"><center>Your partner</center></th>
+            </tr>
+            <tr>
+                <th><center>A</center></th>
+                <th><center>B</center></th>
+                <th><center>C</center></th>
+            </tr>
+            <tr class="highlight-row-on-hover">
+                <th rowspan="3"><span class="rotate90">You</span></th>
+                <td><button name="decision" value="A" class="btn btn-primary btn-large">A</button></td>
+                <td>{{Constants.cc|to0}}, {{Constants.cc|to0}}</td>
+                <td>{{Constants.cdrow|to0}}, {{Constants.cdcol|to0}}</td>
+                <td>{{Constants.cprow|to0}}, {{Constants.cpcol|to0}}</td>
+            </tr>
+            <tr class="highlight-row-on-hover">
+                <td><button name="decision" value="B" class="btn btn-primary btn-large">B</button></td>
+                <td>{{Constants.dcrow|to0}}, {{Constants.dccol|to0}}</td>
+                <td>{{Constants.dd|to0}}, {{Constants.dd|to0}}</td>
+                <td>{{Constants.dprow|to0}}, {{Constants.dpcol|to0}}</td>
+            </tr>
+            <tr class="highlight-row-on-hover">
+                <td><button name="decision" value="C" class="btn btn-primary btn-large">C</button></td>
+                <td>{{Constants.pcrow|to0}}, {{Constants.pccol|to0}}</td>
+                <td>{{Constants.pdrow|to0}}, {{Constants.pdcol|to0}}</td>
+                <td>{{Constants.pp|to0}}, {{Constants.pp|to0}}</td>
+            </tr>
+        </table>
+    </div>
+
+{% endblock %}

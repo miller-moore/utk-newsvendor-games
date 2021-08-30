@@ -1,0 +1,319 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Round {{ round }}
+
+    {% if margin == 'high' %}
+        (low cost product)
+    {% else %}
+        (high cost product)
+    {% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <b>Inventory: <span id="inventory">-</span></b><br>
+    <b>Total cost: <span id="totacost">-</span></b><br><br>
+    <div id="topid">
+        <button type="button" id="btn" class="btn btn-primary btn-large">+</button>
+        <button type="button" id="minusbtn" class="btn btn-primary btn-large">-</button>
+        {% comment %}
+        <button type="button" id="resbtn" class="btn btn-primary btn-large">Reset</button>
+        {% endcomment %}
+    </div>
+    <div id="wrapper" align="center">
+
+        <div id="circle"></div>
+
+    </div>
+    <br>
+    <div id="buttondiv" align="center">
+        <input type="hidden" name="q" id="hiddeninput">
+        <button class="btn btn-primary btn-large">Ready</button>
+        {% comment %}
+        <button class="btn btn-primary btn-large" type="button" onclick="instructions()" style="line-height: 15px;"><span style="font-size: 25px; font-family: Georgia, serif;">i</span></button>
+        {% endcomment %}
+        <br><br>
+    </div>
+
+        <br>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+function instructions() {
+    alert("You are a firm maintaining an inventory. Your task is to decide how large to make your inventory.\n\nYou adjust the blue circle to determine inventory size. The numerical value of your inventory size is a number between 1 and 300. This is the number of products that you stock.\n\nYou can only sell the inventory that is demanded. Demand is determined after you have set your inventory size. Demand is also a value between 1 and 300.\n\nIf your inventory is not large enough to satisfy all demand, some customers will leave your inventory empty handed. If your inventory is larger than demand, you will have leftover products which do not bring you any profit.\n\nDemand is determined as the size of the demand circle, randomly drawn each round, numerically as a whole number between 1 and 300. Each value of demand has an equal probability of occurring. Each random draw of demand is independent of previous draws.\n\nYou will know demand only after you have set your inventory circle size.\n\nYour revenue will be determined by how much of your inventory you are able to sell to your customers. If the demand circle is larger than your inventory circle, then your revenue is determined only by your inventory circle. If the demand circle is smaller than your inventory circle, then your revenue is determined only by the size of the demand circle. Numerically, the customers will pay you 12 pence per each unit that is sold from the inventory.\n\nFor example, if your inventory circle size is 40, but your demand circle size is 60, then the extra demand of 20 will not be satisfied. In this case your revenue is 12 × 40 = 480 p. If the demand circle size turns out to be 30 instead of 60, your revenue is 12 × 30 = 360 p, and your leftover inventory is 10.\n\nYou pay {{ costparam }} pence for each unit that you order to the inventory. Note that due to the randomness of demand, it may be that your ordering cost will be higher than your revenue, resulting into losses.\n\nYour profit is revenue minus cost.");
+}
+
+var b = document.querySelector('#btn');
+var minusb = document.querySelector('#minusbtn');
+var resb = document.querySelector('#resbtn');
+var divi = document.getElementById('circle');
+
+let f = function() {
+    if (divi.clientWidth < 300) {
+        divi.style.width = 1 + divi.clientWidth + "px";
+        divi.style.height = 1 + divi.clientHeight + "px";
+    }
+    divi.style.background = "blue";
+    var elmnt = document.getElementById('circle');
+    document.getElementById("inventory").innerHTML = elmnt.clientHeight;
+    document.getElementById("totacost").innerHTML = elmnt.clientHeight * {{ costparam|json }};
+    document.getElementById("hiddeninput").value = elmnt.clientHeight;
+}
+
+let fminus = function() {
+    if (divi.clientWidth > 0) {
+        divi.style.width = divi.clientWidth - 1 + "px";
+        divi.style.height = divi.clientHeight - 1 + "px";
+    }
+    divi.style.background = "blue";
+    var elmnt = document.getElementById('circle');
+    document.getElementById("inventory").innerHTML = elmnt.clientHeight;
+    document.getElementById("totacost").innerHTML = elmnt.clientHeight * {{ costparam|json }};
+    document.getElementById("hiddeninput").value = elmnt.clientHeight;
+}
+
+let resf = function() {
+    divi.style.width = "1px";
+    divi.style.height = "1px";
+    divi.style.background = "blue";
+    var elmnt = document.getElementById('circle');
+    document.getElementById("inventory").innerHTML = elmnt.clientHeight;
+    document.getElementById("totacost").innerHTML = elmnt.clientHeight * {{ costparam|json }};
+    document.getElementById("hiddeninput").value = elmnt.clientHeight;
+}
+
+var timerId;
+
+let fd = function() {
+    timerId = setInterval(f,10);
+}
+
+let fu = function() {
+    clearInterval(timerId);
+}
+
+let fdminus = function() {
+    timerId = setInterval(fminus,10);
+}
+
+let fuminus = function() {
+    clearInterval(timerId);
+}
+
+b.addEventListener("click", f);
+b.addEventListener("mousedown", fd); //mousedown
+document.addEventListener("mouseup", fu); //mouseup
+b.addEventListener("touchstart", fd); //mousedown
+document.addEventListener("touchend", fu); //mouseup
+
+minusb.addEventListener("click", fminus);
+minusb.addEventListener("mousedown", fdminus); //mousedown
+document.addEventListener("mouseup", fuminus); //mouseup
+minusb.addEventListener("touchstart", fdminus); //mousedown
+document.addEventListener("touchend", fuminus); //mouseup
+
+resb.addEventListener("click", resf);
+
+
+
+
+
+
+</script>
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+
+    .instr {
+        background-color: #ddd;
+        padding: 10px;
+    }
+
+    body {
+        background-color: #e6f2ff;
+      }
+
+    .page-header {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding-top: 0px;
+    }
+
+    #wrapper {
+        height: 306px;
+        width: 306px;
+        align-items: center;
+        position: relative;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+    }
+
+    #circle {
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        background: white;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.5;
+    }
+
+    #buttondiv {
+        width: 300px;
+        align-items: center;
+        position: relative;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    #topid { height: 50px; width: 100%; text-align: center; }
+
+    .slider {
+        -webkit-user-select: none; /* prevents copying the button when pressed long */
+        -webkit-appearance: none;  /* Override default CSS styles */
+        appearance: none;
+        width: 100%;
+        height: 25px; /* Specified height */
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    .slider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: #4CAF50; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+
+
+
+
+
+
+    #bigwrapper { display: table-row; }
+    #pcleft { display: table-cell; }
+    #pccenter { display: table-cell; }
+    #pcright { display: table-cell; }
+
+    #pcwrapper {
+        height: 156px;
+        width: 156px;
+        align-items: center;
+        position: absolute;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #pccircle {
+        border-radius: 50%;
+        width: 1px;
+        height: 1px;
+        background-color: blue;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    #pcdemwrapper {
+        height: 156px;
+        width: 156px;
+        align-items: center;
+        position: relative;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+        opacity: 0.5;
+    }
+
+    #pcdemcircle {
+        border-radius: 50%;
+        width: 1px;
+        height: 1px;
+        background-color: red;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .pcslider, .pcdemslider {
+        -webkit-appearance: none;  /* Override default CSS styles */
+        appearance: none;
+        width: 300px; /* Full-width */
+        height: 25px; /* Specified height */
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    .pcslider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    .pcslider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcslider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcdemslider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: red; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcdemslider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: red; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+</style>
+{% endblock %}

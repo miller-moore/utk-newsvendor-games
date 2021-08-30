@@ -1,0 +1,28 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Practice Session
+{% endblock %}
+
+{% block content %}
+
+<h3>Have a rest</h3>
+
+<p>You can take a break for up to {{rest_minites}} minutes.</p>
+
+<p>– Trials completed: {{trials_gone}}<br>– Trials left to do: {{trials_left}}</p>
+
+<p>If you feel you are ready to proceed, please click the button below.</p>
+
+<br>
+{% next_button %}
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Auction ( {{ player.round_number }} / {{ Constants.num_rounds }})
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Please specify how much you want to pay for the current lottery ( {{ player.round_number }} / {{ Constants.num_rounds }})</h1>
+
+<body onload="setStartTime()">
+
+  <div class="container">
+
+    <article class="auction">
+
+      <!-- <h4>type in your valuation of the lottery</h4>
+      <br> -->
+
+      <p class="instruction1"> <b>Reminder:</b> <br>The values in the blue and red boxes represent the probability of winning and losing the lottery, respectively. The monetary amount at the bottom is the reward in case of winning.</p>
+
+      <br>
+      <p class="instruction2">A reasonable price of this lottery should be: <br> - Greater than {{ floor }} <br> - Less than {{ ceiling }}</p>
+
+      <p class="instruction2">Type in your bid price:</p>
+
+      <div style="float: left; font-size: 25px; position: relative; left: 5px;">
+        <p>$</p>
+      </div>
+
+      <div style="position: relative; left: 15px;">
+        {% formfield player.WTP label = "" %}
+      </div>
+
+      <br>
+
+      <button class="btn btn-primary btn-large" onclick="end()">
+        Submit
+      </button>
+
+    </article>
+
+    <article class="lottery">
+      <div class="risk_up_div" style="height: {{ risk_up_px }};">
+        <p class="risk_up_txt">{{ risk_up }}</p>
+      </div>
+      <div class="risk_down_div"  style="height: {{ risk_down_px }};">
+        <p class="risk_down_txt">{{ risk_down }}</p>
+      </div>
+      <div class="reward_div">
+        <p class="reward_txt">{{ reward }}</p>
+      </div>
+
+    </article>
+
+  </div>
+
+</body>
+
+<input type="hidden" name="jsdectime_start" id="id_jsdectime_start" value=0>
+<input type="hidden" name="jsdectime_end" id="id_jsdectime_end" value=0>
+
+<script>
+  function setStartTime() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_start').value = d.getTime();
+  }
+  function end() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_end').value = d.getTime();
+  }
+</script>
+
+<!-- thie following section is for the lottery and instruction -->
+<style type="text/css">
+
+  .otree-title {
+    font-size: 0;
+  }
+
+  .container {
+    /* float: left; */
+    /* width: 100%; */
+    overflow: hidden;
+    /* overflow: auto; */
+  }
+
+  .instruction1 {
+    font-size: 20px;
+    /* font-style: italic; */
+  }
+
+  .instruction2 {
+    font-size: 20px;
+    font-style: italic;
+  }
+
+  .auction {
+    float: left;
+    width: 65%;
+    padding: 20px;
+    vertical-align: middle;
+    height: 500px;
+  }
+
+  .lottery {
+    float: left;
+    width: 25%;
+    background-color: black;
+    padding: 20px;
+    vertical-align: middle;
+    height: 420px;
+  }
+
+  .risk_up_div {
+    width: 100px;
+    background: red;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .risk_up_txt {
+    color: white;
+    font-size: 25px;
+    position: relative;
+    top: {{risk_up_posi}};
+  }
+
+  .risk_down_div {
+    width: 100px;
+    background: blue;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .risk_down_txt {
+    color: white;
+    font-size: 25px;
+    position: relative;
+    top: {{risk_down_posi}};
+  }
+
+  .reward_div {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .reward_txt {
+    color: white;
+    font-weight: normal;
+    font-size: 40px;
+  }
+</style>
+
+
+{% endblock %}

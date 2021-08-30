@@ -1,0 +1,24 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Part 2: End
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Part 2</h1>
+
+<br>
+<p>Now you have completed the Part 2. The outcome of this auction and your payment from this part will be revealed at the end of the experiment. Click the button below to proceed to the Part 3.</p>
+
+<br>
+{% next_button %}
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

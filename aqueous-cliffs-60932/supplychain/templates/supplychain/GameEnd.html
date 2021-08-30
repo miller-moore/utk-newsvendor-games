@@ -1,0 +1,87 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Game ends after {{ roundnumber }} rounds
+{% endblock %}
+
+{% block content %}
+
+    {% if group.retaileraccept == 'Accept' %}
+
+        <p>The Retailer has accepted the Supplier's offer.</p>
+
+    {% else %}
+
+        <p>The maximum number of rounds has been played and an agreement was not reached.</p>
+
+    {% endif %}
+
+    {% if retailerprofit < 0 %}
+        <p>Retailer will not profit but loses an amount £{{ retailerloss | to0 }}</p>
+    {% else %}
+        <p>Retailer profits an amount £{{ retailerprofit | to0 }}</p>
+    {% endif %}
+
+    {% if wholesalerprofit < 0 %}
+        <p>Wholesaler will not profit but loses an amount £{{ wholesalerloss | to0 }}</p>
+    {% else %}
+        <p>Wholesaler profits an amount £{{ wholesalerprofit | to0 }}</p>
+    {% endif %}
+
+    <br>
+    <h3>History</h3>
+    <table border="1" cellpadding="5pt">
+        <tr valign="bottom" align="center">
+            <td> </td><td>May Q</td><td>June Q</td><td>July Q</td><td>August Q</td><td>w</td>
+        </tr>
+        {% for g in group.in_all_rounds %}
+            <tr align="center">
+                {% if g.round_number > 1 %}
+                    <td>Wholesaler Offer</td>
+                    <td>{{ g.supplyQ_May }}</td>
+                    <td>{{ g.supplyQ_June }}</td>
+                    <td>{{ g.supplyQ_July }}</td>
+                    <td>{{ g.supplyQ_August }}</td>
+                    <td>{{ g.wholesaleprice | to0 }}</td>
+                {% endif %}
+            </tr>
+            <tr align="center">
+                {% if g.round_number == roundnumberp1 %}
+                    <td>Retailer RFQ</td>
+                    <td>Accept</td>
+                    <td>Accept</td>
+                    <td>Accept</td>
+                    <td>Accept</td>
+                    <td> </td>
+                {% elif g.round_number == 1 %}
+                    <td>Retailer initial RFQ</td>
+                    <td>{{ g.orderQ_May }}</td>
+                    <td>{{ g.orderQ_June }}</td>
+                    <td>{{ g.orderQ_July }}</td>
+                    <td>{{ g.orderQ_August }}</td>
+                    <td> </td>
+                {% else %}
+                    <td>Retailer RFQ</td>
+                    <td>{{ g.orderQ_May }}</td>
+                    <td>{{ g.orderQ_June }}</td>
+                    <td>{{ g.orderQ_July }}</td>
+                    <td>{{ g.orderQ_August }}</td>
+                    <td> </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+    Q = quantity, w = wholesale price
+
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+
+    body {
+        background-color: #e6f2ff;
+      }
+
+</style>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Practice Trials
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Part 2: Practice Trials</h1>
+
+<div class="final_instructions">
+  <p>You have passed all the check-up questions!</p>
+
+  <p>Before starting the actual trials, we prepared a short practice session for you to be familiar with the mechanism in this section. This practice session only has 10 trials, including a rest point in the middle. These practice trials will NOT count for payment.</p>
+
+  <p>Please maximise the browser before you start.</p>
+  
+  <br>
+  <button class="btn btn-primary btn-large">
+    Start the practice session
+  </button>
+
+</div>
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,54 @@
+{% load otree_tags staticfiles %}
+
+<div class="instructions well well-lg">
+
+    <h3 class="panel-sub-heading">
+        Instructions
+    </h3>
+
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'global/matrix.css' %}"/>
+
+    <p>
+        In this study, you will be randomly and anonymously paired with another
+        participant.
+        Each of you simultaneously and privately chooses one of the available decisions, A, B, or C.
+        Your payoffs will be determined by both of your decisions as given in the payoff table below:
+    </p>
+    <p><i>In each cell of the payoff table, the amount (in points) to the left is the payoff for
+        you and to the right for the other participant.</i></p>
+
+    <table class='table table-bordered text-center'
+           style='width: auto; margin: auto'>
+        <tr>
+            <th colspan=2 rowspan=2></th>
+            <th colspan=3>The Other Participant</th>
+        </tr>
+            <tr>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
+            </tr>
+            <tr class="highlight-row-on-hover">
+                <th rowspan="3"><span class="rotate90">You</span></th>
+                <td>A</td>
+                <td>{{Constants.cc|to0}}, {{Constants.cc|to0}}</td>
+                <td>{{Constants.cdrow|to0}}, {{Constants.cdcol|to0}}</td>
+                <td>{{Constants.cprow|to0}}, {{Constants.cpcol|to0}}</td>
+            </tr>
+            <tr class="highlight-row-on-hover">
+                <td>B</td>
+                <td>{{Constants.dcrow|to0}}, {{Constants.dccol|to0}}</td>
+                <td>{{Constants.dd|to0}}, {{Constants.dd|to0}}</td>
+                <td>{{Constants.dprow|to0}}, {{Constants.dpcol|to0}}</td>
+            </tr>
+            <tr class="highlight-row-on-hover">
+                <td>C</td>
+                <td>{{Constants.pcrow|to0}}, {{Constants.pccol|to0}}</td>
+                <td>{{Constants.pdrow|to0}}, {{Constants.pdcol|to0}}</td>
+                <td>{{Constants.pp|to0}}, {{Constants.pp|to0}}</td>
+            </tr>
+        </tr>
+    </table>
+
+</div>

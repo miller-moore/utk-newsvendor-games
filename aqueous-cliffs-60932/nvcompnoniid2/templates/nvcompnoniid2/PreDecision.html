@@ -1,0 +1,28 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    View market information
+{% endblock %}
+
+{% block content %}
+
+    <p>
+        Please spend a moment to reflect the information provided below about the previous studies in which you participated.
+        You can also revise the instructions and practice with the profit calculator (scroll page down), all of which are provided for your
+        convenience also in the actual decision making page.
+    </p>
+
+    <p>
+        You will be asked to make the decision on the next page.
+    </p>
+
+    {% next_button %}
+
+    {% include Constants.marketinfo_template %}
+
+    {% include Constants.profitcalculator_template %}
+    {% include Constants.instructions_template %}
+
+
+{% endblock %}

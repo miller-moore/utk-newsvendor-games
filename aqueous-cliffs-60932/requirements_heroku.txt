@@ -1,0 +1,6 @@
+-r requirements_base.txt
+# packages that are unnecessary on Windows/Mac local dev environments, or don't install properly
+psycopg2==2.7.4
+django-toolbelt==0.0.1
+pandas==1.0.1
+numpy==1.18.1

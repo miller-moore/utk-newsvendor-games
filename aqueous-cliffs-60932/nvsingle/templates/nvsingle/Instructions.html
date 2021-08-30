@@ -1,0 +1,73 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+    <h3 class="panel-sub-heading">
+        Instructions for Part II
+    </h3>
+
+    <p>
+        In this part of the study you represent a firm that sells products from an inventory to
+        customers. Your only task is to make one decision: how many units to order into your
+        inventory. Below we explain how you make your decision and how the profits from this part are determined.
+    </p>
+
+    <p><b>Order and demand.</b>
+        Your order of units to the inventory can be any whole number between 1 and 100. However, you can only sell the
+        amount of units that is demanded by the customers who visit your inventory. If you do not have enough units to
+        satisfy all demand, some customers will leave your inventory empty handed. On the other hand, if you have too many
+        units in your inventory, some of them will be leftovers. </p><p>Demand is randomly drawn as a number
+        between 1 and 100. Each value of demand has an equal probability of occurring. You will
+        know the demand only after you have made the decision on how much to order to the inventory.
+    </p>
+
+    <p>
+        <b>Revenue.</b>
+        Your revenue will be determined by how many units you are able to sell to your customers. If the demand is higher
+        than your inventory level, then your revenue is determined only by the amount that is in your inventory. If the
+        demand is lower than your inventory level, then your revenue is determined only by the amount that is demanded.
+        The customers will pay 4 pence per each unit that is sold from the inventory.
+    </p>
+
+    <p>
+        For example, if your inventory level is 40 units, but your demand is 60 customers, then the extra 20 customers will leave your
+        inventory with empty hands. In this case your revenue is 4 × 40 = 160 p. If the demand turns out to be 30 customers instead of 60,
+        your revenue is 4 × 30 = 120 p, and you have 10 units in the inventory as leftovers.
+    </p>
+
+    <p>
+        <b>Ordering cost.</b>
+        You have to pay 2 pence for each unit that you order to the inventory. Note that due to the randomness of demand,
+        it may be that your ordering cost will be higher than your revenue, resulting into losses.
+    </p>
+
+    <p>
+        <b>Profit.</b> Your profit is calculated by subtracting ordering cost from revenue. Measured in pence (£ 1/100),
+        profit is therefore:
+    </p>
+
+    <ul>
+        If demand is less than ordered units: <strong>4 × [demand] &minus; 2 × [ordered units]</strong><br>
+        If demand is more than ordered units: <strong>4 × [ordered units] &minus; 2 × [ordered units]</strong><br>
+    </ul>
+
+    <p>
+        If lossess occur, these will be subtracted from your baseline reward.
+    </p>
+
+    <p>
+        When you make your decision, you are provided a profit calculator that you can use to calculate the profit for
+        any combination of ordered units and demand.
+    </p>
+
+    <p>
+        <b>Monetary reward.</b> You will be paid the average of the two profits that you get from this part and Part III,
+        where you will be making a decision in a similar situation. For example, if your profit in this part is 90 pence
+        and in Part III, 120 pence, your monetary reward is (0.90 + 1.20)/2 = £1.05. This will be added to your reward from Part I.
+    </p>
+
+    <p>
+        For your convenience, these instructions will remain available to you on all subsequent screens of this part of the study.
+    </p>
+
+</div>

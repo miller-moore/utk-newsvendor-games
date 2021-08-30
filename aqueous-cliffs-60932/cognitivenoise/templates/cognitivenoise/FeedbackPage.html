@@ -1,0 +1,46 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Feedback Page
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Your feed back is invaluable to us</h1>
+
+<br>
+<p>How do you feel about the Part 1 (survey and questions)? Did you have problem understanding the instruction?</p>
+<textarea name="feedback_p1" rows="5" cols="50">
+</textarea>
+
+<br><br>
+<p>How do you feel about the Part 2 (auction)? Did you have problem understanding the instruction?</p>
+<textarea name="feedback_p2" rows="5" cols="50">
+</textarea>
+
+<br><br>
+<p>How do you feel about the Part 3 (binary choices)? Did you have problem understanding the instruction? Were you able to concentrate on the tasks without interruptions? Do you think you will be able to concentrate on the experiment if we increase the trial amount from 100 to 300 (with more breaks)?</p>
+<textarea name="feedback_p3" rows="5" cols="50">
+</textarea>
+
+<br><br>
+<p>Do you have any comment about this experiment in general?</p>
+<textarea name="feedback_general" rows="5" cols="50">
+</textarea>
+
+<br><br>
+<h5>Once again, we trully appreciate your feedback.</h5>
+
+<br><br>
+<button class="btn btn-primary btn-large">
+  Submit your feedback
+</button>
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

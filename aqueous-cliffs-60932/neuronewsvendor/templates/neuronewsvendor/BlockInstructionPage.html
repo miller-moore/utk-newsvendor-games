@@ -1,0 +1,19 @@
+{% extends "neuronewsvendor/Page.html" %}
+{% load staticfiles otree %}
+
+{% block title %}
+    {{ blocktitle }}
+{% endblock %}
+
+{% block content %}
+
+    <div class="instructions well well-lg">
+
+    <p>{{ blockinstruction|safe }} </p>
+
+    </div>
+    <center>
+        {% next_button %}
+    </center>
+
+{% endblock %}

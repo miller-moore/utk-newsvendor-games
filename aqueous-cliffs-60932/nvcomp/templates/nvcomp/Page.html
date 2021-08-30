@@ -1,0 +1,30 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree %}
+
+{% block app_styles %}
+
+<style type="text/css">
+
+p, td, tr {
+ font-size: 14pt;
+}
+
+table.pc tr:hover td {
+ background: #fffccc;
+}
+
+.highlight {
+ background-color: red;
+}
+
+tr.borderbottom td {
+ border-bottom: 1pt solid black;
+}
+
+.otree-timer {
+ display: none;
+}
+
+</style>
+
+{% endblock %}

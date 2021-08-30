@@ -1,0 +1,62 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+Part 1 Section 3
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Part 1 Section 3</h1>
+
+<body onload="setStartTime()">
+
+  <h3>Please rate the following statements</h3>
+
+{% formfield player.NA1 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>UPSET</b>?" %}
+
+{% formfield player.NA2 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>HOSTILE</b>?" %}
+
+{% formfield player.PA1 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>ALERT</b>?" %}
+
+{% formfield player.NA3 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>ASHAMED</b>?" %}
+
+{% formfield player.PA2 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>INSPIRED</b>?" %}
+
+{% formfield player.NA4 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>NERVOUS</b>?" %}
+
+{% formfield player.PA3 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>DETERMINED</b>?" %}
+
+{% formfield player.PA4 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>ATTENTIVE</b>?" %}
+
+{% formfield player.NA5 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>AFRAID</b>?" %}
+
+{% formfield player.PA5 label="Thinking about yourself and how you normally feel, to what extent do you generally feel <b>ACTIVE</b>?" %}
+
+</body>
+
+<button class="btn btn-primary btn-large" onclick="end()">
+  Next
+</button>
+
+<input type="hidden" name="dt_start" id="id_jsdectime_start" value=0>
+<input type="hidden" name="dt_end" id="id_jsdectime_end" value=0>
+
+<script>
+  function setStartTime() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_start').value = d.getTime();
+  }
+  function end() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_end').value = d.getTime();
+  }
+</script>
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

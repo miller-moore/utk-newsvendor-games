@@ -1,0 +1,28 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Supply Chain Contracting Game
+{% endblock %}
+
+{% block content %}
+
+{% include Constants.instructions_template %}
+
+    <br><center>
+    <button class="btn btn-primary btn-large">Start</button>
+    </center>
+
+{% endblock %}
+
+{% block styles %}
+
+<style type="text/css">
+
+body {
+    background-color: #e6f2ff;
+  }
+
+</style>
+
+{% endblock %}

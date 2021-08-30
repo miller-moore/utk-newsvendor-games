@@ -1,0 +1,122 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+    <h3 class="panel-sub-heading">
+        Instructions
+    </h3>
+
+    <p>
+        You again represent a firm that sells products from an inventory to customers.
+        There is also another firm selling almost the same product from its own inventory. We have paired you
+        with a randomly chosen another participant who represents this other firm.
+    </p>
+
+    <p>
+        You will remain anonymous to each other. The decision making situation
+        is identical to both participants and both see the same instructions. You will again make a single decision about
+        an inventory level that will determine your monetary reward.
+    </p>
+
+    <p>
+        <i>
+            If you have any unsatisfied demand, <b>that demand
+            benefits the other firm</b>. Likewise, if the other firm has unsatisfied demand, that demand will flow to your
+            inventory and benefit you. Therefore, any decision that you make may affect the other participant's profit,
+            or any decision that the other participant makes may affect your profit. This is all described below in detail.</i>
+    </p>
+
+    <p>
+        Your <b>order</b> of units to the inventory can be any whole number between 1 and 100.
+    </p>
+    <p>
+        <b>Industry demand</b> is split in half, and each half forms the <b>initial allocation</b> of demand for each firm.
+    </p>
+
+    <p> The industry demand is randomly drawn as an even number between 2 and 200. Each value of industry demand has an
+        equal probability of occurring.
+    </p>
+
+    <p>
+        <b>Important</b>: The industry demand is always split in half to form the initial allocations of the two firms.
+        This means that you and the other firm will always face the same number of customers coming to your inventories.
+        For example, if industry demand is 130 units, initial allocation of demand for each firm is 65 units.
+    </p>
+
+    <p>
+        When a firm's inventory level is below the initial allocation, 80% of the extra demand will flow to the other firm's inventory;
+        this type of demand is called <strong>reallocated demand</strong>. However, a firm's reallocated demand will go to the other firm
+        <i>only if</i> the other firm has a higher inventory level to accommodate the reallocation.
+    </p>
+
+    <p>
+        <b>Effective demand</b> at one inventory will consist of the initial allocation +
+        reallocation from the other inventory. You will know the industry demand and the effective demands of
+        both firms only after both have made the decisions on how much to order.
+    </p>
+
+    <p>
+        <b>Revenue</b>. Your revenue will be determined by how many units you are able to sell to your customers.
+        Your revenue is determined by the effective demand.
+        If the effective demand is higher than your inventory level, then your revenue is determined only by the amount that is
+        in your inventory. If the effective demand is lower than your inventory level, then your revenue is determined only by
+        the amount that is demanded. The customers will pay 4 pence (£ 1/100) per each unit that is sold from the inventory.
+    </p>
+
+    <p>
+        For example, if your inventory level is 40, but your initial demand is 60, then there are 20 customers who will leave
+        your inventory empty handed. 80% of these 20 customers, or 16 customers, will be reallocated to
+        the other firm's inventory if its inventory level is greater than your inventory level of 40. Thus, in this example
+        reallocated demand from your inventory to the other firm's inventory is 16, indicating an effective demand of 60 + 16 = 76
+        at the other firm's inventory.
+    </p>
+
+    <p>
+        Likewise, if there are customers at the other firm's inventory that the other firm cannot satisfy, 80% of them will
+        be reallocated from its inventory to your inventory if your inventory level is higher than that in the other firm's inventory.
+    </p>
+
+    <p>
+        <b>Ordering cost</b>. You will have to pay 2 pence for each unit that you order to the inventory. Note that due
+        to the randomness of demand, it may be that your ordering cost will be higher than your revenue, resulting into losses.
+    </p>
+
+    <p>
+        Your profit, measured in pence (£ 1/100), is therefore:
+    </p>
+
+    <ul>
+        If effective demand is less than ordered units: <b>4 × [effective demand] &minus; 2 × [ordered units]</b><br>
+        If effective demand is more than ordered units: <b>4 × [ordered units] &minus; 2 × [ordered units]</b><br>
+    </ul>
+
+    <p>
+        If your inventory level is greater than the other's inventory level, your effective demand is calculated as:
+    </p>
+
+    <ul>
+        <b>[initial allocation] +  0.8 × [unsatisfied demand at the other firm's inventory]</b>
+    </ul>
+
+    <p>
+        Otherwise your effective demand equals your initial allocation. The calculation of effective demand is identical for the other firm.
+    </p>
+
+    <p>
+        If losses occur, these will be subtracted from your baseline reward.
+    </p>
+
+    <p>
+        When you make your decision, you are provided a profit calculator that you can use to calculate the profit for
+        any combination of ordered units and demand.
+    </p>
+
+    <p>
+        <b>Monetary reward</b>. You will be paid the profit that you get from this decision.
+    </p>
+
+    <p>
+        For your convenience, these instructions will remain available to you on all subsequent screens of this study.
+    </p>
+
+</div>

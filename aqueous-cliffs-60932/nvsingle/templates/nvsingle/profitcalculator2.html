@@ -1,0 +1,145 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+<h3>Profit calculator</h3>
+    <p>
+        <i>
+            Adjust the order level and demand level to see how revenue, cost, and profit changes. Note that in the
+            final decision, demand is given randomly and you only decide order.</i>
+    </p>
+    <center>
+    <table border="1">
+        <tr>
+            <td align="center" valign="middle" rowspan="5" width="200pt">
+                <b>Demand: <span id="dem">50</span></b><br>
+                <input type="range" min="1" max="100" value="50" class="slider" id="demrange"><br>
+                <br>
+
+                <b>Order: <span id="ord"></span></b><br>
+                <input type="range" min="1" max="100" value="50" class="slider" id="ordrange">
+            </td>
+            <td width="170pt">
+                Unsatisfied demand:
+            </td>
+            <td width="50pt" align="center">
+                <span id="unsat">0</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Leftover inventory:
+            </td>
+            <td align="center">
+                <span id="unsold">0</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Revenue:
+            </td>
+            <td align="center">
+                <span id="rev">200</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Cost:
+            </td>
+            <td align="center">
+                <span id="cost">100</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <b>Profit:</b>
+            </td>
+            <td align="center">
+                <b><span id="prof">100</span></b>
+            </td>
+        </tr>
+    </table>
+</center>
+
+
+{% block scripts %}
+<script>
+
+var unsatoutput = document.getElementById("unsat");
+var unsoldoutput = document.getElementById("unsold");
+var revoutput = document.getElementById("rev");
+var costoutput = document.getElementById("cost");
+var profoutput = document.getElementById("prof");
+
+var demslider = document.getElementById("demrange");
+var demoutput = document.getElementById("dem");
+demoutput.innerHTML = demslider.value;
+demslider.oninput = function() {
+    unsoldoutput.innerHTML = Math.max(ordslider.value-this.value,0)
+    unsatoutput.innerHTML = Math.max(this.value-ordslider.value,0)
+    demoutput.innerHTML = this.value;
+    revoutput.innerHTML = 4*Math.min(this.value,ordslider.value);
+    costoutput.innerHTML = 2*ordslider.value;
+    profoutput.innerHTML = 4*Math.min(this.value,ordslider.value)-2*ordslider.value;
+}
+
+var ordslider = document.getElementById("ordrange");
+var ordoutput = document.getElementById("ord");
+ordoutput.innerHTML = ordslider.value;
+ordslider.oninput = function() {
+    unsoldoutput.innerHTML = Math.max(this.value-demslider.value,0)
+    unsatoutput.innerHTML = Math.max(demslider.value-this.value,0)
+    ordoutput.innerHTML = this.value;
+    revoutput.innerHTML = 4*Math.min(demslider.value,this.value);
+    costoutput.innerHTML = 2*this.value;
+    profoutput.innerHTML = 4*Math.min(demslider.value,this.value)-2*this.value;
+}
+
+</script>
+{% endblock %}
+
+</div>
+
+{% block styles %}
+
+<style type="text/css">
+
+.slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: #d3d3d3; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+</style>
+{% endblock %}
+

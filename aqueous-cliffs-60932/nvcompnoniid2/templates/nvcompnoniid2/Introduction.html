@@ -1,0 +1,42 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Introduction
+{% endblock %}
+
+{% block content %}
+
+    <p>
+        You have been invited to participate in this study because you completed a similar study last week and the week
+        before.
+        In the first study on week 1, you were asked to complete three decisions, all of which contributed towards your monetary reward.
+        In the second study on week 2, you completed the final part of week 1's study.
+        In this study, you will be asked to repeat week 2's study again.
+    </p>
+
+    <p>
+        In the previous study, you decided upon an inventory order quantity in a situation that is
+        described in the instructions below. You are free to revise the instructions now.
+    </p>
+
+    <p>
+        Today, we ask you to make that inventory order decision again. You are newly paired with another participant of
+        today's study. All participants that we have invited for today's study took part in last week's study.
+        Your monetary reward today will be the profit (in pence, £1/100) that you make from selling the units that
+        you order to your inventory.
+    </p>
+
+    <p>
+        We again give market information from last week as well as from week 1 to all our participants.
+        On the next page, you will
+        see what were the inventory order quantities of your firm and the firm that you were paired with.
+        You will also see how the inventory order quantities of the other
+        participants were distributed.
+    </p>
+
+    {% next_button %}
+
+    {% include Constants.instructions_template %}
+
+{% endblock %}

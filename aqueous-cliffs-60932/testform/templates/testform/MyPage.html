@@ -1,0 +1,82 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    press left or right arrow
+{% endblock %}
+
+{% block content %}
+
+<body  onload="setStartTime()">
+    <div id="wrapper">
+        <div id="left">
+            left div
+        </div>
+
+        <div id="right">
+            right div
+        </div>
+
+    </div>
+    <input type="hidden" name="choice" id="id_choice" value="nothing">
+    <input type="hidden" name="jsdectime_start" id="id_jsdectime_start" value=0>
+    <input type="hidden" name="jsdectime_end" id="id_jsdectime_end" value=0>
+
+</body>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+    function setStartTime() {
+        var d = new Date();
+        document.getElementById('id_jsdectime_start').value = d.getTime();
+    }
+
+    document.addEventListener('keydown', function(event) {
+        var d = new Date();
+
+        if(event.keyCode === 37) {
+            document.getElementById('id_choice').value = 'left';
+            document.getElementById("right").style.display = "none";
+        }
+        if(event.keyCode === 39) {
+            document.getElementById('id_choice').value = 'right';
+            document.getElementById("left").style.display = "none";
+        }
+        document.getElementById('id_jsdectime_end').value = d.getTime();
+        document.getElementById('form').submit();
+    });
+
+</script>
+
+{% endblock %}
+
+{% block styles %}
+
+<style>
+
+    #left {
+        background-color: red;
+        color: white;
+        padding: 20px;
+        float: left;
+    }
+
+    #right {
+        background-color: green;
+        color: white;
+        padding: 20px;
+        float: left;
+        position: absolute;
+        left: 400px;
+    }
+
+    #wrapper {
+        margin: auto;
+    }
+
+</style>
+
+{% endblock %}

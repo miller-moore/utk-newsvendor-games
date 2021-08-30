@@ -1,0 +1,38 @@
+{% load staticfiles otree_tags %}
+
+<div class="instructions well well-lg">
+
+    <div class="panel-body">
+
+        <h4 class="panel-sub-heading">
+            Wholesaler's parameters
+        </h4>
+
+        <table id="table2">
+            <tr>
+                <td>
+                    Cost per order:
+                </td>
+                <td>
+                    £{{ Constants.wordercost }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Unit inventory holding cost:
+                </td>
+                <td>
+                    £{{ Constants.wholdingcost }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Cost per unit when ordering from the manufacturer:
+                </td>
+                <td>
+                    £{{ Constants.wunitcost }}
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

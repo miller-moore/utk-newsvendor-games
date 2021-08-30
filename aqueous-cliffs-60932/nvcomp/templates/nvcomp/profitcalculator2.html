@@ -1,0 +1,353 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+<h3>Profit calculator</h3>
+    <p>
+        <i>
+            Adjust the order levels of your firm and the other firm and the individual demand levels to see how revenues,
+            costs, and profits change. Note that in the final decision, you only decide your own order after which demands
+            are given randomly.</i>
+    </p>
+<center>
+
+    <table border="1" cellspacing="3">
+
+        <tr>
+            <td rowspan="9" width="250pt" align="center">
+                <b>Own demand: <span id="dem">50</span></b><br>
+                <input type="range" min="1" max="100" value="50" class="slider" id="demrange"><br>
+                <br>
+                <b>Own order: <span id="ord">50</span></b><br>
+                <input type="range" min="1" max="100" value="50" class="slider" id="ordrange"><br>
+                <br>
+                <b>Other's demand: <span id="dem2">50</span></b><br>
+                <input type="range" min="1" max="100" value="50" class="slider" id="dem2range"><br>
+                <br>
+                <b>Other's order: <span id="ord2">50</span></b><br>
+                <input type="range" min="1" max="100" value="50" class="slider" id="ord2range"><br>
+            </td>
+
+            <td>
+                &nbsp;
+            </td>
+            <td width="100pt" align="center">
+                Own firm
+            </td>
+            <td width="100pt" align="center">
+                Other firm
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Initial demand:
+            </td>
+            <td align="center">
+                <span id="indem">50</span>
+            </td>
+            <td align="center">
+                <span id="indem2">50</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Unsatisfied demand:
+            </td>
+            <td align="center">
+                <span id="unsat">0</span>
+            </td>
+            <td align="center">
+                <span id="unsat2">0</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Leftover inventory:
+            </td>
+            <td align="center">
+                <span id="unsold">0</span>
+            </td>
+            <td align="center">
+                <span id="unsold2">0</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Reallocation from other:
+            </td>
+            <td align="center">
+                <span id="overflow">0</span>
+            </td>
+            <td align="center">
+                <span id="overflow2">0</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Effective demand:
+            </td>
+            <td align="center">
+                <span id="effdem">50</span>
+            </td>
+            <td align="center">
+                <span id="effdem2">50</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Revenue:
+            </td>
+            <td align="center">
+                <span id="rev">200</span>
+            </td>
+            <td align="center">
+                <span id="rev2">200</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                Cost:
+            </td>
+            <td align="center">
+                <span id="cost">100</span>
+            </td>
+            <td align="center">
+                <span id="cost2">100</span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <b>Profit:</b>
+            </td>
+            <td align="center">
+                <b><span id="prof">100</span></b>
+            </td>
+            <td align="center">
+                <b><span id="prof2">100</span></b>
+            </td>
+        </tr>
+    </table>
+</center>
+
+
+{% block scripts %}
+<script>
+
+var unsatoutput = document.getElementById("unsat");
+var unsoldoutput = document.getElementById("unsold");
+var overflowoutput = document.getElementById("overflow");
+var effdemoutput = document.getElementById("effdem");
+var revoutput = document.getElementById("rev");
+var costoutput = document.getElementById("cost");
+var profoutput = document.getElementById("prof");
+
+var unsat2output = document.getElementById("unsat2");
+var unsold2output = document.getElementById("unsold2");
+var overflow2output = document.getElementById("overflow2");
+var effdem2output = document.getElementById("effdem2");
+var rev2output = document.getElementById("rev2");
+var cost2output = document.getElementById("cost2");
+var prof2output = document.getElementById("prof2");
+
+var demslider = document.getElementById("demrange");
+var demoutput = document.getElementById("dem");
+var dem2slider = document.getElementById("dem2range");
+var dem2output = document.getElementById("dem2");
+var indemoutput = document.getElementById("indem");
+var indem2output = document.getElementById("indem2");
+var ordslider = document.getElementById("ordrange");
+var ordoutput = document.getElementById("ord");
+var ord2slider = document.getElementById("ord2range");
+var ord2output = document.getElementById("ord2");
+
+demslider.oninput = function() {
+
+    d = Math.round(this.value);
+    d2 = Math.round(dem2slider.value)
+    q1 = Math.round(ordslider.value);
+    q2 = Math.round(ord2slider.value);
+
+    demoutput.innerHTML = d;
+    dem2output.innerHTML = d2;
+    indemoutput.innerHTML = d;
+    indem2output.innerHTML = d2;
+
+    overflow = Math.round(0.8*Math.max(d2 - q2, 0));
+    overflow2 = Math.round(0.8*Math.max(d - q1, 0));
+    efdem = d + overflow;
+    efdem2 = d2 + overflow2;
+
+    overflowoutput.innerHTML = overflow;
+    overflow2output.innerHTML = overflow2;
+    effdemoutput.innerHTML = efdem;
+    effdem2output.innerHTML = efdem2;
+
+    unsoldoutput.innerHTML = Math.max(q1 - d, 0)
+    unsatoutput.innerHTML = Math.max(d - q1, 0)
+    unsold2output.innerHTML = Math.max(q2 - d2, 0)
+    unsat2output.innerHTML = Math.max(d2 - q2, 0)
+
+    revoutput.innerHTML = 4*Math.min(efdem, q1);
+    costoutput.innerHTML = 2*q1;
+    profoutput.innerHTML = 4*Math.min(efdem, q1) - 2*q1;
+
+    rev2output.innerHTML = 4*Math.min(efdem2, q2);
+    cost2output.innerHTML = 2*q2;
+    prof2output.innerHTML = 4*Math.min(efdem2, q2) - 2*q2;
+}
+
+dem2slider.oninput = function() {
+
+    d = Math.round(demslider.value);
+    d2 = Math.round(this.value)
+    q1 = Math.round(ordslider.value);
+    q2 = Math.round(ord2slider.value);
+
+    demoutput.innerHTML = d;
+    dem2output.innerHTML = d2;
+    indemoutput.innerHTML = d;
+    indem2output.innerHTML = d2;
+
+    overflow = Math.round(0.8*Math.max(d2 - q2, 0));
+    overflow2 = Math.round(0.8*Math.max(d - q1, 0));
+    efdem = d + overflow;
+    efdem2 = d2 + overflow2;
+
+    overflowoutput.innerHTML = overflow;
+    overflow2output.innerHTML = overflow2;
+    effdemoutput.innerHTML = efdem;
+    effdem2output.innerHTML = efdem2;
+
+    unsoldoutput.innerHTML = Math.max(q1 - d, 0)
+    unsatoutput.innerHTML = Math.max(d - q1, 0)
+    unsold2output.innerHTML = Math.max(q2 - d2, 0)
+    unsat2output.innerHTML = Math.max(d2 - q2, 0)
+
+    revoutput.innerHTML = 4*Math.min(efdem, q1);
+    costoutput.innerHTML = 2*q1;
+    profoutput.innerHTML = 4*Math.min(efdem, q1) - 2*q1;
+
+    rev2output.innerHTML = 4*Math.min(efdem2, q2);
+    cost2output.innerHTML = 2*q2;
+    prof2output.innerHTML = 4*Math.min(efdem2, q2) - 2*q2;
+}
+
+ordslider.oninput = function() {
+
+    d = Math.round(demslider.value);
+    d2 = Math.round(dem2slider.value)
+    q1 = Math.round(this.value);
+    q2 = Math.round(ord2slider.value);
+
+    ordoutput.innerHTML = q1;
+
+    overflow = Math.round(0.8*Math.max(d2 - q2, 0));
+    overflow2 = Math.round(0.8*Math.max(d - q1, 0));
+    efdem = d + overflow;
+    efdem2 = d2 + overflow2;
+
+    overflowoutput.innerHTML = overflow;
+    overflow2output.innerHTML = overflow2;
+    effdemoutput.innerHTML = efdem;
+    effdem2output.innerHTML = efdem2;
+
+    unsoldoutput.innerHTML = Math.max(q1 - d, 0);
+    unsatoutput.innerHTML = Math.max(d - q1, 0);
+    unsold2output.innerHTML = Math.max(q2 - d2, 0);
+    unsat2output.innerHTML = Math.max(d2 - q2, 0);
+
+    revoutput.innerHTML = 4*Math.min(efdem, q1);
+    costoutput.innerHTML = 2*q1;
+    profoutput.innerHTML = 4*Math.min(efdem, q1) - 2*q1;
+
+    rev2output.innerHTML = 4*Math.min(efdem2, q2);
+    cost2output.innerHTML = 2*q2;
+    prof2output.innerHTML = 4*Math.min(efdem2, q2) - 2*q2;
+
+}
+
+ord2slider.oninput = function() {
+
+    d = Math.round(demslider.value);
+    d2 = Math.round(dem2slider.value)
+    q1 = Math.round(ordslider.value);
+    q2 = Math.round(this.value);
+
+    ord2output.innerHTML = q2;
+
+    overflow = Math.round(0.8*Math.max(d2 - q2, 0));
+    overflow2 = Math.round(0.8*Math.max(d - q1, 0));
+    efdem = d + overflow;
+    efdem2 = d2 + overflow2;
+
+    overflowoutput.innerHTML = overflow;
+    overflow2output.innerHTML = overflow2;
+    effdemoutput.innerHTML = efdem;
+    effdem2output.innerHTML = efdem2;
+
+    unsoldoutput.innerHTML = Math.max(q1 - d, 0);
+    unsatoutput.innerHTML = Math.max(d - q1, 0);
+    unsold2output.innerHTML = Math.max(q2 - d2, 0);
+    unsat2output.innerHTML = Math.max(d2 - q2, 0);
+
+    revoutput.innerHTML = 4*Math.min(efdem, q1);
+    costoutput.innerHTML = 2*q1;
+    profoutput.innerHTML = 4*Math.min(efdem, q1) - 2*q1;
+
+    rev2output.innerHTML = 4*Math.min(efdem2, q2);
+    cost2output.innerHTML = 2*q2;
+    prof2output.innerHTML = 4*Math.min(efdem2, q2) - 2*q2;
+
+}
+
+</script>
+{% endblock %}
+
+</div>
+
+
+{% block styles %}
+
+<style type="text/css">
+
+.slider {
+    -webkit-appearance: none;  /* Override default CSS styles */
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: #d3d3d3; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+    width: 25px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+</style>
+{% endblock %}

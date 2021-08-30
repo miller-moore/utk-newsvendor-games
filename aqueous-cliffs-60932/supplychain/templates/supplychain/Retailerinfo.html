@@ -1,0 +1,86 @@
+{% load staticfiles otree_tags %}
+
+<div class="instructions well well-lg">
+
+    <div class="panel-body">
+
+        <h4 class="panel-sub-heading">
+            Retailer's parameters
+        </h4>
+
+        <table id="table1">
+            <tr>
+                <td>
+
+                </td>
+                <td>
+                    May
+                </td>
+                <td>
+                    June
+                </td>
+                <td>
+                    July
+                </td>
+                <td>
+                    August
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Demand:
+                </td>
+                <td>
+                    {{ demand.0 }}
+                </td>
+                <td>
+                    {{ demand.1 }}
+                </td>
+                <td>
+                    {{ demand.2 }}
+                </td>
+                <td>
+                    {{ demand.3 }}
+                </td>
+            </tr>
+        </table>
+        <br>
+        <p>
+            The above quantities are the Retailer's maximum sales quantities.
+        </p>
+        <table id="table2">
+            <tr>
+                <td>
+                    Cost per order:
+                </td>
+                <td>
+                    £{{ Constants.rordercost }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Unit inventory holding cost:
+                </td>
+                <td>
+                    £{{ Constants.rholdingcost }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Selling price to end customers:
+                </td>
+                <td>
+                    £{{ Constants.rprice }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Salvage price:
+                </td>
+                <td>
+                    £{{ Constants.salvageprice }}
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+{% extends "neuronewsvendor/Page.html" %}
+{% load staticfiles otree %}
+
+{% block title %}
+    {{ blockk }} block results
+{% endblock %}
+
+{% block content %}
+
+<p>Your performance during the previous block is shown in the table below.</p>
+
+<center>
+
+    <table width=300 border="1">
+        <tr valign="bottom" align="center">
+            <th>Block<br>type</th><th>Round</th><th>Order<br>quantity</th><th>Customer<br>demand</th><th>Profit</th>
+        </tr>
+        {% for p in player_in_previous_5rounds %}
+            <tr align="center">
+                <td>{{ p.block }}</td>
+                <td>{{ p.round_number }}</td>
+                <td>{{ p.trueorderquantity }}</td>
+                <td>{{ p.demand }}</td>
+                <td>{{ p.payoff|floatformat:0 }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+<br>
+<br>
+    {% next_button %}
+</center>
+
+{% endblock %}

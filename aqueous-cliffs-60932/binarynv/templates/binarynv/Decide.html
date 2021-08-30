@@ -1,0 +1,267 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+
+    Round {{ round }}
+
+    {% if nvframe == 'yes' %}
+        {% if margin == 'high' %}
+            (low cost product)
+        {% else %}
+            (high cost product)
+        {% endif %}
+    {% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <br><br><br>
+
+    <div id="wrapper" align="center">
+
+        <div id="circle"></div>
+
+    </div>
+    <br>
+    <div id="buttondiv" align="center">
+        <input type="hidden" name="q" id="hiddeninput">
+        <input type="hidden" name="jsdectime_start" id="id_jsdectime_start" value=0>
+        <input type="hidden" name="jsdectime_end" id="id_jsdectime_end" value=0>
+        <button type="submit" id="opt" class="btn btn-primary btn-large">OPT</button>&nbsp;&nbsp;&nbsp;
+        <button type="submit" id="mean" class="btn btn-primary btn-large">MEAN</button>
+        {% comment %}
+        <button class="btn btn-primary btn-large">Ready</button>
+        {% endcomment %}
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+function setStartTime() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_start').value = d.getTime();
+}
+
+var optb = document.querySelector('#opt');
+var meanb = document.querySelector('#mean');
+var divi = document.getElementById('circle');
+
+let fopt = function() {
+    divi.style.width = {{ optq }} + "px";
+    divi.style.height = {{ optq }} + "px";
+    divi.style.background = "blue";
+    var elmnt = document.getElementById('circle');
+    document.getElementById("hiddeninput").value = elmnt.clientHeight;
+    document.getElementById('id_jsdectime_end').value = d.getTime();
+}
+
+let fmean = function() {
+    divi.style.width = 150 + "px";
+    divi.style.height = 150 + "px";
+    divi.style.background = "blue";
+    var elmnt = document.getElementById('circle');
+    document.getElementById("hiddeninput").value = elmnt.clientHeight;
+    document.getElementById('id_jsdectime_end').value = d.getTime();
+}
+
+optb.addEventListener("click", fopt);
+meanb.addEventListener("click", fmean);
+
+</script>
+
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+
+    .instr {
+        background-color: #ddd;
+        padding: 10px;
+    }
+
+    body {
+        background-color: #ddffbf;
+      }
+
+    .page-header {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding-top: 0px;
+    }
+
+    #wrapper {
+        height: 306px;
+        width: 306px;
+        align-items: center;
+        position: relative;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+    }
+
+    #circle {
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        background: white;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.5;
+    }
+
+    #buttondiv {
+        width: 300px;
+        align-items: center;
+        position: relative;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    #topid { height: 50px; width: 100%; text-align: center; }
+
+    .slider {
+        -webkit-user-select: none; /* prevents copying the button when pressed long */
+        -webkit-appearance: none;  /* Override default CSS styles */
+        appearance: none;
+        width: 100%;
+        height: 25px; /* Specified height */
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    .slider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .slider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: #4CAF50; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+
+
+
+
+
+
+    #bigwrapper { display: table-row; }
+    #pcleft { display: table-cell; }
+    #pccenter { display: table-cell; }
+    #pcright { display: table-cell; }
+
+    #pcwrapper {
+        height: 156px;
+        width: 156px;
+        align-items: center;
+        position: absolute;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #pccircle {
+        border-radius: 50%;
+        width: 1px;
+        height: 1px;
+        background-color: blue;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    #pcdemwrapper {
+        height: 156px;
+        width: 156px;
+        align-items: center;
+        position: relative;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+        opacity: 0.5;
+    }
+
+    #pcdemcircle {
+        border-radius: 50%;
+        width: 1px;
+        height: 1px;
+        background-color: red;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .pcslider, .pcdemslider {
+        -webkit-appearance: none;  /* Override default CSS styles */
+        appearance: none;
+        width: 300px; /* Full-width */
+        height: 25px; /* Specified height */
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    .pcslider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    .pcslider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcslider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcdemslider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: red; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcdemslider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: red; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+</style>
+{% endblock %}

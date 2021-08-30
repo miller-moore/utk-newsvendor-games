@@ -1,0 +1,187 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Decision Page
+{% endblock %}
+
+{% block content %}
+
+<body>
+  <br><br>
+
+  <section>
+    <article class="box_left" id="option_left">
+
+      <div class="gamble_div_left">
+        <p class = "gamble_txt">
+          {% if display == 1 %}
+            {{ gain }}
+          {% else %}
+            {{ loss }}
+          {% endif %}
+        </p>
+      </div>
+
+    </article>
+
+    <article class="box_middle">
+      {% if accept == 1 %}
+      <div class="accept_div" id="accept_div">
+        <p class = "accept_txt"> O </p>
+      </div>
+      {% else %}
+      <div class="reject_div" id="reject_div">
+        <p class = "reject_txt"> X </p>
+        <!-- <p class = "reject_txt"> &#x2715; </p> -->
+      </div>
+      {% endif %}
+
+    </article>
+
+    <article class="box_right" id="option_right">
+
+      <div class="gamble_div_right">
+        <p class = "gamble_txt">
+          {% if display == 1 %}
+            {{ loss }}
+          {% else %}
+            {{ gain }}
+          {% endif %}
+        </p>
+      </div>
+
+    </article>
+
+  </section>
+
+  <!-- This is just to push away the debug table, should be commented off in actual deploy -->
+  <!-- <div style="height: 600px;">
+  </div> -->
+
+</body>
+
+<!-- <br><br>
+<center class="instruction">Press Up Arrow to accept the gamble. Press Down Arrow to reject the gamble.</center> -->
+
+
+{% endblock %}
+
+
+{% block styles %}
+<style type="text/css">
+
+  .otree-title {
+    font-size: 0;
+  }
+
+  body {
+    background-color: black;
+    overflow: hidden; /* Hide scrollbars */
+  }
+
+  /* Clear floats after the columns */
+  section:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  p {
+    color: white;
+  }
+
+  article {
+    padding: 20px;
+    vertical-align: middle;
+    height: 450px;
+    background-color: black;
+
+    /* the transparent border is not necessary in the current study */
+    /* box-sizing: border-box;
+    border: 5px solid transparent; */
+  }
+
+  .box_left {
+    float: left;
+    width: 40%;
+
+    /* background-color: red; */
+  }
+
+  .box_right {
+    float: right;
+    width: 40%;
+
+    /* background-color: blue; */
+  }
+
+  .box_middle {
+    float: left;
+    width: 20%;
+
+    /* background-color: yellow; */
+  }
+
+  .gamble_div_left {
+    text-align: right;
+    margin: 0 auto;
+  }
+
+  .gamble_div_right {
+    text-align: left;
+    margin: 0 auto;
+  }
+
+  .accept_div {
+    text-align: center;
+    margin: 0 auto;
+
+    /* display: none; */
+  }
+
+  .reject_div {
+    text-align: center;
+    margin: 0 auto;
+
+    /* display: none; */
+  }
+
+  .gamble_txt {
+    /* font-family: "Times New Roman", Times, serif; */
+    font-weight: 300;
+    font-size: 120px;
+    position: relative;
+    top: 110px;
+  }
+
+  .accept_txt {
+    /* color: Chartreuse; */
+    color: LawnGreen;
+    font-weight: 300;
+    font-size: 120px;
+    position: relative;
+    top: 110px;
+  }
+
+  .reject_txt {
+    color: red;
+    font-weight: 300;
+    font-size: 120px;
+    position: relative;
+    top: 110px;
+  }
+
+  .instruction {
+    color: darkgray;
+    font-weight: normal;
+    font-size: 20px;
+  }
+
+  .otree-timer {
+    display: none;
+  }
+
+</style>
+
+{% endblock %}

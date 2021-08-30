@@ -1,0 +1,74 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Thanks
+{% endblock %}
+
+{% block content %}
+
+    <p>{{ beforetext }} {{ correct }}</p>
+
+    <p>Your points are {{ points }}/10.</p>
+
+    <center>
+        <button class="btn btn-primary btn-large">Play again</button>
+        <button class="btn btn-primary btn-large" type="button" onclick="location.href='http://tiny.cc/bachallenges';">Start over</button>
+    </center>
+
+    <br>
+    <div id="wrapper">
+        <div id="info">
+            <p>
+                This challenge is an example of an <b>assignment problem</b>, a common problem class in combinatorial optimisation.
+                Companies face assignment problems when they need to match workers with jobs, machines with orders, contracts with bidders, or drivers with passengers.
+            </p>
+            <p>
+                And of course, online dating apps develop sophisticated algorithms that match people together romantically. These algorithms are based on the assignment problem, and also utilise such techniques as machine learning to predict the success of the match.
+            </p>
+            <p>
+                Analytics is beneficial in the assignment problem, because we can describe the problem in a precise fashion and solve it using computational methods.
+                Small-scale assignment problems can be solved using spreadsheet software (such as MS Excel), but sometimes there are thousands of possible pairings, which makes it computationally challenging to find feasible solutions.
+            </p>
+            <p>
+                National railway companies, for example, have hundreds of employees working in trains and it is challenging to find an optimal rostering given that the trains constantly change locations. Analytics can help with that.
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block styles %}
+
+    <style type="text/css">
+        .btn {
+            background-color: #679b9b;
+            border: #679b9b;
+        }
+
+        body {
+            background-color: #ffcbcb;
+            width: 100%;
+            height: 100%;
+        }
+
+        .page-header {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding-top: 0px;
+        }
+
+        #wrapper {
+            height: 345px;
+        }
+
+        #info {
+            border-radius: 25px;
+            max-height: 100%;
+            overflow: auto;
+            background-color: #aacfcf;
+            padding: 15px;
+        }
+
+    </style>
+
+{% endblock %}

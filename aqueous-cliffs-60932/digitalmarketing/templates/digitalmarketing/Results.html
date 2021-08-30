@@ -1,0 +1,15 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Thanks
+{% endblock %}
+
+{% block content %}
+    <p>You chose to send the shoes to {{ player.shoes }} and the handbag to {{ player.handbag }}. Total costs from
+        your marketing campaign are {{ points }}.</p>
+
+    <p>Play again by clicking the button below.</p>
+    {% next_button %}
+
+{% endblock %}

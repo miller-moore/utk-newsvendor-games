@@ -1,0 +1,174 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Part 3: Instructions
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Part 3: Instructions</h1>
+
+<body>
+  <article>
+    <h4>Binary Choices and Your Payment:</h4>
+    <p>In the following part, you are asked to make investment decisions based on binary choices. As in Part 2, you are allocated a fund of {{endowment}} (= {{pound}}). In total, 216 trials will be presented to you, each of them represents a trade opportunity. Completing all trials on average takes about 20 to 30 minutes, but you can spend as much time as you want to make decisions.</p>
+
+    <p>As is shown in the figure below, in each trial, you will see a lottery and a monetary amount. You are asked to decide whether to trade the monetary amount from the fund assigned to you for a lottery, of which the reward can potentially make you earn more. If you feel the lottery is more attractive, you can approve this trade by choosing the lottery. Otherwise, If you prefer to keep the money, you can give up the trade opportunity by choosing the monetary amount.</p>
+
+    <p>After completing this section, one random trial will be selected to count. If you chose the lottery in that trial, the monetary amount in the same trial will be deducted from your fund, but you will also receive the outcome of the lottery. On the other hand, if you chose the money, you will keep the entire {{endowment}} and leave without a lottery.</p>
+
+  </article>
+
+  <article class="figure">
+    <!-- <h5>Figure 3:</h5> -->
+    <br>
+    <div class="background">
+      <!-- lottery shown on the right hand side -->
+      <section>
+        <article class="binary">
+
+          <div class="certainty_div">
+            <p class = "certainty_txt">{{ certainty }}</p>
+
+          </div>
+
+        </article>
+
+        <article class="binary">
+          <div class="risk_up_div" style="height: {{ risk_up_px }};">
+            <p class="risk_up_txt">{{ risk_up }}</p>
+          </div>
+          <div class="risk_down_div"  style="height: {{ risk_down_px }};">
+            <p class="risk_down_txt">{{ risk_down }}</p>
+          </div>
+          <div class="reward_div">
+            <p class="reward_txt">{{ reward }}</p>
+          </div>
+
+        </article>
+      </section>
+    </div>
+  </article>
+
+  <article class="text">
+    <h4>Further Instructions:</h4>
+
+    <p>To make the choice between the lottery and the monetary amount, <b>you can and can only use the left key (&#8592) and the right key (&#8594) on your keyboard,</b> they are located on the bottom-right of a standard keyboard. You can keep your right hand near the arrow keys at all times during this Part, to make it easier.</p>
+
+    <p>To note, the side of display in which each of these two items will appear on the screen will vary from trial to trial. So, in each trial you need to observe their locations and use the correct key to make selection. </p>
+
+    <p>When the choice trials start, we would like to ask you to maximise your browser and concentrate on making investment choices without interruptions. You will have opportunity to take two breaks after the trial 72 and 144.</p>
+
+    <p>Before starting the actual trials, we prepared a short practice session for you to be familiar with the mechanism in this section. This practice session only has six trials, including a rest point in the middle. The practice trials will NOT count for payment.</p>
+
+    <!-- <p>Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test Test.</p> -->
+
+    <br>
+    <button class="btn btn-primary btn-large">
+      Start the practice session
+    </button>
+
+  </article>
+
+</body>
+
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+
+  .otree-title {
+    font-size: 0;
+  }
+
+  h4 {
+    text-decoration: underline;
+  }
+
+  .figure {
+    float: right;
+    width: 60%;
+    padding: 20px;
+    /* height: 300px; */
+  }
+
+  .text {
+    width: 100%;
+  }
+
+  .binary {
+    float: left;
+    width: 50%;
+    background-color: black;
+    padding: 20px;
+    vertical-align: middle;
+    height: 410px;
+    box-sizing: border-box;
+    border: 5px solid transparent;
+  }
+
+  /* Clear floats after the columns */
+  section:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  section p {
+    color: white;
+  }
+
+  .risk_up_div {
+    width: 100px;
+    background: red;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .risk_up_txt {
+    font-size: 25px;
+    position: relative;
+    top: {{risk_up_posi}};
+  }
+
+  .risk_down_div {
+    width: 100px;
+    background: blue;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .risk_down_txt {
+    font-size: 25px;
+    position: relative;
+    top: {{risk_down_posi}};
+  }
+
+  .reward_div {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .reward_txt {
+    font-weight: normal;
+    font-size: 40px;
+  }
+
+  .certainty_div {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .certainty_txt {
+    /* font-family: "Times New Roman", Times, serif;
+    font-weight: normal;
+    font-size: 90px; */
+    font-weight: 300;
+    font-size: 85px;
+    position: relative;
+    top: 120px;
+  }
+
+
+</style>
+{% endblock %}

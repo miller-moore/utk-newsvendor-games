@@ -1,0 +1,25 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+Questionnaire
+{% endblock %}
+
+{% block content %}
+
+<p>Please answer the following questions.</p>
+
+{% formfield player.q1 with label="I control my emotions by changing the way I think about the situation I'm in." %}
+{% formfield player.q2 with label="When I want to feel less negative emotion, I change the way I'm thinking about the situation." %}
+{% formfield player.q3 with label="When I want to feel more positive emotion, I change the way I'm thinking about the situation." %}
+{% formfield player.q4 with label="When I want to feel more positive emotion (such as joy or amusement), I change what I'm thinking about." %}
+{% formfield player.q5 with label="When I want to feel less negative emotion (such as sadness or anger), I change what I'm thinking about." %}
+{% formfield player.q6 with label="When I'm faced with a stressful situation, I make myself think about it in a way that helps me stay calm." %}
+{% formfield player.q7 with label="I control my emotions by not expressing them." %}
+{% formfield player.q8 with label="When I am feeling negative emotions, I make sure not to express them." %}
+{% formfield player.q9 with label="I keep my emotions to myself." %}
+{% formfield player.q10 with label="When I am feeling positive emotions, I am careful not to express them." %}
+
+{% next_button %}
+
+{% endblock %}

@@ -1,0 +1,258 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Practice Trials
+{% endblock %}
+
+{% block content %}
+
+<body onload="setStartTime()">
+  <!-- <br><br> -->
+  <h2 style="color: white;" >[Practice Session]</h2>
+
+  <section>
+    <article class="box_left" id="option_left">
+
+      <div class="gamble_div_left">
+        <p class = "gamble_txt">
+          {% if display == 1 %}
+            {{ gain }}
+          {% else %}
+            {{ loss }}
+          {% endif %}
+        </p>
+      </div>
+
+    </article>
+
+    <article class="box_middle">
+
+      <div class="accept_div" id="accept_div">
+        <p class = "accept_txt"> O </p>
+      </div>
+
+      <div class="reject_div" id="reject_div">
+        <p class = "reject_txt"> X </p>
+        <!-- <p class = "reject_txt"> &#x2715; </p> -->
+      </div>
+
+    </article>
+
+    <article class="box_right" id="option_right">
+
+      <div class="gamble_div_right">
+        <p class = "gamble_txt">
+          {% if display == 1 %}
+            {{ loss }}
+          {% else %}
+            {{ gain }}
+          {% endif %}
+        </p>
+      </div>
+
+    </article>
+
+  </section>
+
+  <!-- This is just to push away the debug table, should be commented off in actual deploy -->
+  <!-- <div style="height: 600px;">
+  </div> -->
+
+  <div style="font-size: 20px;">
+    <br>
+    <p>In this trial, you need to decide whether to accept a gamble with 50 percent chance of winning {{gain_txt}} points and 50 percent chance of losing {{loss_txt}} points.<br>– You can press the Up Arrow to accept the gamble, a green circle <font color = 'LawnGreen'><b>O</b></font> will appear to confirm the acceptence.<br>– You can press the Down Arrow to reject the gamble, a red cross <font color = 'red'><b>X</b></font> will appear to confirm the rejection.</p>
+
+    <p>[This instruction will not be shown in the actual trials]</p>
+  </div>
+
+</body>
+
+<!-- <br><br>
+<center class="instruction">Press Up Arrow to accept the gamble. Press Down Arrow to reject the gamble.</center> -->
+
+<input type="hidden" name="accept" id="id_accept" value='nothing'>
+<input type="hidden" name="jsdectime_start" id="id_jsdectime_start" value=0>
+<input type="hidden" name="jsdectime_end" id="id_jsdectime_end" value=0>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+  // record the starting time
+  function setStartTime() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_start').value = d.getTime();
+  }
+
+  // disable the default functions of the arrows and space
+  // the standard code (For most browsers):
+  window.addEventListener("keydown", function(e) {
+      if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+          e.preventDefault();
+      }
+  }, false);
+
+  // // Deprecated code! (to support older browsers such as the IE)
+  // window.addEventListener("keydown", function(e) {
+  //     // space and arrow keys
+  //     if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+  //         e.preventDefault();
+  //     }
+  // }, false);
+
+
+  // record choice and end time, show confirmation sign and submit the form
+  var down = false;
+  document.addEventListener('keydown', function(event) {
+
+    var d = new Date();
+
+    if(event.keyCode === 38) {
+      document.getElementById('id_accept').value = 1;
+      document.getElementById('id_jsdectime_end').value = d.getTime();
+
+      if(down) return;
+      down = true;
+
+      var x = document.getElementById("accept_div");
+      x.style.display = "block";
+
+      document.getElementById('form').submit();
+    }
+
+    if(event.keyCode === 40) {
+      document.getElementById('id_accept').value = 0;
+      document.getElementById('id_jsdectime_end').value = d.getTime();
+
+      if(down) return;
+      down = true;
+
+      var x = document.getElementById("reject_div");
+      x.style.display = "block";
+
+      document.getElementById('form').submit();
+    }
+
+  }, false);
+
+</script>
+
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+
+  .otree-title {
+    font-size: 0;
+  }
+
+  body {
+    background-color: black;
+    /* overflow: hidden;  */
+    /* Activate the line above to hide scrollbars */
+  }
+
+  /* Clear floats after the columns */
+  section:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  p {
+    color: white;
+  }
+
+  article {
+    padding: 20px;
+    vertical-align: middle;
+    height: 350px;
+    background-color: black;
+
+    /* the transparent border is not necessary in the current study */
+    /* box-sizing: border-box;
+    border: 5px solid transparent; */
+  }
+
+  .box_left {
+    float: left;
+    width: 40%;
+
+    /* background-color: red; */
+  }
+
+  .box_right {
+    float: right;
+    width: 40%;
+
+    /* background-color: blue; */
+  }
+
+  .box_middle {
+    float: left;
+    width: 20%;
+
+    /* background-color: yellow; */
+  }
+
+  .gamble_div_left {
+    text-align: right;
+    margin: 0 auto;
+  }
+
+  .gamble_div_right {
+    text-align: left;
+    margin: 0 auto;
+  }
+
+  .accept_div {
+    text-align: center;
+    margin: 0 auto;
+
+    display: none;
+  }
+
+  .reject_div {
+    text-align: center;
+    margin: 0 auto;
+
+    display: none;
+  }
+
+  .gamble_txt {
+    /* font-family: "Times New Roman", Times, serif; */
+    font-weight: 300;
+    font-size: 120px;
+    position: relative;
+    top: 110px;
+  }
+
+  .accept_txt {
+    /* color: Chartreuse; */
+    color: LawnGreen;
+    font-weight: 300;
+    font-size: 120px;
+    position: relative;
+    top: 110px;
+  }
+
+  .reject_txt {
+    color: red;
+    font-weight: 300;
+    font-size: 120px;
+    position: relative;
+    top: 110px;
+  }
+
+  .instruction {
+    color: darkgray;
+    font-weight: normal;
+    font-size: 20px;
+  }
+
+</style>
+
+{% endblock %}

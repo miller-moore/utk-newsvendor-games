@@ -1,0 +1,17 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Contribute (round {{ group.round_number }})
+{% endblock %}
+
+{% block content %}
+
+    <p>How much will you contribute to the project (from 0 to 100)?</p>
+    {% formfield player.contribution %}
+
+    {% next_button %}
+
+    {% include Constants.instructions_template %}
+
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+Instructions
+{% endblock %}
+
+{% block content %}
+
+<p>This is a simple survey on the use of causal maps. We will show you parts of a causal map that we have created using other experimental subjects and then ask you questions about the map.
+Please read the instructions on this page carefully. You will be rewarded according to your performance in the task in the manner described in this page. The task will start from the next page.</p>
+
+<h3>Background</h3>
+
+<p>A causal map is a visualisation tool that is typically used to assist managers wishing to explore an issue or take a decision. A causal map consists of several statements representing means or ends, and links that connect the statements together. The direction of a link is always from means to ends. Below is an example of two statements and a link. </p><br>
+
+<center>
+<table style="color:#0000cc" border=0 width="400px">
+    <td align="center"><b>increase spending</b></td><td  align="center" style="font-size:22px">&rarr;</td><td align="center"><b>provide high quality services</b></td>
+</table>
+</center>
+
+<br>
+<p>You can see from the example above how the link establishes a causal relationship between a mean and an end. At the bottom of the link is the mean, "increase spending", that contributes towards the fulfilment of the end, "provide high quality services".
+Statements can also be combined to form networks of several statements and links. Below is an example of how one end can be fulfilled by two means.</p>
+<br>
+<center>
+<table style="color:#0000cc" border=0 width="400px">
+    <tr>
+    <td align="center"><b>increase spending</b></td><td align="center" style="font-size:22px">&rarr;</td><td align="center"><b>provide high quality services</b></td>
+    </tr>
+    <tr>
+    <td align="center"> </td><td> </td><td align="center" style="font-size:22px">&uarr;</td>
+    </tr>
+    <tr>
+    <td align="center"> </td><td> </td><td align="center"><b>hire competent people</b></td>
+    </tr>
+</table>
+</center>
+<br>
+<p>In other words, providing high quality services can be accomplished either by increasing spending or by hiring competent people. We could also have one mean leading to two different ends, as in the example below.</p>
+<br>
+<center>
+<table style="color:#0000cc" border=0 width="400px">
+    <tr>
+    <td align="center"><b>increase spending</b></td><td align="center" style="font-size:22px">&rarr;</td><td align="center"><b>provide high quality services</b></td>
+    </tr>
+    <tr>
+    <td align="center" style="font-size:22px">&darr;</td><td> </td><td> </td>
+    </tr>
+    <tr>
+    <td align="center"><b>pay more bonuses</b></td><td> </td><td> </td>
+    </tr>
+</table>
+</center>
+<br>
+
+<p>And below is an example of how means and ends can be chained together.</p>
+<br>
+<center>
+<table style="color:#0000cc" border=0 width="600px">
+<td align="center"><b>increase spending</b></td><td align="center" style="font-size:22px">&rarr;</td><td align="center"><b>expand service capacity</b></td><td align="center" style="font-size:22px">&rarr;</td><td align="center"><b>provide high quality services</b></td>
+</table>
+</center>
+<br>
+<p>In this chain of statements, expanding service capacity is an intermediate step to providing high quality.</p>
+<p>A complete causal map might look like the one shown below.</p>
+<center>
+<img src="{% static "linkstudy/schematicmap.png" %}"/>
+</center>
+
+<h3>How causal maps are created</h3>
+
+<p>Typically causal maps are created in a workshop that consists of two steps. In the first step the participants are asked to enter statements using post-it notes or networked computers in a brainstorming fashion. In the second step they are asked to create links between the statements created by themselves and others.</p>
+
+<p>While the first step is crucial for the final causal map to be as comprehensive as possible, the second step is likewise crucial to know which ends can actually be accomplished by which means. In our research we are interested in this second step and therefore ask for your help.</p>
+
+<h3>Your task</h3>
+
+<p>We have created a causal map in a workshop that took place at a university in the midlands region of the UK. The participants in the workshop consisted of doctoral research students and masters students, and their task was to brainstorm issues that the university should focus on in order to provide the students with the best overall academic and life experience.</p>
+
+<p>In the page that follows we will show you parts of the causal map that we created in the workshop. We will then ask you to state whether the means-ends relationships are correct. This is Part 1 of the study. In Part 2 we will ask you to choose between several competing means or ends according to your own personal preference.</p>
+
+<p>After you have completed Part 2, you will move to Part 3 where you will fill a survey that is not related to mapping but that explores your decision making style. After completing Part 3 you are asked to move back to Prolific Academic to receive your reward.</p>
+
+<h3>Reward</h3>
+
+<p>Your reward will be determined in the following fashion. There are in total 21 questions in Part 1 and for each correct answer you will receive £0.20 (or 20 pence) that will be added to your baseline reward. There are 6 questions in Part 2 and for each answer you will likewise receive £0.20. From completing Part 3 you will receive £3. For example, if you get 15 correct answers in Part 1 and complete Part 2, you will receive a total reward of £3 + £1.20 + £3 = £7.20. The maximum possible reward from the study is £8.40.</p>
+
+<br>
+
+<center>{% next_button %}</center>
+
+
+{% endblock %}

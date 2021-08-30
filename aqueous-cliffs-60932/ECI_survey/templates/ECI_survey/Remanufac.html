@@ -1,0 +1,94 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+Part 1 Section 2
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Part 1 Section 2</h1>
+
+<body onload="setStartTime()">
+
+  <p>In the following queries, you will be asked to answer questions about your perceptions and reactions toward <b>remanufactured products</b>. When considering the product, imagine yourself buying the product for your own use.</p>
+
+  <p>Before we continue, we want to give you some basic information about the nature of remanufactured products.</p>
+
+  <p>A remanufactured/refurbished product is a product that has been returned to the manufacturer for a variety of reasons. For example, a consumer might find a defect requiring return of the product, or the consumer might simply change his/her mind about owning the product. In other cases, retailers simply return unsold products to the manufacturer. Whatever the reason for the return, the manufacturer must remanufacture the product by testing and ensuring that the product is still fully functional. After a product is refurbished by the original equipment manufacturer, the manufacturer offers the product for sale as a "remanufactured" product. The remanufactured product often carries the same warranty as a new product and the warranty is offered by the original equipment manufacturer.</p>
+
+  <h3>Questions</h3>
+
+  <center>
+    <table>
+      <tr>
+        <td><img src="https://images.macrumors.com/article-new/2019/10/iphone12-lineup-wide.jpg" width="400px"></td>
+        <td>
+          <b>Apple iPhone 12 - Remanufactured</b><br><br>
+          Technical details:<br>
+          <ul>
+            <li>Capacity: 128 GB</li>
+            <li>Battery: 7 hours in typical use</li>
+            <li>Same warranty as a new iPhone 12</li>
+            <li>Display: 6.1 inch Super Retina XDR</li>
+            <li>Dual 12 mexapixel camera</li>
+            <li>Face ID</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+  </center>
+
+  {% formfield player.RM_likelytobuy label="How likely are you to consider buying the remanufactured iPhone 12 described above?" %}
+
+  <p>If you were considering buying the remanufactured iPhone 12 shown above, how much would you be willing to pay when the price for a new iPhone 12 is <b>£750</b>? Use the slider to answer.</p>
+  <center>
+    <input type="range" min="0" max="750" value="0" class="slider" name="WTP_iPhone" oninput="changevalue()" id="wtp"><br>
+    £<output id="wtpvalue">0</output>
+  </center>
+  <br><br>
+  <p>How likely do you think each of the following statements would be when considering a remanufactured product?</p>
+
+  {% formfield player.RM_reliable label="The remanufactured product will be <b>less reliable</b> than a comparable new product" %}
+  {% formfield player.RM_fail label="The remanufactured product will <b>fail more often</b> than a comparable new product" %}
+  {% formfield player.RM_returned label="The remanufactured product is more likely to <b>need to be returned</b> than a comparable new product" %}
+  {% formfield player.RM_problems label="The remanufactured product will <b>cause me problems</b> that a comparable new product would not cause" %}
+  {% formfield player.RM_cosmetic label="The remanufactured product will have <b>cosmetic flaws</b>" %}
+  {% formfield player.RM_scratches label="The remanufactured product will have <b>scratches</b> on the screen or case" %}
+  {% formfield player.RM_worn label="The remanufactured product will <b>look worn</b>" %}
+
+</body>
+
+<button class="btn btn-primary btn-large" onclick="end()">
+  Next
+</button>
+
+<input type="hidden" name="dt_start" id="id_jsdectime_start" value=0>
+<input type="hidden" name="dt_end" id="id_jsdectime_end" value=0>
+
+<script>
+  function setStartTime() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_start').value = d.getTime();
+  }
+  function end() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_end').value = d.getTime();
+  }
+  function changevalue() {
+    var val = document.getElementById("wtp").value;
+    document.getElementById("wtpvalue").innerHTML = val;
+  }
+</script>
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+.slider {
+  width: 300px;
+}
+
+</style>
+
+{% endblock %}

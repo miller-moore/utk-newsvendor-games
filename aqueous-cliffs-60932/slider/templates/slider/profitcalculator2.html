@@ -1,0 +1,188 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+    <h3>Profit calculator</h3>
+    <table width="100%">
+        <tr>
+            <td width="50%" align="left" valign="top">
+                <b>Inventory: <span id="pcord"></span></b><br>
+                <b>Demand: <span id="pcdem"></span></b><br>
+                <b>Revenue: <span id="revenue">-</span> p</b><br>
+                <b>Cost: <span id="cost">-</span> p</b><br>
+                <b>Profit: <span id="profit">-</span> p</b>
+            </td>
+            <td width="50%" align="left" valign="top">
+            <i>Adjust the inventory circle (blue slider) and demand circle (red slider) to see how revenue, cost, and profit changes. Note that in the final decision, demand is drawn randomly and you only set the inventory circle.</i>
+            </td>
+        </tr>
+    </table>
+
+    <div id="pcwrapper" align="center">
+        <div id="pccircle"></div>
+    </div>
+    <div id="pcdemwrapper" align="center">
+        <div id="pcdemcircle"></div>
+    </div>
+    <center>
+        <br>
+        <input type="range" min="1" max="300" value="1" class="pcslider" id="pcordrange"><br>
+        <input type="range" min="1" max="300" value="1" class="pcdemslider" id="pcdemrange"><br>
+    </center>
+
+{% block scripts %}
+<script>
+let pcslider = document.querySelector('[id=pcordrange]')
+let pcdemslider = document.querySelector('[id=pcdemrange]')
+
+let pcdiv = document.querySelector('#pccircle')
+let pcdemdiv = document.querySelector('#pcdemcircle')
+
+pcslider.addEventListener('input', e => {
+    pcdiv.style.width = e.target.value/2 + 'px'
+    pcdiv.style.height = e.target.value/2 + 'px'
+})
+
+pcdemslider.addEventListener('input', e => {
+    pcdemdiv.style.width = e.target.value/2 + 'px'
+    pcdemdiv.style.height = e.target.value/2 + 'px'
+})
+
+var pcordslider = document.getElementById("pcordrange");
+var pcdemslider2 = document.getElementById("pcdemrange");
+
+var pcordoutput = document.getElementById("pcord");
+var pcdemoutput = document.getElementById("pcdem");
+var rev = document.getElementById("revenue");
+var cost = document.getElementById("cost");
+var profit = document.getElementById("profit");
+
+pcdemoutput.innerHTML = pcdemslider.value;
+pcdemslider2.oninput = function() {
+    var costparam = {{ costparam|json }}
+    pcdemoutput.innerHTML = this.value;
+    rev.innerHTML = Math.min(12*this.value,12*pcordslider.value);
+    cost.innerHTML = costparam*pcordslider.value;
+    profit.innerHTML = Math.min(12*this.value,12*pcordslider.value) - costparam*pcordslider.value;
+}
+
+pcordoutput.innerHTML = pcordslider.value;
+pcordslider.oninput = function() {
+    var costparam = {{ costparam|json }}
+    pcordoutput.innerHTML = this.value;
+    rev.innerHTML = Math.min(12*this.value,12*pcdemslider2.value);
+    cost.innerHTML = costparam*this.value;
+    profit.innerHTML = Math.min(12*this.value,12*pcdemslider.value) - costparam*this.value;
+}
+
+</script>
+{% endblock %}
+
+</div>
+
+
+{% block styles %}
+
+<style type="text/css">
+
+    #bigwrapper { display: table-row; }
+    #pcleft { display: table-cell; }
+    #pccenter { display: table-cell; }
+    #pcright { display: table-cell; }
+
+    #pcwrapper {
+        height: 156px;
+        width: 156px;
+        align-items: center;
+        position: absolute;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #pccircle {
+        border-radius: 50%;
+        width: 1px;
+        height: 1px;
+        background-color: blue;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    #pcdemwrapper {
+        height: 156px;
+        width: 156px;
+        align-items: center;
+        position: relative;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+        opacity: 0.5;
+    }
+
+    #pcdemcircle {
+        border-radius: 50%;
+        width: 1px;
+        height: 1px;
+        background-color: red;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .pcslider, .pcdemslider {
+        -webkit-appearance: none;  /* Override default CSS styles */
+        appearance: none;
+        width: 300px; /* Full-width */
+        height: 25px; /* Specified height */
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    .pcslider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    .pcslider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcslider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcdemslider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: red; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcdemslider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: red; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+</style>
+
+{% endblock %}

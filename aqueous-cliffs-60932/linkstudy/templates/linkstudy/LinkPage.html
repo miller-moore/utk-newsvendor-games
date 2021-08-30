@@ -1,0 +1,97 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+Part 1
+{% endblock %}
+
+{% block content %}
+
+<p>Below we show you parts of the causal map that we created. The statements are all actual statements produced by participants in the workshop but the links between the statements are either correct or incorrect. If the links are incorrect, they can either run in the wrong direction or they can connect unrelated statements together. </p>
+
+<p>Please answer carefully all questions. You will be rewarded according to the number of correct answers you give.
+</p>
+
+<h3>Are the links below correct between the pair of statements?</h3>
+<p>You receive £0.20 for each correct answer.</p>
+<br>
+<center>
+<table border=0 style="color:#0000cc; font-weight:bold">
+<tr><td width="250px" valign="center" align="center">manage and strengthen relations with the industrial sector</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">improve practical relevance of course/degree</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q1 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">increase scholarships for department toppers</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">increase mechanisms for student financial support</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q2 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">support group activities either for research or social purposes</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">provide peer to peer career counselling for masters students by senior lecturers</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q3 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">increase the number of job fairs and recruitment fairs</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">create more links with industry</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q4 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">allocate more appropriate space that is fit-for-purpose</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">allocate personal working spaces</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q5 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">create a supportive culture where opinions may be exchanged among individuals from different levels</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">support students by offering relevant extra-curricular services</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q6 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">ensure a feeling of community and belonging among students is created and sustained</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">create more social events for students to participate</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q7 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">allocate more appropriate space that is fit-for-purpose</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">develop and sustain a stimulating and positive research environment</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q8 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">make certain that students finish their degrees in the originally suggested timeframe</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">better disseminate student-relevant information</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q9 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">offer more optional modules</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">provide flexibility while learning</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q10 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">increase the allocated £400 yearly budget for research students</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">develop and sustain a stimulating and positive research environment</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q11 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">improve management of teaching and research resources</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">build and maintain better facilities</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q12 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">create opportunities for research exchange</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">provide flexibility while learning</td><td width="100px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q13 with label="" %}</td></tr>
+</table>
+</center>
+
+<br>
+<h3>Are the links below correct in the network of statements?</h3>
+<p>You receive £0.20 for each correct answer. Note: one link can be correct but the other link incorrect, in which case you answer that the links are incorrect.</p>
+<br>
+<center>
+<table border=0 style="color:#0000cc; font-weight:bold">
+<tr><td width="250px" valign="center" align="center">better disseminate student relevant information</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">make certain that students finish their degrees in the originally suggested timeframe</td><td width="100px">&nbsp;</td><td></td></tr>
+<tr><td> </td><td> </td><td style="font-size:22px" align="center">&uarr;</td><td> </td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q14 with label="" %} </td></tr>
+<tr><td> </td><td> </td><td align="center">consider students' opinion also while forming timetables</td><td> </td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">ensure a fast and precise administrative and academic processes</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">motivate staff members or faculty to provide real time projects or groupworks</td><td width="100px">&nbsp;</td><td></td></tr>
+<tr><td> </td><td> </td><td style="font-size:22px" align="center">&uarr;</td><td> </td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q15 with label="" %} </td></tr>
+<tr><td> </td><td> </td><td align="center">better disseminate student relevant information</td><td> </td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">increase the allocated 400 pound-a-year budget for research students</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">develop and sustain a stimulating and positive research environment</td><td width="100px">&nbsp;</td><td></td></tr>
+<tr><td style="font-size:22px" align="center">&darr;</td><td> </td><td> </td><td> </td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q16 with label="" %} </td></tr>
+<tr><td align="center">offer more optional modules</td><td> </td><td> </td><td> </td><td> </td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">increse and better disseminate opportunities for students to present their research within the school</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">support group activities either for research or social purposes</td><td width="100px">&nbsp;</td><td></td></tr>
+<tr><td style="font-size:22px" align="center">&darr;</td><td> </td><td> </td><td> </td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q17 with label="" %} </td></tr>
+<tr><td align="center">create opportunities for students to collaborate with each other</td><td> </td><td> </td><td> </td><td> </td></tr>
+</table>
+</center>
+
+<br>
+<h3>Are the links below correct in the chain of statements?</h3>
+<p>You receive £0.20 for each correct answer. Note: one link can be correct but the other link incorrect, in which case you answer that the links are incorrect.</p>
+<br>
+<center>
+<table border=0 style="color:#0000cc; font-weight:bold">
+<tr><td width="250px" valign="center" align="center">enable students to feedback their experience to responsible administration</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">consider students' opinion also when forming timetables</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">make certain that students finish their degrees in the originally suggested timeframe</td><td width="<50px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q18 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">manage and strengthen relations with the industrial sector</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">improve practical relevance of course/degree</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">increase the number of job fairs and recruitment fairs</td><td width="50px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q19 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">support students by offering relevant extra-curricular services</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">create a supportive culture where opinions may be exchanged among individuals from different levels</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">ensure a feeling of community and belonging among students is created and sustained</td><td width="50px">&nbsp;</td><td valign="center" width="100px" align="left">&nbsp;{% formfield player.q20 with label="" %}</td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td width="250px" valign="center" align="center">allocate personal working spaces</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">create more social events for students to participate</td><td width="60px" valign="center" align="center" style="font-size:22px">&rarr;</td><td width="250px" valign="center" align="center">improve infrastructure and facilities continuously</td><td width="50px">&nbsp;</td><td valign="center" width="150px" align="left">&nbsp;{% formfield player.q21 with label="" %}</td></tr>
+</table>
+<br>
+<br>
+
+
+{% next_button %}
+
+</center>
+
+{% endblock %}

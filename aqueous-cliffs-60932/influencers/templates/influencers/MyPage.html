@@ -1,0 +1,111 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block content %}
+
+    <center>
+        <h1>Digital Marketing</h1>
+
+        <table class="t1">
+            <tr><th>Influencer</th><th>Cost (US $)</th><th>Marketing vol.</th><th>ROI</th></tr>
+            <tr class="t3"><td class="t2">{{ names.0 }}</td><td>12,000</td><td>125</td><td>8.1%</td></tr>
+            <tr class="t3"><td class="t2">{{ names.1 }}</td><td>12,000</td><td>150</td><td>9%</td></tr>
+            <tr class="t3"><td class="t2">{{ names.2 }}</td><td>20,000</td><td>200</td><td>11%</td></tr>
+            <tr class="t3"><td class="t2">{{ names.3 }}</td><td>14,000</td><td>40</td><td>10.2%</td></tr>
+            <tr class="t3"><td class="t2">{{ names.4 }}</td><td>15,000</td><td>40</td><td>10.5%</td></tr>
+            <tr class="t3"><td class="t2">{{ names.5 }}</td><td>2,000</td><td>20</td><td>14.1%</td></tr>
+            <tr class="t3"><td class="t2">{{ names.6 }}</td><td>32,000</td><td>100</td><td>13.2%</td></tr>
+        </table>
+        <br>
+                <p>Choose the influencers you want to use in product promotions</p>
+
+        <input type="hidden" name="choices" id="choicesid">
+        <br>
+        <button class="btn btn-primary btn-large">Submit your answer</button>
+        <button class="btn btn-primary btn-large" type="button" onclick="instructions()" style="line-height: 15px;"><span style="font-size: 25px; font-family: Georgia, serif;">i</span></button>
+    </center>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+
+        function instructions() {
+            alert('Each influencer has a different cost that must be paid up-front as a retainer. Each influencer also has a different marketing volume that has to be taken into account. Marketing volume means roughly the volume of products that the influencer can promote on their account.\n\nThe company has estimated a return on investment (ROI) for each influencer that is also given in the table.\n\nThe client has stated that they will use at least three influencers, but they will choose as many as they can afford to and accommodate in terms of total marketing volume.\n\nThere are also a few additional constraints they need to consider:\n\n1) {{ names.2 }} is close friends with {{ names.0 }} and {{ names.1 }}, so either one of the latter must be chosen if {{ names.2 }} is chosen\n\n2) because {{ names.3 }} and {{ names.4 }} are bitter rivals, they must use either one of them and not the other\n\n3) if they use {{ names.1 }}, they must also use {{ names.5 }}\n\nThe client has in total USD 45,000 to invest and their marketing volume cannot exceed 420.\n\n');
+        }
+
+        var cells = document.querySelectorAll("td.t2");
+        var rows = document.querySelectorAll("tr.t3");
+
+        for (var cell of cells) {
+            cell.addEventListener('click', myFunction)
+        }
+
+        for (var row of rows) {
+            row.addEventListener('click', colorRow)
+        }
+
+        var choices = '';
+        function myFunction() {
+            var newchoice = ',';
+            newchoice = newchoice.concat(this.textContent);
+            if (!choices.includes(newchoice)) {
+                choices = choices.concat(newchoice);
+            } else {
+                choices = choices.replace(newchoice, '');
+            }
+//            document.getElementById('demo').innerHTML = choices;
+            document.getElementById('choicesid').value = choices;
+        }
+
+        function colorRow() {
+            if (this.style.color != "blue") {
+                this.style.color = "blue";
+            } else {
+                this.style.color = "black";
+            }
+        }
+
+    </script>
+
+{% endblock %}
+
+{% block styles %}
+
+    <style type="text/css">
+
+    .btn {
+        background-color: #afa939;
+        border: #afa939;
+    }
+
+    body {
+        background-color: #fdef96;
+        width: 100%;
+        height: 100%;
+      }
+
+    table.t1 th, table.t1 td {
+        padding: 8px;
+        font-size: 14px;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+    }
+
+    table.t1 td {
+        text-align: center;
+    }
+
+    table.t1 td.t2 {
+        text-align: left;
+    }
+
+    table.t1 tr.t3:hover {
+//        background-color: #F4D03F;
+        cursor:pointer;
+    }
+
+    </style>
+
+{% endblock %}

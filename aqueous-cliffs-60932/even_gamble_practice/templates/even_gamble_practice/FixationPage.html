@@ -1,0 +1,66 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Practice Trials
+{% endblock %}
+
+{% block content %}
+
+<!-- use divs to center the fixation cross -->
+<!-- should the background colour be black? -->
+<body>
+  <!-- <br><br> -->
+  <!-- the line below is just for evening the height of the stimuli display -->
+  <h2 style="color: black;" >[Practice Session]</h2>
+
+  <div class="cross">
+    <center><p style="font-size: 70px; color: white;"> + </p></center>
+  </div>
+
+  <!-- This is just to push away the debug table, should be commented off in actual deploy -->
+  <!-- <div style="height: 600px;">
+  </div> -->
+
+</body>
+
+{% endblock %}
+
+{% block scripts %}
+
+<!-- <script>
+  document.documentElement.style.cursor = 'none';
+  // This is to hide the cursor, work the same as the CSS method.
+
+</script> -->
+
+{% endblock %}
+
+
+{% block app_styles %}
+
+<style type="text/css">
+
+  .otree-title {
+    font-size: 0;
+  }
+
+  .otree-timer {
+    display: none;
+  }
+
+  body {
+    background: black;
+    text-align: center;
+    overflow: hidden; /* Hide scrollbars */
+  }
+
+
+  .cross {
+    position: relative;
+    top: 160px;
+  }
+
+</style>
+
+{% endblock %}

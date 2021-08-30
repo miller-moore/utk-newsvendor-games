@@ -1,0 +1,127 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %} Part 1 {% endblock %}
+
+
+{% block styles %}
+
+    <style type="text/css">
+        table.pc td:hover {
+            background:#fffccc;
+        }
+        .highlight { background-color: red; }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+<div class="instructions well well-lg">
+
+<p>
+    In this part you are randomly paired with another participant of the study, whom we refer to as the other.
+    You do not know this other and you will remain mutually anonymous. We ask you to make six decisions about allocating
+    money between yourself and this other.
+</p>
+
+<p>Each of the following questions asks you to state your preferred allocation. There are 9 different allocations
+    available for each question. The question numbers are shown on the left hand side of each row of allocations.
+</p>
+
+<p>How the money is distributed in each allocation is shown by the numbers above and below each radio button. The number
+    above tells how much you get and the number below tells how much the other gets. The monies in the allocations are
+    given in pence (e.g. 85 means £0.85).
+</p>
+
+<p>There are no right or wrong answers, this is all about personal preferences. However, you will be rewarded according 
+    to your choices.</p>
+
+<p>Your reward from this part is determined as follows. We randomly choose one of the six allocations that you have
+    selected and one of the six allocations that the other has selected. Then we take the average of these two. Your
+    reward will therefore depend on the allocation determined by yourself and also by the other person.
+</p>
+
+<p>
+    <i>Example: After our randomization the allocation that you chose is 85/76 and the allocation that the other chose
+        is 87/19. Therefore your reward from this part of the study is (85p + 19p)/2 = £0.52, and the other person's
+        reward is (76p + 87p)/2 = £0.81. (We round to the nearest pence.)</i>
+</p>
+
+<p>
+    In short, please make sound decisions as any of them may influence how much reward you and how much someone else
+    receives from this study. After you have completed this part of the study, you will move to Part 2.
+</p>
+
+</div>
+<br>
+<center>
+
+<div id="tabledata"></div>
+
+
+{{ form.errors }}
+
+{% next_button %}
+
+</center>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+    function createTable() {
+
+        var alloc = {{ alloc }};
+
+        var code = "";
+
+        for (var j = 1; j < 7; j++) {
+
+            code += "<table class=pc border=1 cellpadding=5>";
+
+            code += "<tr align=center><td> </td><td bgcolor=#fffccc>You:</td>";
+
+            for (var i = 1; i < 10; i++) {
+            code += "<td bgcolor=#fffccc width=50>" + alloc[j-1][(i-1)*2] + "</td>";
+            }
+
+            code += "</tr><tr align=center><td><b>" + j + "</b></td><td> </td>";
+
+            for (var i = 1; i < 10; i++) {
+               code += "<td><input type=radio name=allocation" + j + " value =" + i + "></td>";
+            }
+
+            code += "</tr><tr align=center><td> </td><td bgcolor=#fffccc>Other:</td>";
+
+            for (var i = 1; i < 10; i++) {
+               code += "<td bgcolor=#fffccc>" + alloc[j-1][(i-1)*2+1] + "</td>";
+            }
+
+            code += "</tr></table><br><br>";
+        }
+
+        return code;
+    }
+
+    function insertHTML(id, html) {
+        var el = document.getElementById(id);
+
+        if(!el) {
+            alert('Element with id ' + id + ' not found.');
+        }
+
+        el.innerHTML = html;
+    }
+
+    function run() {
+        var html = createTable();
+
+        insertHTML('tabledata', html);
+    }
+
+    window.onload = run;
+
+    </script>
+
+{% endblock %}

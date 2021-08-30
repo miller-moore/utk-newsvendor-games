@@ -1,0 +1,26 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+
+{% endblock %}
+
+{% block content %}
+
+    <h2>Part 3(a)</h2>
+
+    <p>A number of controversial statements or questions with two alternative answers are given below. Indicate your personal preferences by writing appropriate figures in the dropdown boxes. Some of the alternatives may appear equally attractive or unattractive to you. Nevertheless, please attempt to choose the alternative that is relatively more acceptable to you. For each question you have three points (1,2,3) that you may distribute in any of the following combinations:</p>
+    <ul>(a) 0, (b) 3<br>(a) 1, (b) 2<br>(a) 2, (b) 1<br>(a) 3, (b) 0</ul>
+    <p>Do not choose any combination of numbers except one of these four. There is no time limit, but do not linger over any one question or statement, and do not leave out any of the questions unless you find it really impossible to make a decision.</p>
+
+    <table border="1">
+        <tr><td><b> </b></td><td>&nbsp;</td><td><center><b>(a)</b></center></td><td><center><b>(b)</b></center></td></tr>
+        <tr><td><b>The main object of scientific research should be the discovery of truth rather than its practical applications. (a)Yes; (b)No.</b></td><td>&nbsp;</td><td>{% formfield player.q1a with label=""%}</td><td>{% formfield player.q1b with label=""%}</td></tr>
+        <tr><td><b>Taking the Bible or the Koran as a whole, one should regard it from the point of view of its beautiful mythology and literary style, rather than it as a spiritual revelation? (a)Yes; (b)No.</b></td><td>&nbsp;</td><td>{% formfield player.q2a with label=""%}</td><td>{% formfield player.q2b with label=""%}</td></tr>
+
+    </table>
+
+<br>
+    {% next_button %}
+
+{% endblock %}

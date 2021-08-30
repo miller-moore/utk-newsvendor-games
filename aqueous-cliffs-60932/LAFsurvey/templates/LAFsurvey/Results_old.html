@@ -1,0 +1,36 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+	That's it!
+{% endblock %}
+
+{% block content %}
+
+    <p>Parts I and II measured your <i>Values</i> that are identified in six value orientations below. The score in each value orientation can take values between 0 and 70. Scores above 50 are considered high and score below 30 are considered low.</p>
+
+    <p>
+    <ul>
+    TH - theoretical: {{ allportth }}<br>
+    EC - economic: {{ allportec }}<br>
+    PO - political: {{ allportpo }}<br>
+    AE - aesthetic: {{ allportae }}<br>
+    SO - social: {{ allportso }}<br>
+    RE - religious: {{ allportre }}
+    </ul>
+    </p>
+
+    <br>
+    <p>Part III measured your <i>Need for Cognition</i> and <i>Faith in Intuition</i>. These scores can range between 19 and 95 and 12 and 60, respectively.</p>
+
+    <p><ul>
+    Need for Cognition: {{ nfcscore }}<br>
+    Faith in Intuition: {{ fiscore }}
+    </ul></p>
+
+    <br>
+    <p>You will receive the report on your decision making style by email from us. Thank you for participating in the Survey!</p>
+
+{% endblock %}
+
+

@@ -1,0 +1,100 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Thank you for your response
+{% endblock %}
+
+{% block content %}
+
+<p>
+    We would like to ensure that you understood correctly the task.
+    We therefore present Question 2 from the task and highlight your choice in the table below.
+    Please answer the two questions. They are only check-up questions and do not affect your reward.
+</p>
+<br>
+<center>
+    <div id="tabledata"></div>
+
+    {% formfield player.check1 with label="How much do you get in this allocation? (Enter the number only)" %}
+    {% formfield player.check2 with label="How much does the other get in this allocation? (Enter the number only)" %}
+
+    <br>
+
+    {% next_button %}
+
+</center>
+
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    function createTable() {
+
+        var alloc = {{ alloc }};
+        var alloc2 = {{ alloc2 }};
+
+        var j = 2;
+
+        var code = "<table class=pc border=1 cellpadding=5><tr align=center><td> </td><td bgcolor=#fffccc>You:</td>";
+
+        for (var i = 1; i < 10; i++) {
+            if (i == alloc2) {
+                code += "<td bgcolor=#fffccc width=50><b>" + alloc[j-1][(i-1)*2] + "</b></td>";
+            }
+            else {
+                code += "<td bgcolor=#fffccc width=50>" + alloc[j-1][(i-1)*2] + "</td>";
+            }
+        }
+
+        code += "</tr><tr align=center><td><b>" + j + "</b></td><td> </td>";
+
+        for (var i = 1; i < 10; i++) {
+            if (i == alloc2) {
+                code += "<td bgcolor=#fffccc> &nbsp; </td>";
+            }
+            else {
+                code += "<td> &nbsp; </td>";
+            }
+        }
+
+        code += "</tr><tr align=center><td> </td><td bgcolor=#fffccc>Other:</td>";
+
+        for (var i = 1; i < 10; i++) {
+            if (i == alloc2) {
+                code += "<td bgcolor=#fffccc><b>" + alloc[j-1][(i-1)*2+1] + "</b></td>";
+            }
+            else {
+                code += "<td bgcolor=#fffccc>" + alloc[j-1][(i-1)*2+1] + "</td>";
+            }
+        }
+
+        code += "</tr></table><br><br>";
+
+        return code;
+    }
+
+    function insertHTML(id, html) {
+        var el = document.getElementById(id);
+
+        if(!el) {
+            alert('Element with id ' + id + ' not found.');
+        }
+
+        el.innerHTML = html;
+    }
+
+    function run() {
+        var html = createTable();
+
+        insertHTML('tabledata', html);
+    }
+
+    window.onload = run;
+
+    </script>
+
+{% endblock %}
+
+
+

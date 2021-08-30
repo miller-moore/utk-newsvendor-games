@@ -1,0 +1,35 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+    <table align="center">
+        <tr>
+            <td valign="top" align="center">
+                <h3>Own information from week 2</h3>
+                <i>Note that the information about other firm's order last week is not indicative of the other firm's order
+                today, as you have been randomly allocated a pair again for today's study.</i><br><br>
+                <b>Own order: {{ ownq }}</b><br>
+                <b>Other's order: {{ othq }}</b><br>
+                <b>Industry demand: {{ dem }}</b><br>
+                <b>Own profit: {{ ownpay }}</b><br>
+                <b>Other's profit: {{ othpay }}</b>
+            </td>
+            <td width="50">
+                &nbsp;
+            </td>
+            <td width="450" align="center">
+                <h3>Market information from weeks 2 and 3</h3>
+                <i>In the bar graphs below, you see what were the inventory order quantities of all participants
+                in last two weeks' studies. For example, in the week 1 graph, the bar that is between inventory
+                levels 20 and 24 has height 1. This
+                means that only one participant chose an inventory order between 20 and 24. In contrast, the bar that
+                is between levels 50 and 54 has height 14, which means that there were 14 participants who chose an inventory
+                order between 50 and 54 units.</i><br><br>
+                <center><img src="{% static "nvcompnoniid2/week2hist.png" %}"><br><br><img src="{% static "nvcompnoniid2/week1hist.png" %}"></center>
+            </td>
+        </tr>
+
+    </table>
+
+
+</div>

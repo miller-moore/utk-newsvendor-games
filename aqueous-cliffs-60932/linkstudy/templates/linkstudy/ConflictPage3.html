@@ -1,0 +1,31 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+Part 2 -- 3/6
+{% endblock %}
+
+{% block content %}
+
+<h3>You chose {{ choice }}. How difficult was the choice between the two?</h3>
+<br>
+<center>
+<p>1 = Not at all difficult; 9 = Very difficult {% formfield player.conflict24 with label="" %} </p>
+<br>
+<br>
+<table border=0 style="color:#0000cc; font-weight:bold">
+<tr><td width="250px" valign="center" align="center"> </td><td  width="60px"> </td><td width="250px" valign="center" align="center">(A) create spaces for social get-togethers</td><td width="<50px">&nbsp; </td><td valign="center" width="100px" align="left">&nbsp; </td></tr>
+<tr><td width="250px" valign="center" align="center"> </td><td  width="60px" valign="center" align="center" style="font-size:22px">&nearr;</td><td> </td><td width="<50px"> </td><td valign="center" width="100px" align="left">&nbsp; </td></tr>
+<tr><td width="250px" valign="center" align="center">Allocate more appropriate space that is fit-for-purpose</td><td> </td><td> </td><td> </td><td valign="center" width="100px" align="left">&nbsp; </td></tr>
+<tr><td width="250px" valign="center" align="center"> </td><td  width="60px" valign="center" align="center" style="font-size:22px">&searr;</td><td> </td><td width="<50px">&nbsp; </td><td valign="center" width="100px" align="left">&nbsp; </td></tr>
+<tr><td width="250px" valign="center" align="center"> </td><td  width="60px"> </td><td width="250px" valign="center" align="center">(B) improve aesthetics and cosyness of working spaces</td><td width="<50px">&nbsp; </td><td valign="center" width="100px" align="left">&nbsp; </td></tr>
+</table>
+<br>
+<br>
+
+
+{% next_button %}
+
+</center>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Part III
+{% endblock %}
+
+{% block content %}
+<h3>(a) Please rate each of the following items by choosing the correct option</h3>
+<ul>
+    1 = extremely uncharacteristic of me<br>
+    2 = somewhat uncharacteristic of me<br>
+    3 = neither uncharacteristic nor characteristic of me<br>
+    4 = somewhat characteristic of me<br>
+    5 = extremely characteristic of me
+</ul>
+<center>
+<table width="800" border="1">
+    <tr><td>Some of my friends think I am a hothead.</td><td>{% formfield player.aq1 with label="" %}</td></tr>
+    <tr><td>If I have to resort to violence to protect my rights, I will.</td><td>{% formfield player.aq2 with label="" %}</td></tr>
+    <tr><td>	When people are especially nice to me, I wonder what they want.	</td><td>{% formfield player.aq3 with label="" %}</td></tr>
+    <tr><td>	I tell my friends openly when I disagree with them.	</td><td>{% formfield player.aq4 with label="" %}</td></tr>
+    <tr><td>	I have become so mad that I have broken things.	</td><td>{% formfield player.aq5 with label="" %}</td></tr>
+    <tr><td>	I can’t help getting into arguments when people disagree with me.	</td><td>{% formfield player.aq6 with label="" %}</td></tr>
+    <tr><td>	I wonder why sometimes I feel so bitter about things.	</td><td>{% formfield player.aq7 with label="" %}</td></tr>
+    <tr><td>	Once in a while, I can’t control the urge to strike another person.	</td><td>{% formfield player.aq8 with label="" %}</td></tr>
+    <tr><td>	I am an even-tempered person.	</td><td>{% formfield player.aq9 with label="" %}</td></tr>
+    <tr><td>	I am suspicious of overly friendly strangers.	</td><td>{% formfield player.aq10 with label="" %}</td></tr>
+    <tr><td>	I have threatened people I know.	</td><td>{% formfield player.aq11 with label="" %}</td></tr>
+    <tr><td>	I flare up quickly but get over it quickly.	</td><td>{% formfield player.aq12 with label="" %}</td></tr>
+    <tr><td>	Given enough provocation, I may hit another person.	</td><td>{% formfield player.aq13 with label="" %}</td></tr>
+    <tr><td>	When people annoy me, I may tell them what I think of them.	</td><td>{% formfield player.aq14 with label="" %}</td></tr>
+    <tr><td>	I am sometimes eaten up with jealousy.	</td><td>{% formfield player.aq15 with label="" %}</td></tr>
+    <tr><td>	I can think of no good reason for ever hitting a person.	</td><td>{% formfield player.aq16 with label="" %}</td></tr>
+    <tr><td>	At times I feel I have gotten a raw deal out of life.	</td><td>{% formfield player.aq17 with label="" %}</td></tr>
+    <tr><td>	I have trouble controlling my temper.	</td><td>{% formfield player.aq18 with label="" %}</td></tr>
+    <tr><td>	When frustrated, I let my irritation show.	</td><td>{% formfield player.aq19 with label="" %}</td></tr>
+    <tr><td>	I sometimes feel that people are laughing at me behind my back.	</td><td>{% formfield player.aq20 with label="" %}</td></tr>
+    <tr><td>	I often find myself disagreeing with people.	</td><td>{% formfield player.aq21 with label="" %}</td></tr>
+    <tr><td>	If somebody hits me, I hit back.	</td><td>{% formfield player.aq22 with label="" %}</td></tr>
+    <tr><td>	I sometimes feel like a powder keg ready to explode.	</td><td>{% formfield player.aq23 with label="" %}</td></tr>
+    <tr><td>	Other people always seem to be more fortunate than me.	</td><td>{% formfield player.aq24 with label="" %}</td></tr>
+    <tr><td>	There are people who pushed me so far that we came to blows.	</td><td>{% formfield player.aq25 with label="" %}</td></tr>
+    <tr><td>	I know that "friends" talk about me behind my back.	</td><td>{% formfield player.aq26 with label="" %}</td></tr>
+    <tr><td>	My friends say that I’m somewhat argumentative.	</td><td>{% formfield player.aq27 with label="" %}</td></tr>
+    <tr><td>	Sometimes I fly off the handle for no good reason.	</td><td>{% formfield player.aq28 with label="" %}</td></tr>
+    <tr><td>	I get into fights a little more than the average person.	</td><td>{% formfield player.aq29 with label="" %}</td></tr>
+</table>
+</center>
+<br>
+<h3>(b) Please answer false (F) or true (T)</h3>
+<br>
+<center>
+<table width="800" border="1">
+    <tr><td>	I might be willing to try eating monkey meat, under some circumstances. 	</td><td>{% formfield player.dsr1 with label="" %}</td></tr>
+    <tr><td>	It would bother me to see a rat run across my path in a park.	</td><td>{% formfield player.dsr2 with label="" %}</td></tr>
+    <tr><td>	Seeing a cockroach in someone else’s house doesn’t bother me.	</td><td>{% formfield player.dsr3 with label="" %}</td></tr>
+    <tr><td>	It bothers me to hear someone clear a throat full of mucus. 	</td><td>{% formfield player.dsr4 with label="" %}</td></tr>
+    <tr><td>	If I see someone vomit, it makes me sick to my stomach.	</td><td>{% formfield player.dsr5 with label="" %}</td></tr>
+    <tr><td>	It would bother me to be in a science class, and see a human hand preserved in a jar. 	</td><td>{% formfield player.dsr6 with label="" %}</td></tr>
+    <tr><td>	It would not upset me at all to watch a person with a glass eye take the eye out of the socket. 	</td><td>{% formfield player.dsr7 with label="" %}</td></tr>
+    <tr><td>	It would bother me tremendously to touch a dead body. 	</td><td>{% formfield player.dsr8 with label="" %}</td></tr>
+    <tr><td>	I would go out of my way to avoid walking through a graveyard.	</td><td>{% formfield player.dsr9 with label="" %}</td></tr>
+    <tr><td>	I never let any part of my body touch the toilet seat in a public washroom. 	</td><td>{% formfield player.dsr10 with label="" %}</td></tr>
+    <tr><td>	I probably would not go to my favorite restaurant if I found out that the cook had a cold.	</td><td>{% formfield player.dsr11 with label="" %}</td></tr>
+    <tr><td>	Even if I was hungry, I would not drink a bowl of my favorite soup it if had been stirred with a used<br>but thoroughly washed flyswatter. 	</td><td>{% formfield player.dsr12 with label="" %}</td></tr>
+    <tr><td>	It would bother me to sleep in a nice hotel room if I knew that a man had died of a heart attack<br>in that room the night before. 	</td><td>{% formfield player.dsr13 with label="" %}</td></tr>
+</table>
+</center>
+<br>
+<h3>(c) Please rate how disgusting you would find the following experiences</h3>
+<ul>
+    1 = not disgusting<br>
+    2 = slightly disgusting<br>
+    3 = very disgusting
+</ul>
+<center>
+<table width="800" border="1">
+    <tr><td>	If you see someone put ketchup on vanilla ice cream and eat it. 	</td><td>{% formfield player.dsr14 with label="" %}</td></tr>
+    <tr><td>	You are about to drink a glass of milk when you smell that it is spoiled. 	</td><td>{% formfield player.dsr15 with label="" %}</td></tr>
+    <tr><td>	You see maggots on a piece of meat in an outdoor garbage pail. 	</td><td>{% formfield player.dsr16 with label="" %}</td></tr>
+    <tr><td>	You are walking barefoot on concrete and step on an earthworm. 	</td><td>{% formfield player.dsr17 with label="" %}</td></tr>
+    <tr><td>	While you are walking through a tunnel under a railroad track, you smell urine. 	</td><td>{% formfield player.dsr18 with label="" %}</td></tr>
+    <tr><td>	You see a man with his intestines exposed after an accident. 	</td><td>{% formfield player.dsr19 with label="" %}</td></tr>
+    <tr><td>	Your friend’s pet cat dies and you have to pick up the dead body with your bare hands. 	</td><td>{% formfield player.dsr20 with label="" %}</td></tr>
+    <tr><td>	You accidentally touch the ashes of a person who has been cremated. 	</td><td>{% formfield player.dsr21 with label="" %}</td></tr>
+    <tr><td>	You take a sip of soda and realize that you drank from the glass that an acquaintance<br>of yours had been drinking from. 	</td><td>{% formfield player.dsr22 with label="" %}</td></tr>
+    <tr><td>	You discover that a friend of yours changes underwear only once a week.	</td><td>{% formfield player.dsr23 with label="" %}</td></tr>
+    <tr><td>	A friend offers you a piece of chocolate shaped like dog-doo. 	</td><td>{% formfield player.dsr24 with label="" %}</td></tr>
+    <tr><td>	As part of a sex education class, you are required to inflate a new lubricated condom,<br>using your mouth. 	</td><td>{% formfield player.dsr25 with label="" %}</td></tr>
+</table>
+</center>
+
+
+
+{% next_button %}
+
+{% endblock %}

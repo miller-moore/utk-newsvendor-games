@@ -1,0 +1,26 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Personal Trust Foundation: £500,000
+{% endblock %}
+
+{% block content %}
+
+<p>You have £500,000 to allocate from this fund.  Proposals received from various organisations for projects are listed below.  Each project is in need of £500,000 but can benefit from any contribution you might make.  The greater the contribution that you make to a particular project, the more likely it is that the chosen project will succeed.</p>
+<table border="0">
+    <tr><th>Project</th><th>Allocation (in £1,000s</th></tr>
+<tr><td>To purchase a new computer system for the county government in order to hold local taxes constant.</td><td>{% formfield player.p1 with label=""%}</td></tr>
+<tr><td>To purchase additional volumes for the community’s library system.</td><td>{% formfield player.p2 with label=""%}</td></tr>
+<tr><td>To create a tourist bureau to develop advertising and other methods of attracting tourism into the community.</td><td>{% formfield player.p3 with label=""%}</td></tr>
+<tr><td>To establish a community arts program featuring art, music and dance programs for children and adults.</td><td>{% formfield player.p4 with label=""%}</td></tr>
+<tr><td>To establish an additional shelter for the homeless in the community.</td><td>{% formfield player.p5 with label=""%}</td></tr>
+<tr><td>To purchase art for display in the community’s art gallery.</td><td>{% formfield player.p6 with label=""%}</td></tr>
+</table>
+
+<br>
+<center>
+{% next_button %}
+</center>
+
+{% endblock %}

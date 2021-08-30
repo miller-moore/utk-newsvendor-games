@@ -1,0 +1,404 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Round {{ round }} results
+{% endblock %}
+
+{% block content %}
+
+    {% if nvframe == 'yes' %}
+        <table border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="150px"><b>Inventory: {{ q }}</b></td><td><b>Total cost: {{ costi }}</b></td>
+            </tr>
+            <tr>
+                <td><b>Demand: {{ d }}</b></td><td><b>Revenue: {{ reve }}</b></td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>{{ profitloss }}</b></td>
+            </tr>
+        </table>
+
+    {% else %}
+        <b>Blue circle: {{ q }}</b><br>
+        <b>Red circle: {{ d }}</b><br>
+        <b>{{ profitloss }}</b>
+    {% endif %}
+
+    <div id="wrapper" align="center">
+        <div id="circle"></div>
+    </div>
+    <div id="demwrapper" align="center">
+        <div id="demcircle"></div>
+    </div>
+
+    <center>
+
+        <br><p>{{ demandtext }}</p>
+        <button class="btn btn-primary btn-large">Start new round</button>
+        <button class="btn btn-primary btn-large" type="button" onclick="instructions()">Instructions</button>
+
+    </center>
+    <br>
+    <div class="instr">
+
+        <h3>History</h3>
+
+        <center>
+            <table width="260px">
+                <tr valign="bottom" align="center">
+                    {% if nvframe == 'yes' %}
+                        <th>Rnd</th><th>Inventory</th><th>Demand</th><th>Profit</th>
+                    {% else %}
+                        <th>Rnd</th><th>Blue circle</th><th>Red circle</th><th>Profit</th>
+                    {% endif %}
+                </tr>
+                {% for p in player_in_all_rounds %}
+                <tr align="center">
+                    <td>{{ p.round_number }}</td>
+                    <td>{{ p.q }}</td>
+                    <td>{{ p.d }}</td>
+                    <td>{{ p.payoff|to0 }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </center>
+
+    </div>
+
+    <br>
+
+    <div class="instr">
+
+        <h3>Profit calculator</h3>
+        <table align="center">
+        <tr>
+            <td valign="top" width="150px">
+                {% if nvframe == 'yes' %}
+                    Inventory: <span id="pcord"></span><br>
+                    Demand: <span id="pcdem"></span>
+                {% else %}
+                    Blue circle: <span id="pcord"></span><br>
+                    Red circle: <span id="pcdem"></span>
+                {% endif %}
+            </td>
+            <td width="150px">
+                {% if nvframe == 'yes' %}
+                    Revenue: <span id="revenue">-</span><br>
+                    Cost: <span id="cost">-</span>
+                {% else %}
+                    <br><br>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="left">
+                Profit: <span id="profit">-</span>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <div id="topid">
+        <button type="button" id="pcopt" class="btn btn-primary btn-large">OPT</button>&nbsp;&nbsp;&nbsp;
+        <button type="button" id="pcmean" class="btn btn-primary btn-large">MEAN</button>
+    </div>
+
+    <div id="pcwrapper" align="center">
+        <div id="pcordcircle"></div>
+    </div>
+    <div id="pcdemwrapper" align="center">
+        <div id="pcdemcircle"></div>
+    </div>
+    <center>
+        <br>
+        <input type="range" min="1" max="300" value="1" class="pcdemslider" id="pcdemrange"><br>
+    </center>
+
+
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+    function instructions() {
+        if ({{ nvframe|json }} == 'yes') {
+            alert("You are a firm maintaining an inventory. On each round, your task is to decide how large to make your inventory.\n\nYou adjust the blue circle to determine inventory size. There are two options: set the expected profit maximising quantity (OPT) or the mean demand (MEAN). This is the number of products that you stock.\n\nYou can only sell the inventory that is demanded. Demand is determined after you have set your inventory size. Demand is a value between 1 and 300.\n\nIf your inventory is not large enough to satisfy all demand, some customers will leave your inventory empty handed. If your inventory is larger than demand, you will have leftover products which do not bring you any profit.\n\nDemand is determined as the size of the demand circle, randomly drawn each round, numerically as a whole number between 1 and 300. Each value of demand has an equal probability of occurring. Each random draw of demand is independent of previous draws.\n\nYou will know demand only after you have set your inventory circle size.\n\nYour revenue will be determined by how much of your inventory you are able to sell to your customers. If the demand circle is larger than your inventory circle, then your revenue is determined only by your inventory circle. If the demand circle is smaller than your inventory circle, then your revenue is determined only by the size of the demand circle. Numerically, the customers will pay you 12 pence per each unit that is sold from the inventory.\n\nYou pay {{ costparam }} pence for each unit that you order to the inventory. Note that due to the randomness of demand, it may be that your ordering cost will be higher than your revenue, resulting into losses.\n\nYour profit is revenue minus cost.");
+        }
+        else {
+            alert("On each round, your task is to decide how large to make the blue circle.\n\nThere are two options: set the expected profit maximising quantity (OPT) or the mean (MEAN). This is the number of products that you stock.\n\nYou can only sell the inventory that is demanded. Demand is determined after you have set your inventory size. Demand is a value between 1 and 300.\n\nIf your inventory is not large enough to satisfy all demand, some customers will leave your inventory empty handed. If your inventory is larger than demand, you will have leftover products which do not bring you any profit.\n\nDemand is determined as the size of the demand circle, randomly drawn each round, numerically as a whole number between 1 and 300. Each value of demand has an equal probability of occurring. Each random draw of demand is independent of previous draws.\n\nYou will know demand only after you have set your inventory circle size.\n\nYour revenue will be determined by how much of your inventory you are able to sell to your customers. If the demand circle is larger than your inventory circle, then your revenue is determined only by your inventory circle. If the demand circle is smaller than your inventory circle, then your revenue is determined only by the size of the demand circle. Numerically, the customers will pay you 12 pence per each unit that is sold from the inventory.\n\nYou pay {{ costparam }} pence for each unit that you order to the inventory. Note that due to the randomness of demand, it may be that your ordering cost will be higher than your revenue, resulting into losses.\n\nYour profit is revenue minus cost.");
+        }
+    }
+
+    let div = document.querySelector('#circle')
+    div.style.width = {{ q }} + 'px'
+    div.style.height = {{ q }} + 'px'
+
+    let demdiv = document.querySelector('#demcircle')
+    demdiv.style.width = {{ d }} + 'px'
+    demdiv.style.height = {{ d }} + 'px'
+
+
+
+
+
+
+    var pcoptb = document.querySelector('#pcopt');
+    var pcmeanb = document.querySelector('#pcmean');
+    let pcorddiv = document.querySelector('#pcordcircle')
+
+    let pcdemslider = document.querySelector('[id=pcdemrange]')
+    let pcdemdiv = document.querySelector('#pcdemcircle')
+
+    let pcfopt = function() {
+        pcorddiv.style.width = {{ optq }}/2 + "px";
+        pcorddiv.style.height = {{ optq }}/2 + "px";
+        pcorddiv.style.background = "blue";
+        document.getElementById("pcord").innerHTML = {{ optq }};
+        var elmnt = document.getElementById("pcdemcircle");
+        var dem = elmnt.clientHeight*2;
+        if ({{ nvframe|json }} == 'yes') {
+            document.getElementById("revenue").innerHTML = Math.min(12*dem, 12*{{ optq }});
+            document.getElementById("cost").innerHTML = {{ costparam }} * {{ optq }};
+        }
+        document.getElementById("profit").innerHTML = Math.min(12*dem, 12*{{ optq }}) - {{ costparam }} * {{ optq }};
+    }
+
+    let pcfmean = function() {
+        pcorddiv.style.width = 150/2 + "px";
+        pcorddiv.style.height = 150/2 + "px";
+        pcorddiv.style.background = "blue";
+        document.getElementById("pcord").innerHTML = 150;
+        var elmnt = document.getElementById("pcdemcircle");
+        var dem = elmnt.clientHeight*2;
+        if ({{ nvframe|json }} == 'yes') {
+            document.getElementById("revenue").innerHTML = Math.min(12*dem, 12*150);
+            document.getElementById("cost").innerHTML = {{ costparam }} * 150;
+        }
+        document.getElementById("profit").innerHTML = Math.min(12*dem, 12*150) - {{ costparam }} * 150;
+    }
+
+    pcoptb.addEventListener("click", pcfopt);
+    pcmeanb.addEventListener("click", pcfmean);
+
+    pcdemslider.addEventListener('input', e => {
+        pcdemdiv.style.width = e.target.value/2 + 'px'
+        pcdemdiv.style.height = e.target.value/2 + 'px'
+    })
+
+    var pcdemslider2 = document.getElementById("pcdemrange");
+    var pcdemoutput = document.getElementById("pcdem");
+
+    var rev = document.getElementById("revenue");
+    var cost = document.getElementById("cost");
+    var profit = document.getElementById("profit");
+
+    pcdemoutput.innerHTML = pcdemslider.value;
+    pcdemslider2.oninput = function() {
+        var costparam = {{ costparam|json }}
+        pcdemoutput.innerHTML = this.value;
+        var elmnt = document.getElementById("pcordcircle");
+        var ord = elmnt.clientHeight*2;
+        rev.innerHTML = Math.min(12*this.value,12*ord);
+        profit.innerHTML = Math.min(12*this.value,12*ord) - costparam*ord;
+    }
+
+
+</script>
+{% endblock %}
+
+
+{% block styles %}
+<style type="text/css">
+
+    .instr {
+        background-color: #ddd;
+        padding: 10px;
+    }
+
+    body {
+        background-color: #ddffbf;
+      }
+
+    .page-header {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding-top: 0px;
+    }
+
+    #wrapper {
+        height: 306px;
+        width: 306px;
+        align-items: center;
+        position: absolute;
+        justify-content: center;
+        background-color: #fff;
+        border-style: dotted;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #demwrapper {
+        height: 306px;
+        width: 306px;
+        align-items: center;
+        position: relative;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        opacity: 0.5;
+        border-style: dotted;
+    }
+
+    #circle {
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        background-color: blue;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    #demcircle {
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+        background-color: red;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        -webkit-animation-name: example; /* Safari 4.0 - 8.0 */
+        -webkit-animation-duration: 4s; /* Safari 4.0 - 8.0 */
+        animation-name: example;
+        animation-duration: 5s;
+    }
+
+    #topid { height: 50px; width: 100%; text-align: center; }
+
+    @-webkit-keyframes example {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+
+    /* Standard syntax */
+    @keyframes example {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+
+
+
+
+
+
+
+
+
+    #bigwrapper { display: table-row; }
+    #pcleft { display: table-cell; }
+    #pccenter { display: table-cell; }
+    #pcright { display: table-cell; }
+
+    #pcwrapper {
+        height: 156px;
+        width: 156px;
+        align-items: center;
+        position: absolute;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    #pcordcircle {
+        border-radius: 50%;
+        width: 1px;
+        height: 1px;
+        background-color: blue;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    #pcdemwrapper {
+        height: 156px;
+        width: 156px;
+        align-items: center;
+        position: relative;
+        justify-content: center;
+        background-color: #fff;
+        margin: 0 auto;
+        border-style: dotted;
+        opacity: 0.5;
+    }
+
+    #pcdemcircle {
+        border-radius: 50%;
+        width: 1px;
+        height: 1px;
+        background-color: red;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .pcslider, .pcdemslider {
+        -webkit-appearance: none;  /* Override default CSS styles */
+        appearance: none;
+        width: 300px; /* Full-width */
+        height: 25px; /* Specified height */
+        background: #d3d3d3; /* Grey background */
+        outline: none; /* Remove outline */
+        opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+        -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+        transition: opacity .2s;
+    }
+
+    .pcslider:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    .pcslider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcslider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: blue; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcdemslider::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: red; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+    .pcdemslider::-moz-range-thumb {
+        width: 25px; /* Set a specific slider handle width */
+        height: 25px; /* Slider handle height */
+        background: red; /* Green background */
+        cursor: pointer; /* Cursor on hover */
+    }
+
+
+
+</style>
+{% endblock %}
+
+
+

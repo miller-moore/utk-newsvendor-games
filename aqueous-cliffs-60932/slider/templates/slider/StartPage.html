@@ -1,0 +1,37 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+
+{% block title %}
+    Part 1 begins
+{% endblock %}
+
+{% block content %}
+
+    <p>
+        The game consists of Parts 1 and 2. In Part 1 you will manage an inventory of a low cost product. In Part 2 the product is high cost.
+    </p>
+    <p>
+        There are 15 decision rounds in both parts. You can view the instructions and use the profit calculator between decision rounds.
+    </p>
+
+    {% next_button %}
+
+{% endblock %}
+
+{% block styles %}
+
+<style type="text/css">
+
+    body {
+        background-color: #e6f2ff;
+      }
+
+    .instr {
+        background-color: #eee;
+        padding: 10px;
+    }
+
+</style>
+
+{% endblock %}

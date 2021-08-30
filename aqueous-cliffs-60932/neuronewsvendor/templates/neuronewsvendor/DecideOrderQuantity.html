@@ -1,0 +1,121 @@
+{% extends "neuronewsvendor/Page.html" %}
+{% load otree_tags %}
+{% load staticfiles %}
+
+{% block styles %}
+
+  <link rel="stylesheet" href="styles.css">
+
+{% endblock %}
+
+{% block content %}
+    <h2>&nbsp;</h2>
+    <div id="tabledata"></div>
+    <p>&nbsp;</p>
+    <center>
+    {% next_button %}
+    </center>
+
+{% endblock %}
+
+{% block scripts %}
+
+    {% for field in form %}
+    {{ form.orderquantity.errors }}
+
+    <script>
+    function createTable() {
+        var margin = {{ margin }}
+
+        if (margin == 'low') {
+            var price = 7.28;
+            var cost = 5.72;
+        }
+        else {
+            var price = 1.78;
+            var cost = 0.38;
+        }
+        var code = "<center><table class=pc cellpadding=5 width=800>";
+        code += "<tr align=center><td width=80>Order</td><td width=80></td><td width=80></td><td width=80></td><td width=80>Demand</td><td width=80></td><td width=80></td><td width=80></td></tr>";
+        code += "<tr align=center class=borderbottom><td> </td>";
+        if (margin == 'low') {
+            for (var j = 0; j < 7; j++) {
+                code += "<td><b>" + (500 + j*50) + "</b></td>";
+            }
+            code += "</tr>";
+        }
+        else {
+            for (var j = 0; j < 7; j++) {
+                code += "<td><b>" + (300 + j*100) + "</b></td>";
+            }
+            code += "</tr>";
+        }
+        code += "<tr align=center class=borderbottom><td> </td>";
+
+        for (var j = 0; j < 7; j++) {
+            code += "<td>1/7</td>";
+            }
+        code += "</tr>";
+
+        for (var i = 0; i < 7; i++) {
+
+            if (i == 6) {
+                code += "<tr align=center class=borderbottom>";
+            }
+            else {
+                code += "<tr align=center>";
+            }
+
+            if (margin == 'low') {
+                code += "<td><b><input type=radio name= {{ field.html_name }} value=" + i + "> " + (500 + i*50) + "</b></td>";
+            }
+            else {
+                code += "<td><b><input type=radio name= {{ field.html_name}} value=" + i + "> " + (300 + i*100) + "</b></td>";
+            }
+
+            for (var j = 0; j < 7; j++) {
+                if (margin == 'low') {
+                    var dem = (500 + j*50);
+                    var quant = (500 + i*50);
+                }
+                else {
+                    var dem = (300 + j*100);
+                    var quant = (300 + i*100);
+                }
+                if (dem >= quant) {
+                    var pay = price*quant - cost*quant;
+                }
+                else {
+                    var pay = price*dem - cost*quant;
+                }
+                code += "<td>" + pay + "</td>";
+            }
+            code += "</tr>";
+        }
+        code += "</table></center><br>";
+
+        return code;
+    }
+
+    function insertHTML(id, html) {
+        var el = document.getElementById(id);
+
+        if(!el) {
+            alert('Element with id ' + id + ' not found.');
+        }
+
+        el.innerHTML = html;
+    }
+
+    function run() {
+        var html = createTable();
+
+        insertHTML('tabledata', html);
+    }
+
+    window.onload = run;
+
+    </script>
+    {% endfor %}
+
+{% endblock %}

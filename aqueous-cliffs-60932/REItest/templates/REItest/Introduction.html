@@ -1,0 +1,34 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Welcome!
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Welcome!</h1>
+
+<body>
+<p>Thank you for participating in this online experiment. Before introducing the content, we would like to draw your attention to two issues. Firstly, please make sure you are using a device with a keyboard, as some parts of this experiment will require you to complete tasks by pressing keys. For this reason, phones and tablets are NOT suitable for this experiment. Secondly, once you leave a page, you cannot come back to change your answer, so please do not use your browser's back or refresh button in this online experiment.</p>
+
+<p>The whole experiment contains three parts. You will be given {{pound}} at the beginning of the Part 2 and the Part 3 ({{pound_total}} total). Moreover, you will have the chance to earn more by investing the money we assign to you. Specific instructions will be given later. All the monetary values in this experiment will be represented in a fictitious currency “Experiment Dollar”, denoted by “$”. Its exchange rate with Pound Sterling is {{exchange}} to 1, i.e. ${{exchange}} = £1. Your payment will be paid in Pounds after you have completed the study.</p>
+
+<p>To begin with the Part 1, there are two sections. Section 1 is a short survey, and section 2 consists of eleven multiple-choice questions that vary in difficulty.</p>
+
+<!-- <p style="font-style: italic;">*Thank you very much for taking part in this pilot version of our coming experiment. We are sorry that we will not be able to provide monetary reward like in the real experiment. Your feedback will be greatly appreciated.</p> -->
+
+</body>
+
+<br>
+<button class="btn btn-primary btn-large">
+  Start Part 1
+</button>
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

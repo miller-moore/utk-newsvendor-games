@@ -1,0 +1,58 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+{% endblock %}
+
+{% block content %}
+
+<div class="instructions well well-lg">
+
+    <link rel="stylesheet" type="text/css"
+          href="{% static 'global/matrix.css' %}"/>
+    <p>You are randomly and anonymously paired with another participant. </p>
+    <p>Each of you simultaneously and privately chooses one of the available decisions, <b>A</b>, <b>B</b>, or <b>C</b>. Your payoffs will be determined by both of your decisions as given in the payoff table below.</p>
+    <p><i>In each cell of the payoff table, the amount (in £) to the left is the payoff for you and to the right for your partner.</i></p>
+
+    <table class='table table-bordered text-center'
+           style='width: auto; margin: auto'>
+        <tr>
+            <th colspan=2 rowspan=2></th>
+            <th colspan=3><center>Your partner</center></th>
+        </tr>
+            <tr>
+                <th><center>A</center></th>
+                <th><center>B</center></th>
+                <th><center>C</center></th>
+            </tr>
+            <tr class="highlight-row-on-hover">
+                <th rowspan="3"><span class="rotate90"><center>You</center></span></th>
+                <th>A</th>
+                <td>{{Constants.cc|to0}}, {{Constants.cc|to0}}</td>
+                <td>{{Constants.cdrow|to0}}, {{Constants.cdcol|to0}}</td>
+                <td>{{Constants.cprow|to0}}, {{Constants.cpcol|to0}}</td>
+            </tr>
+            <tr class="highlight-row-on-hover">
+                <th>B</th>
+                <td>{{Constants.dcrow|to0}}, {{Constants.dccol|to0}}</td>
+                <td>{{Constants.dd|to0}}, {{Constants.dd|to0}}</td>
+                <td>{{Constants.dprow|to0}}, {{Constants.dpcol|to0}}</td>
+            </tr>
+            <tr class="highlight-row-on-hover">
+                <th>C</th>
+                <td>{{Constants.pcrow|to0}}, {{Constants.pccol|to0}}</td>
+                <td>{{Constants.pdrow|to0}}, {{Constants.pdcol|to0}}</td>
+                <td>{{Constants.pp|to0}}, {{Constants.pp|to0}}</td>
+            </tr>
+        </tr>
+    </table>
+    <br>
+    <p><i>Example: if you choose B and your partner chooses A, you will receive a payoff of £3 and your partner will lose £2.</i></p>
+    <p>You will interact in this way with your partner for many rounds. The number of interactions is determined by a random mechanism. The probability that there will be another round is 3/4. Therefore, you will interact another round with your partner with probability 3/4. Your behavior will have no effect on the number of rounds. Every round will follow the same pattern of two steps: first you make your decisions, and then you view the results.</p>
+    <p>After the final round, we will randomly choose one of the rounds from which you and your partner will receive payoffs. </p>
+
+</div>
+
+{% next_button %}
+
+{% endblock %}

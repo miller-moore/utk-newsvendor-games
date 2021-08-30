@@ -1,0 +1,75 @@
+{% load staticfiles otree_tags %}
+
+<div class="instructions well well-lg">
+
+    <div class="panel-body">
+
+        <h4 class="panel-sub-heading">
+            Instructions
+        </h4>
+
+        <p>You play this game in pairs. One is the Retailer and one is the Wholesaler. You do not know who your pair is.</p>
+
+        <p>The purpose of the game is to come to an agreement of a supply contract, that consists of a supply schedule over
+            four months (May, June, July, August) and a single wholesale price.
+        </p>
+        <p>
+            The game starts by the Retailer sending an initial Request for Quotation (RFQ) to the Wholesaler. The Wholesaler
+            then devises an offer that consists of a monthly supply schedule and a wholesale price. The retailer can accept
+            or reject this offer. If accepted, the game ends. If rejected, the Retailer devises a new RFQ. Both players
+            can attach messages to their RFQ's and offers.
+        </p>
+        <p>
+            The game is active as long as an acceptable agreement is reached. Each time the Retailer rejects the Wholesaler's
+            offer, a new round begins. If the Retailer accepts, the game ends.
+        </p>
+
+        <h4 class="panel-sub-heading">
+            Retailer's role
+        </h4>
+
+        <p>The retailer controls the inventory from which items are sold to end customers. The customers pay a
+            retail price from each item which brings in revenue for the retailer.
+        </p>
+        <p>
+            To each order in each month is associated a fixed cost per order, that is paid if the monthly order is nonzero.
+            The Retailer also pays the wholesale price for each unit ordered.
+        </p>
+        <p>
+            The items that are not sold during one month are carried over as retail inventory to the next month. The
+            Retailer must pay a unit holding cost for each item in the inventory. In any given month, the inventory consists
+            of the current month's orders that the Wholesaler has sent, and any leftovers from previous months.
+        </p>
+        <p>
+            If there are leftovers at the end of August, the Retailer can salvage these and earn an additional profit.
+        </p>
+        <p>
+            The following parameters are known by the Retailer but not by the Wholesaler: buyer demand per month,
+            cost per order when ordering from the Wholesaler, unit Retailer inventory holding cost, salvage price.
+        </p>
+
+        <h4 class="panel-sub-heading">
+            Wholesaler's role
+        </h4>
+
+        <p>
+            The Wholesaler orders the items from a manufacturer which are then sold to the Retailer. The manufacturer
+            has unlimited capacity to deliver the items.
+        </p>
+        <p>
+            The Wholesaler must pay a unit price for each item it orders from the manufacturer. It also pays a fixed cost
+            per order if the monthly order is nonzero, and a unit order cost for each item the manufacturer delivers.
+        </p>
+        <p>
+            The Wholesaler needs to pay an inventory holding cost for the items that it orders from the manufacturer and
+            keeps inventoried before delivering them to the Retailer, but unlike the Retailer, the Wholesaler does not
+            incur inventory between months.
+        </p>
+        <p>
+            The following parameters are known by the Wholesaler but not by the Retailer: cost per order when ordering from
+            the manufacturer, cost per unit when ordering from the manufacturer, unit Wholesaler inventory holding cost.
+        </p>
+
+    </div>
+
+</div>

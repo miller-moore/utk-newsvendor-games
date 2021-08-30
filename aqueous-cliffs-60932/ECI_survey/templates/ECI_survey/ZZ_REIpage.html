@@ -1,0 +1,75 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+Part 1 Section 1
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Part 1 Section 1</h1>
+
+<body onload="setStartTime()">
+
+  <h3>Please rate the following statements</h3>
+
+{% formfield player.q1 label=" I would rather do something that requires little thought than something that is sure to challenge my thinking abilities." %}
+{% formfield player.q2 label=" I don't like to have the responsibility of handling a situation that requires a lot of thinking." %}
+{% formfield player.q3 label=" I would prefer complex to simple problems." %}
+{% formfield player.q4 label=" I try to anticipate and avoid situations where there is a likely chance I will have to think in depth about something." %}
+{% formfield player.q5 label=" I find little satisfaction in deliberating hard and for long hours." %}
+{% formfield player.q6 label=" Thinking is not my idea of fun." %}
+{% formfield player.q7 label=" The notion of thinking abstractly is not appealing to me." %}
+{% formfield player.q8 label=" I prefer my life to be filled with puzzles that I must solve." %}
+{% formfield player.q9 label=" Simply knowing the answer rather than understanding the reasons for the answer to a problem is fine with me." %}
+{% formfield player.q10 label=" I don't reason well under pressure." %}
+{% formfield player.q11 label=" The idea of relying on thought to make my way to the top does not appeal to me." %}
+{% formfield player.q12 label=" I prefer to talk about international problems rather than to gossip or talk about celebrities." %}
+{% formfield player.q13 label=" Learning new ways to think doesn't excite me very much." %}
+{% formfield player.q14 label=" I would prefer a task that is intellectual, difficult, and important to one that is somewhat important but does not require much thought." %}
+{% formfield player.q15 label=" I generally prefer to accept things as they are rather than to question them." %}
+{% formfield player.q16 label=" It is enough for me that something gets the job done, I don't care how or why it works." %}
+{% formfield player.q17 label=" I tend to set goals that can be accomplished only by expending considerable mental effort." %}
+{% formfield player.q18 label=" I have difficulty thinking in new and unfamiliar situations." %}
+{% formfield player.q19 label=" I feel relief rather than satisfaction after completing a task that required a lot of mental effort." %}
+
+{% formfield player.q20 label=" My initial impressions of people are almost always right." %}
+{% formfield player.q21 label=" I trust my initial feelings about people." %}
+{% formfield player.q22 label=" When it comes to trusting people, I can usually rely on my gut feelings." %}
+{% formfield player.q23 label=" I believe in trusting my hunches." %}
+{% formfield player.q24 label=" I can usually feel when a person is right or wrong even if I can't explain how I know." %}
+{% formfield player.q25 label=" I am a very intuitive person." %}
+{% formfield player.q26 label=" I can typically sense right away when a person is lying." %}
+{% formfield player.q27 label=" I am quick to form impressions about people." %}
+{% formfield player.q28 label=" I believe I can judge character pretty well from a person's appearance." %}
+{% formfield player.q29 label=" I often have clear visual images of things." %}
+{% formfield player.q30 label=" I have a very good sense of rhythm." %}
+{% formfield player.q31 label=" I am good at visualizing things." %}
+
+</body>
+
+<button class="btn btn-primary btn-large" onclick="end()">
+  Next
+</button>
+
+<input type="hidden" name="dt_start" id="id_jsdectime_start" value=0>
+<input type="hidden" name="dt_end" id="id_jsdectime_end" value=0>
+
+<script>
+  function setStartTime() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_start').value = d.getTime();
+  }
+  function end() {
+    var d = new Date();
+    document.getElementById('id_jsdectime_end').value = d.getTime();
+  }
+</script>
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

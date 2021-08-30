@@ -1,0 +1,49 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Your Payment
+
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">This is the end of the experiment</h1>
+<br>
+<div>
+<h4>For your payment:</h4>
+
+<p>Your payment is decided based on the trial {{pick_round}}. In that trial your faced a gamble with an equal probability of winning {{gain}} points and losing {{loss}} points.</p>
+
+{% if scenario == 1 %}
+<p>You decided to reject the gmable. Your final payment from this part is {{pay_point}} points, which equals to £{{pay_pound}}.</p>
+{% endif %}
+
+{% if scenario == 2 %}
+<p>You decided to accept the gamble. Unfortunately, you did not win the reward. Your final payment from this part is {{pay_point}} points, which equals to £{{pay_pound}}.</p>
+{% endif %}
+
+{% if scenario == 3 %}
+<p>You decided to accept the gamble. Congratulations! you won the reward. Your final payment from this part is {{pay_point}} points, which equals to £{{pay_pound}}.</p>
+{% endif %}
+</div>
+
+<div>
+<p>Thank you for your participation! Please click the link below to move back to Prolific Academic and receive your payment.</p>
+<p><a href=" {{ prolificurl }} ">Click here</a></p>
+</div>
+
+
+<!-- <br>
+<button class="btn btn-primary btn-large">
+  Please give us some feedback
+</button> -->
+
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

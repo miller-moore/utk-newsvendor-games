@@ -1,0 +1,161 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %} Results: round {{ round }} {% endblock %}
+
+{% block styles %}
+
+    <style type="text/css">
+        tr.borderbottom td {
+            border-bottom: 1pt solid black;
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+<p>
+    Your decision was {{ player.truedecision }}.
+    The state of the world in this round was {{ player.truestate }}.
+    Your profit is {{ player.payoff }}.
+    Proceed to the next round by clicking the Next button.
+</p>
+
+<center>
+
+<div id="tabledata"></div>
+
+<br>
+
+{% next_button %}
+
+</center><h2>History</h2>
+
+<center>
+
+    <table width=300>
+        <tr valign="bottom" align="center">
+            <td>Round</td><td>Decision</td><td>State of<br>the world</td><td>Profit</td>
+        </tr>
+        {% for p in player_in_all_rounds %}
+            <tr align="center">
+                <td>{{ p.round_number }}</td>
+                <td>{{ p.truedecision }}</td>
+                <td>{{ p.truestate }}</td>
+                <td>{{ p.payoff }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+</center>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+    function createTable() {
+        var margin = {{ margin }};
+        var state = ["S1","S2","S3","S4","S5","S6","S7"];
+        var dec = ["A","B","C","D","E","F","G"];
+        var pdecision = {{ player.decision }}
+        var pstate = {{ player.state }}
+
+        if (margin == 'low') {
+            var price = 7.28;
+            var cost = 5.72;
+        }
+        else {
+            var price = 1.78;
+            var cost = 0.38;
+        }
+        var code = "<table cellpadding=5 width=700>";
+        code += "<tr align=center><td width=80>Decision</td><td width=80></td><td width=80></td><td width=80></td><td width=80>State of the world</td><td width=80></td><td width=80></td><td width=80></td></tr>";
+
+        code += "<tr align=center class=borderbottom><td width=80> </td>";
+        if (margin == 'low') {
+            for (var j = 0; j < 7; j++) {
+                code += "<td><b>" + state[j] + "</b></td>";
+            }
+            code += "</tr>";
+        }
+        else {
+            for (var j = 0; j < 7; j++) {
+                code += "<td><b>" + (300 + j*100) + "</b></td>";
+            }
+            code += "</tr>";
+        }
+
+        code += "<tr align=center class=borderbottom><td> </td>";
+        for (var j = 0; j < 7; j++) {
+            code += "<td>1/7</td>";
+            }
+        code += "</tr>";
+
+        for (var i = 0; i < 7; i++) {
+
+            if (i == 6) {
+                code += "<tr align=center class=borderbottom>";
+            }
+            else {
+                code += "<tr align=center>";
+            }
+
+            if (margin == 'low') {
+                code += "<td><b>" + dec[i] + "</b></td>";
+            }
+            else {
+                code += "<td><b>" + (300 + i*100) + "</b></td>";
+            }
+
+            for (var j = 0; j < 7; j++) {
+                if (margin == 'low') {
+                    var dem = (500 + j*50);
+                    var quant = (500 + i*50);
+                }
+                else {
+                    var dem = (300 + j*100);
+                    var quant = (300 + i*100);
+                }
+                if (dem >= quant) {
+                    var pay = price*quant - cost*quant;
+                }
+                else {
+                    var pay = price*dem - cost*quant;
+                }
+                if (i==pdecision & j==pstate) {
+                    code += "<td bgcolor=#fffccc>" + pay + "</td>";
+                }
+                else {
+                    code += "<td>" + pay + "</td>";
+                }
+            }
+            code += "</tr>";
+        }
+        code += "</table>";
+
+        return code;
+    }
+
+    function insertHTML(id, html) {
+        var el = document.getElementById(id);
+
+        if(!el) {
+            alert('Element with id ' + id + ' not found.');
+        }
+
+        el.innerHTML = html;
+    }
+
+    function run() {
+        var html = createTable();
+
+        insertHTML('tabledata', html);
+    }
+
+    window.onload = run;
+
+    </script>
+
+{% endblock %}

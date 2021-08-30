@@ -1,0 +1,161 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %} Part 2 {% endblock %}
+
+{% block styles %}
+
+    <style type="text/css">
+        table.pc tr:hover td {
+            background:#fffccc;
+        }
+        .highlight { background-color: red; }
+        tr.borderbottom td {
+            border-bottom: 1pt solid black;
+        }
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+<h2>Task description</h2>
+<p>Your task in this part of the study is to make a number of decisions under uncertainty.</p>
+<p>In each decision round you have a choice among alternatives <b>A</b>, <b>B</b>, <b>C</b>, <b>D</b>, <b>E</b>, <b>F</b>, and <b>G</b>. Each alternative represents a lottery, the payoff of which is uncertain at the time of your choice and depends on the realization of a state of the world. There are 7 possible states of the world, labelled <b>S1</b>, <b>S2</b>, <b>S3</b>, <b>S4</b>, <b>S5</b>, <b>S6</b>, and <b>S7</b>.</p>
+<p>For the seven decision alternatives and the seven states of the world, the following decision matrix gives the decision problem:</p>
+
+<br>
+
+<div id="tabledata"></div>
+
+<p>In the decision matrix, you indicate your decision by selecting a radio button from the left hand side column. The state of the world can be any value from the top row of the matrix. Then, your profit will be indicated by the intersection of the row you selected (your decision) and the column (state of the world) that the computer draws randomly.</p>
+<p>The fractions below the state of the world labels are the probabilities of each state. They indicate that there is a 1/7 probability that each state of the world will realize after you have made your decision. The state of the world in any round is independent of the state of the world in previous or later rounds. This means that if state of the world is S7 in one round, it does not affect in any way whether the state of the world is S7 or near that in the next round.</p>
+<p>The possible state of the world realizations are S1, S2, S3, S4, S5, S6, S7, each with equal probability. For example, if your decision is C, your realized profits will be 208 (with probability 1/7), 572 (with probability 1/7), or 936 (with probability 1/7 + 1/7 + 1/7 + 1/7 + 1/7 = 5/7). If the state of the world is S2, your profit is 780 if your decision was A, or 572 if your decision was C.</p>
+<p>If you realized a loss (a negative profit) in a round, this loss will be deducted from your reward (see determination of monetary reward below). Note that each decision situation you will face contains at least one alternative that avoids losses.</p>
+
+
+<h2>Experimental protocol</h2>
+<p>You will first answer to some test questions at the end of this page. Then you have to make decisions in a number of rounds. In each round, you have the choice among a set of possible decisions, and you make these decisions in the decision matrix as given above. After each decision, the computer randomly determines a state of the world. The profit resulting from your decision and the realized state of the world is displayed. Then the computer guides you to the next decision round.</p><p>As in Part 1, you should make sound decisions, because you will be rewarded according to them.</p>
+
+<h2>Reward determination</h2>
+<p>To determine your actual monetary reward from this part, at the end of the experiment the computer will calculate the average profit over all the rounds and divide it by 10. This will be your monetary reward from Part 2 in pence (i.e. in £ 1/100). For example, if your average profit over all the rounds is 897, your monetary reward from this part is £0.90 (rounded to the nearest whole pence). In addition, you will of course receive the reward from Part 1.</p>
+<p>In addition to your rewards from the tasks in Parts 1 and 2, you will receive a baseline reward of £{{ baselinereward }}.</p>
+<h2>Test questions</h2>
+<p>Please answer the following questions concerning the task. We just want to make sure that you have understood the above instructions correctly.</p>
+
+{% formfield player.check1 with label=label1 %}
+{% formfield player.check2 with label=label2 %}
+{% formfield player.check3 with label=label3 %}
+{% formfield player.check4 with label=label4 %}
+{% formfield player.check5 with label=label5 %}
+
+<h2>Begin Part 2</h2>
+
+<p>When you click the Next button below, the first round will start. Please note that every round, starting from the one that begins at the next page, can possibly count for your monetary reward.</p>
+
+<center>
+{% next_button %}
+</center>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+    function createTable() {
+        var margin = {{ margin }}
+        var state = ["S1","S2","S3","S4","S5","S6","S7"];
+        var dec = ["A","B","C","D","E","F","G"];
+
+        if (margin == 'low') {
+            var price = 7.28;
+            var cost = 5.72;
+        }
+        else {
+            var price = 1.78;
+            var cost = 0.38;
+        }
+        var code = "<center><table class=pc cellpadding=5 width=700>";
+        code += "<tr align=center><td width=80>Decision</td><td width=80></td><td width=80></td><td width=80></td><td width=80>State of the world</td><td width=80></td><td width=80></td><td width=80></td></tr>";
+        code += "<tr align=center class=borderbottom><td> </td>";
+        if (margin == 'low') {
+            for (var j = 0; j < 7; j++) {
+                code += "<td><b>" + state[j] + "</b></td>";
+            }
+            code += "</tr>";
+        }
+        else {
+            for (var j = 0; j < 7; j++) {
+                code += "<td><b>" + (300 + j*100) + "</b></td>";
+            }
+            code += "</tr>";
+        }
+        code += "<tr align=center class=borderbottom><td> </td>";
+
+        for (var j = 0; j < 7; j++) {
+            code += "<td>1/7</td>";
+            }
+        code += "</tr>";
+
+        for (var i = 0; i < 7; i++) {
+
+            if (i == 6) {
+                code += "<tr align=center class=borderbottom>";
+            }
+            else {
+                code += "<tr align=center>";
+            }
+
+            if (margin == 'low') {
+                code += "<td><b><input type=radio name= {{ field.html_name }} value=" + i + "> " + dec[i] + "</b></td>";
+            }
+            else {
+                code += "<td><b><input type=radio name= {{ field.html_name}} value=" + i + "> " + (300 + i*100) + "</b></td>";
+            }
+
+            for (var j = 0; j < 7; j++) {
+                if (margin == 'low') {
+                    var dem = (500 + j*50);
+                    var quant = (500 + i*50);
+                }
+                else {
+                    var dem = (300 + j*100);
+                    var quant = (300 + i*100);
+                }
+                if (dem >= quant) {
+                    var pay = price*quant - cost*quant;
+                }
+                else {
+                    var pay = price*dem - cost*quant;
+                }
+                code += "<td>" + pay + "</td>";
+            }
+            code += "</tr>";
+        }
+        code += "</table></center><br><br>";
+
+        return code;
+    }
+
+    function insertHTML(id, html) {
+        var el = document.getElementById(id);
+
+        if(!el) {
+            alert('Element with id ' + id + ' not found.');
+        }
+
+        el.innerHTML = html;
+    }
+
+    function run() {
+        var html = createTable();
+
+        insertHTML('tabledata', html);
+    }
+
+    window.onload = run;
+
+    </script>
+
+{% endblock %}
+

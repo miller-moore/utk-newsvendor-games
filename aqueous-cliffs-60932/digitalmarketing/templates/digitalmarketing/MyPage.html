@@ -1,0 +1,48 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Digital marketing challenge
+{% endblock %}
+
+{% block content %}
+
+    <p>Many companies use social media to market their products. Young consumers especially follow social media accounts
+    of celebrities and influencers and make purchasing decisions based on their recommendations. Promotions of goods and
+        services can be a major source of income for social media influencers.</p>
+
+    <h3>Description</h3>
+
+    <p>You are working with a client, an online retailer that sells fashion items. The client wants to increase sales of
+        two of their items: shoes and a handbag. </p>
+
+    <p>You have initially approached four different Instagram fashion influencers who have
+    given you their terms of promotion. The IG fashion influencers to choose from are:
+    <ul>
+    <li>IG1:</li>
+    <li>IG2:</li>
+    <li>IG3:</li>
+    <li>IG4:</li>
+    </ul>
+
+    <p>To get their fashion item promoted in an influencer's IG account, the client will have to pay each influencer
+        a <b>fixed fee</b> plus a <b>variable fee</b> that depends on the number of followers of the influencer. </p>
+
+    <p>The fixed fee for all influencers is £5,000 to promote the shoes and £3,600 to promote the handbag. </p>
+
+    <p>The variable fee is determined by the number of followers divided by 100. In other words, the client will have
+    to pay one pence per each follower that the influencer has.</p>
+
+    <p><i>Example: Assume that an account has currently 181,000 followers. If shoes are promoted in this account,
+        this will cost: [fixed fee £5,000] + [variable fee 181,000 / 100 = £1,810] = [total: £6,810]</i></p>
+
+    <h3>Your task</h3>
+    <p>To whom the client should send the handbag and to whom they should send the shoes in order to minimise total
+        cost of this marketing campaign? Note: you cannot send both products to the same influencer.</p>
+    <p>Your points are the total cost of your marketing campaign, so the lower the points, the better.</p>
+
+    {% formfields %}
+
+    {% next_button %}
+
+{% endblock %}

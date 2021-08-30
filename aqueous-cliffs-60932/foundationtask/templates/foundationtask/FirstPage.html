@@ -1,0 +1,34 @@
+{% extends "global/Page.html" %}
+{% load otree static otree_tags %}
+
+{% block title %}
+Personal Trust Foundation
+{% endblock %}
+
+{% block content %}
+
+{% formfield player.code with label='Student ID' %}
+
+<div class="instructions well well-lg">
+
+<h2>Background</h2>
+
+<p>Uncle Sylvester is dead.  He had lived a most productive life and accumulated a small fortune.  As you were his favourite, you have been made the sole trustee of your uncle’s estate.  Your uncle had considerable respect for your personal values, and he had directed that, upon his death, you should decide how to allocate the funds that he had placed into the Personal Trust Foundation.  This is the opportunity of a lifetime.  You alone will decide how to spend the money.  Just imagine, you can help those people or projects are closest to your heart.</p>
+
+<p>The Foundation’s goal is to fund projects in the community in which your uncle worked and lived most of his life.  You are required to select programs that you consider to be deserving of a donation from your uncle’s foundation.  Because he was a man who never sought publicity, your uncle has specified that you should not be influenced by the extent to which a program will honour him or preserve the public’s memory of him.  Although many factors may influence the decisions regarding which programs to fund or not to fund, the most critical factor is the degree to which a program agrees with your personal values.</p>
+
+
+<h2>Directions</h2>
+
+<p>You must evaluate competing requests for funding and make judgements about their relative merit.  Many programs have merit, but limited resources require that you select the programs that you prefer to fund.  You have discretionary funds available, and a number of projects are requesting access to these funds.  Your job is to select those that should receive support.  Your goal in selecting projects for funding is to choose those programs that agree with your <b>personal values</b>.</p>
+
+<p>Begin when you are ready.</p>
+
+<p>REMEMBER</p>
+
+<p>YOUR PERSONAL VALUES DETERMINE HOW YOU ALLOCATE THE MONEY</p>
+</div>
+<center>
+{% next_button %}
+</center>
+{% endblock %}

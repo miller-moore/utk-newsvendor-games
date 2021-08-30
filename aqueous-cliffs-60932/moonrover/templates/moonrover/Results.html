@@ -1,0 +1,78 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Thanks!
+{% endblock %}
+
+{% block content %}
+
+    <ul>
+        <li>Total profit: {{ profit }}</li>
+        <li>Travelled distance: {{ dist|to1 }} km</li>
+    </ul>
+    <p>{{ text|safe }}</p>
+
+    <center>
+        <button name="next" class="btn btn-primary btn-large">Play again</button>
+        <button class="btn btn-primary btn-large" type="button" onclick="location.href='http://tiny.cc/bachallenges';">Start over</button>
+    </center>
+
+    <br>
+
+    <div id="wrapper">
+        <div id="info">
+            <p>
+                This challenge is an example of an <b>optimal routing problem</b>, also known as the travelling salesman problem.
+                Companies face routing problems mainly in logistics, where an optimal route must be designed between nodes in a network such that cost is minimised.
+            </p>
+
+            <p>
+                Logistics companies such as Amazon have for long been planning to use drones as delivery vehicles, and the limited range of the drone
+                poses a challenge for designing an optimal route for it. There are also ridesharing platforms in London and other large cities, where companies
+                allow customers to rent vehicles and return them to selected locations, and these platforms face the travelling salesman problem when they design the network.
+                Engineers use the network routing problem to design efficient ways to
+                route information on microchips and fibre optic networks.
+            </p>
+
+            <p>
+                The problem is one of the most difficult ones to solve efficiently. Analytics can help in optimal routing problems by describing the problem as a network and using efficient algorithms to solve it.
+            </p>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block app_styles %}
+
+    <style type="text/css">
+
+        body {
+            background-color: #edffea;
+        }
+
+        .btn {
+            background-color: #216353;
+            border-color: #216353;
+        }
+
+        .page-header {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding-top: 0px;
+        }
+
+        #wrapper {
+            height: 300px;
+        }
+
+        #info {
+            border-radius: 25px;
+            max-height: 100%;
+            overflow: auto;
+            background-color: #75daad;
+            padding: 15px;
+        }
+
+    </style>
+{% endblock %}

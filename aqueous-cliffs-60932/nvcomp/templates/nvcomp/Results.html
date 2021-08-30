@@ -1,0 +1,71 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Results
+{% endblock %}
+
+{% block content %}
+
+    <center>
+
+    <table class="table table-test" style="width:400px; margin-bottom:10px">
+
+        <tr>
+            <td>&nbsp;</td>
+            <td>Your firm</td>
+            <td>Other firm</td>
+        </tr>
+
+        <tr>
+            <td>Order:</td>
+            <td> {{ q1 }}</td>
+            <td> {{ q2 }}</td>
+        </tr>
+
+        <tr>
+            <td>Initial demand:</td>
+            <td>{{ d1 }}</td>
+            <td>{{ d2 }}</td>
+        </tr>
+
+        <tr>
+            <td>Overflow demand:</td>
+            <td>{{ overflowd }}</td>
+            <td>{{ overflowd2 }}</td>
+        </tr>
+
+        <tr>
+            <td>Effective demand:</td>
+            <td> {{ efd1 }} </td>
+            <td> {{ efd2 }} </td>
+        </tr>
+
+        <tr>
+            <td>Revenue:</td>
+            <td>{{ revenue }} p</td>
+            <td>{{ othrevenue }} p</td>
+        </tr>
+
+        <tr>
+            <td>Cost:</td>
+            <td>{{ cost }} p</td>
+            <td>{{ othcost }} p</td>
+        </tr>
+
+        <tr>
+            <td><b>Profit:</b></td>
+            <td><b>{{ payoff }} p</b></td>
+            <td><b>{{ othpayoff }} p</b></td>
+        </tr>
+
+    </table>
+
+    {% next_button %}
+
+    </center>
+
+    {% include Constants.profitcalculator_template %}
+    {% include Constants.instructions_template %}
+
+{% endblock %}

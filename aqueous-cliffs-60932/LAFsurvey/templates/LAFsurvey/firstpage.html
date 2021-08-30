@@ -1,0 +1,18 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Decision Making Style Survey
+{% endblock %}
+
+{% block content %}
+
+
+    <p>The survey is in three parts. Parts I and II start at the next page and include a total of 45 questions. Part III starts after that and contains 40 questions.</p>
+    {% formfield player.name %}
+    {% formfield player.email %}
+    {% formfield player.student_number %}
+    {% next_button %}
+
+
+{% endblock %}

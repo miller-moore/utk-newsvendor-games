@@ -1,0 +1,69 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    press left or right arrow
+{% endblock %}
+
+{% block content %}
+
+    <div id="wrapper">
+
+        <div id="left">
+            left div
+        </div>
+
+        <div id="right">
+            right div
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+
+    var choice = '{{ choice | safe }}';
+    if (choice == 'left') {
+        document.getElementById('right').style.display = 'none';
+    } else {
+        document.getElementById('left').style.display = 'none';
+    }
+
+</script>
+
+{% endblock %}
+
+{% block styles %}
+
+<style>
+
+    .otree-timer {
+        display: none;
+    }
+
+    #left {
+        background-color: red;
+        color: white;
+        padding: 20px;
+        float: left;
+    }
+
+    #right {
+        background-color: green;
+        color: white;
+        padding: 20px;
+        float: left;
+        position: absolute;
+        left: 400px;
+    }
+
+    #wrapper {
+        margin: auto;
+    }
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Test questions -- results
+{% endblock %}
+
+{% block content %}
+
+<p>If you order 45 units, what is the cost of your order?</p>
+<ul>You answered {{ qu1 }}, which is {{ qu1res }} -- the correct answer is 2 × 45 = 90</ul>
+<br>
+<p>If you order 50 units and demand turns out to be 55 units, what is your profit?</p>
+<ul>You answered {{ qu2 }}, which is {{ qu2res }} -- the correct answer is 4 × 50 &minus; 2 × 50 = 100</ul>
+<br>
+<p>What is the likelihood that demand is 60 units or less?</p>
+<ul>You answered {{ qu3 }}%, which is {{ qu3res }} -- the correct answer is 60%</ul>
+<br>
+<p>If you now feel that you understand the instructions, please click the Next button and make your actual decision. </p>
+
+{% next_button %}
+
+{% include Constants.profitcalculator %}
+{% include Constants.instructions_template %}
+
+{% endblock %}

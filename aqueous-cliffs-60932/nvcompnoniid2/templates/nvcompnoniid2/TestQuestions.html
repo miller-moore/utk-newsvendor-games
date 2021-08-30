@@ -1,0 +1,21 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Test questions
+{% endblock %}
+
+{% block content %}
+
+    <p>Please answer the questions below. They will test how well you have understood the instructions.</p>
+
+    {% formfield player.qu1 with label="If you order 50 units to your inventory and the industry demand is 140, and the other firm orders 55 units, what is the effective demand at the other firm's inventory?" %}
+    {% formfield player.qu2 with label="If the industry demand is 100, and the other firm orders 50 units, what is the effective demand at your inventory?" %}
+    {% formfield player.qu3 with label="If you order 40 units to your inventory and the industry demand is 130, and the other firm orders 70 units, what is the other firm's revenue?" %}
+
+    {% next_button %}
+
+    {% include Constants.profitcalculator_template %}
+    {% include Constants.instructions_template %}
+
+{% endblock %}

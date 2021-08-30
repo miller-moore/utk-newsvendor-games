@@ -1,0 +1,26 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Part 3: One Final Question
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Part 3: One Final Question</h1>
+
+<br>
+<p>Now you have completed all trials! Thank you for taking part in this experiment, Before you go to the next page to view your final payoff, we would like to ask you one final question:</p>
+
+{% formfield player.decmode with label="We learned that in the Part 3, sometimes people would straightforwardly choose the options that they feel better about. Other times, people might calculate the potential returns of the lotteries before making choices. How often did you calculate the potential returns of lotteries?" %}
+
+<br><br>
+{% next_button %}
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Practice Session
+{% endblock %}
+
+{% block content %}
+
+<body>
+  {% if display == 0 %}
+  <!-- lottery shown on the right hand side -->
+  <br>
+  <section>
+    <article id="option_left">
+
+      <div class="certainty_div">
+        <p class = "certainty_txt">{{ certainty }}</p>
+
+      </div>
+
+    </article>
+
+    <article id="option_right">
+      <div class="risk_up_div" style="height: {{ risk_up_px }};">
+        <p class="risk_up_txt">{{ risk_up }}</p>
+      </div>
+      <div class="risk_down_div"  style="height: {{ risk_down_px }};">
+        <p class="risk_down_txt">{{ risk_down }}</p>
+      </div>
+      <div class="reward_div">
+        <p class="reward_txt">{{ reward }}</p>
+      </div>
+
+    </article>
+  </section>
+
+  {% else %}
+  <!-- lottery shown on the left hand side -->
+  <br>
+  <section>
+    <article id="option_left">
+      <div class="risk_up_div" style="height: {{ risk_up_px }};">
+        <p class="risk_up_txt">{{ risk_up }}</p>
+      </div>
+      <div class="risk_down_div"  style="height: {{ risk_down_px }};">
+        <p class="risk_down_txt">{{ risk_down }}</p>
+      </div>
+      <div class="reward_div">
+        <p class="reward_txt">{{ reward }}</p>
+      </div>
+
+    </article>
+
+    <article id="option_right">
+
+      <div class="certainty_div">
+        <p class = "certainty_txt">{{ certainty }}</p>
+
+      </div>
+
+    </article>
+  </section>
+  {% endif %}
+
+  <div style="font-size: 20px;">
+    <br>
+    <p>In this trial, you need to decide whether to trade {{certainty}} for a lottery, which has {{risk_down}} percent of chance to win {{reward}}. <br>– If you decide the lottery is more attractive, press the {{lot_key}} key to choose the lottery on the {{lot_key}}. <br>– If you decide to keep the money, press the {{tag_key}} key to choose the monetary amount on the {{tag_key}}.</p>
+
+    <p>[This instruction will not be shown in the actual trials]</p>
+
+  </div>
+
+
+</body>
+
+<!-- <input type="hidden" name="choice" id="id_choice" value='nothing'> -->
+
+<!-- <center>(Press left or right arrow)</center> -->
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+  // document.documentElement.style.cursor = 'none';
+  // This is to hide the cursor, work the same as the CSS method.
+
+  var choice = '{{ choice | safe }}';
+  if (choice == 'left') {
+    document.getElementById("option_left").style.border = "5px solid white";
+  } else {
+    document.getElementById("option_right").style.border = "5px solid white";
+  }
+
+</script>
+
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+
+  .otree-title {
+    font-size: 0;
+  }
+
+  article {
+    float: left;
+    width: 50%;
+    background-color: black;
+    padding: 20px;
+    vertical-align: middle;
+    height: 450px;
+    box-sizing: border-box;
+    border: 5px solid transparent;
+  }
+
+  /* Clear floats after the columns */
+  section:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+
+  p {
+    color: white;
+  }
+
+  body {
+    background-color: black;
+  }
+
+
+  .risk_up_div {
+    width: 100px;
+    background: red;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .risk_up_txt {
+    font-size: 25px;
+    position: relative;
+    top: {{risk_up_posi}};
+  }
+
+  .risk_down_div {
+    width: 100px;
+    background: blue;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .risk_down_txt {
+    font-size: 25px;
+    position: relative;
+    top: {{risk_down_posi}};
+  }
+
+  .reward_div {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .reward_txt {
+    font-weight: normal;
+    font-size: 40px;
+  }
+
+  .certainty_div {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .certainty_txt {
+    /* font-family: "Times New Roman", Times, serif;
+    font-weight: normal;
+    font-size: 90px; */
+    font-weight: 300;
+    font-size: 85px;
+    position: relative;
+    top: 120px;
+  }
+
+  .otree-timer {
+    display: none;
+  }
+
+</style>
+{% endblock %}

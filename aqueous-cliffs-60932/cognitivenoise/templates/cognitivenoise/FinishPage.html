@@ -1,0 +1,69 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Your Payment
+
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">This is the end of the experiment</h1>
+
+<div>
+<h4>For your payment from the Part 2:</h4>
+<p>Your payoff is decided based on the trial {{pick_round_auc}}. In that trial your faced a lottery with {{risk_auc}}% of chance winning ${{reward_auc}}. Your bidding price for this lottery is ${{WTP_auc}}.</p>
+
+{% if scenario_auc == 1 %}
+<p>The generated selling price is ${{selling_price_auc}}, which is greater than your bidding price. Therefore, you did not purchase the lottery. Your payoff from this part is ${{endowment_auc}}</p>
+{% endif %}
+
+{% if scenario_auc == 2 %}
+<p>The generated selling price is ${{selling_price_auc}}, which is less than your bidding price. Therefore, you purchased the lottery at the selling price. Unfortunately, you did not win the reward. Your payoff from this part is ${{payoff_auc}}</p>
+{% endif %}
+
+{% if scenario_auc == 3 %}
+<p>The generated selling price is ${{selling_price_auc}}, which is less than your bidding price. Therefore, you purchased the lottery at the selling price. Congradulation! you won the reward. Your payoff from this part is ${{payoff_auc}}</p>
+{% endif %}
+
+<h4>For your payment from the Part 3:</h4>
+<p>Your payoff is decided based on the trial {{pick_round_ddm}}. In that trial, you were asked if you would like to trade ${{certainty_ddm}} for a lottery with {{risk_ddm}}% of chance winning ${{reward_ddm}}.</p>
+
+{% if scenario_ddm == 1 %}
+<p>You decided to keep the money and declined the trade. Your payoff from this part is ${{endowment_ddm}}</p>
+{% endif %}
+
+{% if scenario_ddm == 2 %}
+<p>You approved the trade and received the lottery. Unfortunately, you did not win the reward. Your payoff from this part is ${{payoff_ddm}}</p>
+{% endif %}
+
+{% if scenario_ddm == 3 %}
+<p>You approved the trade and received the lottery. Congratulations! you won the reward. Your payoff from this part is ${{payoff_ddm}}</p>
+{% endif %}
+
+</div>
+
+<div>
+  <h4>Final payment:</h4>
+  <p>The sum of payment from this experiment is ${{pay_sum}}, which is equal to £{{pay_pound}}.</p>
+</div>
+
+
+<div>
+<p>Thank you for your participation! Please click the link below to move back to Prolific Academic and receive your payment.</p>
+<p><a href=" {{ prolificurl }} ">Click here</a></p>
+</div>
+
+
+<!-- <br>
+<button class="btn btn-primary btn-large">
+  Please give us some feedback
+</button> -->
+
+<style>
+.otree-title {
+  font-size: 0;
+}
+
+</style>
+
+{% endblock %}

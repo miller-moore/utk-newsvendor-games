@@ -1,0 +1,37 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Choose your challenge!
+{% endblock %}
+
+{% block content %}
+
+    <center>
+        <button name="appchoice" value="Dating App" class="buttoni" style="background-color: #d291bc;"><b>Dating App</b><br>Match your clients with each other to create happy couples</button>
+        <button name="appchoice" value="Digital Marketing" class="buttoni" style="background-color: #008CBA;"><b>Digital Marketing</b><br>Create a marketing strategy using social media influencers</button>
+        <button name="appchoice" value="Moonrover" class="buttoni" style="background-color: #216353;"><b>Drone Delivery</b><br>Find an optimal route for a drone delivery company</button>
+    </center>
+
+{% endblock %}
+
+{% block styles %}
+
+<style>
+    .buttoni {
+        border: 0px;
+        color: white;
+        width: 300px;
+        height: 200px;
+        padding: 15px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+    }
+</style>
+
+
+{% endblock %}

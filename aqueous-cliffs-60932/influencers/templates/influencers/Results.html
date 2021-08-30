@@ -1,0 +1,84 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Thanks!
+{% endblock %}
+
+{% block content %}
+
+    <p>You chose to go with {{ chtext }}</p>
+    <ul>Total ROI: ${{ totroi }}<br>
+        Total marketing volume: {{ totvol }}<br>
+        Total cost of investment: ${{ totcost }},000</ul>
+    <p>{{ result }}</p>
+    <center>
+        <button name="next" class="btn btn-primary btn-large">Play again</button>
+        <button class="btn btn-primary btn-large" type="button" onclick="location.href='http://tiny.cc/bachallenges';">Start over</button>
+    </center>
+
+    <br>
+
+    <div id="wrapper">
+        <div id="info">
+            <p>
+                This challenge is an example of a <b>knapsack problem</b>, where there is a need to maximise
+                the value of a collection of non-divisible items. Each item has value that contributes to the
+                total value of the knapsack, and weight that contributes to the total weight.
+                The name derives from the familiar problem of filling a knapsack when going for a holiday:
+                the knapsack has a maximum allowed weight, and the user wants to maximise the total value of
+                the packed items.
+            </p>
+            <p>
+                Companies and decision makers face knapsack problems in resource allocation. For example, a
+                new venture may have to select a set of business divisions to invest in such that the return
+                on investment is maximised. The projects may have interdependencies, as with the
+                digital marketing problem. In other words, if you include one project, this may dictate whether
+                you also include or exclude another.
+            </p>
+            <p>
+                Knapsack problems are most often solved with dynamic programming algorithms, which decompose the
+                problem into smaller sub-problems and solve these recursively. The digital marketing problem is a special
+                case known as the <b>0-1 knapsack problem</b>, where the inclusion of an influencer is described with a binary
+                variable (0 means exclude, 1 means include).
+            </p>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block app_styles %}
+
+    <style type="text/css">
+
+        body {
+            background-color: #fdef96;
+        }
+
+        .btn {
+            background-color: #afa939;
+            border-color: #afa939;
+        }
+
+        .page-header {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding-top: 0px;
+        }
+
+        #wrapper {
+            height: 325px;
+        }
+
+        #info {
+            border-radius: 25px;
+            max-height: 100%;
+            overflow: auto;
+            background-color: #f7b71d;
+            padding: 15px;
+        }
+
+    </style>
+{% endblock %}
+
+

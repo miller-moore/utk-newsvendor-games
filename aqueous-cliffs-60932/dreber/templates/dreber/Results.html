@@ -1,0 +1,73 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Results (round {{roundnumber}})
+{% endblock %}
+
+{% block content %}
+
+    <p>
+        {% if same_choice %}
+        Both of you chose <b>{{ my_decision }}</b>.
+        {% else %}
+        You chose <b>{{ my_decision }}</b> and your partner chose <b>{{ other_player_decision }}</b>.
+        {% endif %}
+    </p>
+
+    <p>
+        {% if earned %}
+        As a result, in this round you <b>earned £{{ player.payoffi }}</b>
+        {% else %}
+        As a result, in this round you <b>lost £{{ lostpayoff }}</b>
+        {% endif %}
+
+        {% if othearned %}
+        and your partner <b>earned £{{ player.othpayoff }}</b>.
+        {% else %}
+        and your partner <b>lost £{{ lostothpayoff }}</b>.
+        {% endif %}
+    </p>
+    <table class='table table-bordered text-center'
+           style='width: auto; margin: auto'>
+        <tr>
+            <th colspan=2 rowspan=2></th>
+            <th colspan=3><center>Your partner</center></th>
+        </tr>
+            <tr>
+                <th><center>A</center></th>
+                <th><center>B</center></th>
+                <th><center>C</center></th>
+            </tr>
+            <tr>
+                <th rowspan="3"><span class="rotate90"><center>You</center></span></th>
+                <th>A</th>
+                <td>{{Constants.cc|to0}}, {{Constants.cc|to0}}</td>
+                <td>{{Constants.cdrow|to0}}, {{Constants.cdcol|to0}}</td>
+                <td>{{Constants.cprow|to0}}, {{Constants.cpcol|to0}}</td>
+            </tr>
+            <tr>
+                <th>B</th>
+                <td>{{Constants.dcrow|to0}}, {{Constants.dccol|to0}}</td>
+                <td>{{Constants.dd|to0}}, {{Constants.dd|to0}}</td>
+                <td>{{Constants.dprow|to0}}, {{Constants.dpcol|to0}}</td>
+            </tr>
+            <tr>
+                <th>C</th>
+                <td>{{Constants.pcrow|to0}}, {{Constants.pccol|to0}}</td>
+                <td>{{Constants.pdrow|to0}}, {{Constants.pdcol|to0}}</td>
+                <td>{{Constants.pp|to0}}, {{Constants.pp|to0}}</td>
+            </tr>
+        </tr>
+    </table>
+    <br>
+    <p><center>
+    How conflicted did you feel when making your decision? (1 = not at all conflicted, 9 = most conflicted)
+    {% formfield player.conflict %}
+    </center></p>
+    <br>
+<p><i>Remember: there is a 3/4 probability that pressing the next button below will lead to a new round of interaction with your partner. Otherwise, the interactions end and you will not meet your partner again.</i></p>
+
+    {% next_button %}
+
+{% endblock %}

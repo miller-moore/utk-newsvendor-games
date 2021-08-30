@@ -1,0 +1,125 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Part 2: Check-up Questions
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Part 2: Check-up Questions (2 / 2)</h1>
+
+<body>
+
+  <article class="figure">
+    <!-- <h5>Figure 2:</h5> -->
+    <div class="lottery">
+      <div class="risk_up_div" style="height: {{ risk_up_px }};">
+        <p class="risk_up_txt">{{ risk_up }}</p>
+      </div>
+      <div class="risk_down_div"  style="height: {{ risk_down_px }};">
+        <p class="risk_down_txt">{{ risk_down }}</p>
+      </div>
+      <div class="reward_div">
+        <p class="reward_txt">{{ reward }}</p>
+      </div>
+    </div>
+  </article>
+
+  <article class="text">
+    <br>
+    <h5>Imagine that you are assigned with $25 to invest in lotteries and you set bid price of $6 to the lottery in the figure. At the end of the auction this lottery is selected to count, then:</h5>
+    <!-- <p>For the lottery shown in the Figure 2:</p> -->
+    <!-- <br> -->
+    {% formfield player.cq_a1 with label="1. If the randomly generated selling price is $9, what is your payment from the auction?" %}
+
+    {% formfield player.cq_a2 with label="2. If the randomly generated selling price is $4 and you win the lottery, what is your payment from the auction?" %}
+
+    {% formfield player.cq_a3 with label="3. If the randomly generated selling price is $4 and you lose the lottery, what is your payment from the auction?" %}
+
+
+    <br>
+
+    <button class="btn btn-primary btn-large">
+      Next
+    </button>
+
+  </article>
+
+</body>
+
+
+<style type="text/css">
+
+  .otree-title {
+    font-size: 0;
+  }
+
+  /* h4 {
+    text-decoration: underline;
+  } */
+
+  .text {
+    float: right;
+    width: 70%;
+    padding: 20px;
+
+  }
+
+  .figure {
+    float: right;
+    width: 30%;
+    padding: 20px;
+
+    position: relative;
+    top: 120px;
+  }
+
+  .lottery {
+    background-color: black;
+    padding: 20px;
+    vertical-align: middle;
+    /* height: 420px; */
+  }
+
+  .risk_up_div {
+    width: 100px;
+    background: red;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .risk_up_txt {
+    color: white;
+    font-size: 25px;
+    position: relative;
+    top: {{risk_up_posi}};
+  }
+
+  .risk_down_div {
+    width: 100px;
+    background: blue;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .risk_down_txt {
+    color: white;
+    font-size: 25px;
+    position: relative;
+    top: {{risk_down_posi}};
+  }
+
+  .reward_div {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .reward_txt {
+    color: white;
+    font-weight: normal;
+    font-size: 40px;
+  }
+</style>
+
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Results from Part II
+{% endblock %}
+
+{% block content %}
+
+    <center>
+
+    <table class="table table-test" style="width:400px; margin-bottom:10px">
+
+        <tr>
+            <td>Order:</td>
+            <td> {{ q }}</td>
+        </tr>
+
+        <tr>
+            <td>Demand:</td>
+            <td>{{ d }}</td>
+        </tr>
+
+        <tr>
+            <td>Nonsatisfied demand:</td>
+            <td>{{ overflowd2 }}</td>
+        </tr>
+
+        <tr>
+            <td>Leftover units:</td>
+            <td>{{ leftovers }}</td>
+        </tr>
+
+        <tr>
+            <td>Revenue:</td>
+            <td>{{ revenue }} p</td>
+        </tr>
+
+        <tr>
+            <td>Cost:</td>
+            <td>{{ cost }} p</td>
+        </tr>
+
+        <tr>
+            <td><b>Profit:</b></td>
+            <td><b>{{ payoff }} p</b></td>
+        </tr>
+
+    </table>
+
+    <p>Clicking the next button below will move you to the final part of the study.</p>
+
+    {% next_button %}
+
+    </center>
+
+    {% include Constants.instructions_template %}
+
+{% endblock %}

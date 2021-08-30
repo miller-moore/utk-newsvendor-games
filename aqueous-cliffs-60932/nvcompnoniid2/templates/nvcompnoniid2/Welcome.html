@@ -1,0 +1,27 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %} Decision making study {% endblock %}
+
+{% block content %}
+
+<p>
+    Please maximise your browser window, switch off phone/e-mail/music and anything else distracting.
+</p>
+
+<p>
+    By proceeding you consent to participate in this study. You understand that all data will be kept confidential by the researcher.
+    Your personal information will not be stored with the data. You are free to withdraw at any time without giving a reason.
+</p>
+
+<br>
+ {% formfield player.prolificcode with label="Please enter your Prolific Academic Participant ID here:" %}
+<br>
+
+<br>
+
+<center>
+    {% next_button %}
+</center>
+
+{% endblock %}

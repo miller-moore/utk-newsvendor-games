@@ -1,0 +1,109 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+<h3>Profit calculator</h3>
+<center>
+<table>
+    <tr>
+        <td>
+            Your order:
+        </td>
+        <td>
+            <input type="text" name="q1" size="5">
+        </td>
+        <td>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </td>
+        <td>
+            Your initial demand:
+        </td>
+        <td>
+            <input type="text" name="d1" size="5">
+        </td>
+        <td>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </td>
+        <td>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Other's order:
+        </td>
+        <td>
+            <input type="text" name="q2" size="5">
+        </td>
+        <td>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </td>
+        <td>
+            Other's initial demand:
+        </td>
+        <td>
+            <input type="text" name="d2" size="5">
+        </td>
+        <td>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </td>
+        <td>
+            <input type="button" id="submit_button" value="Calculate">
+        </td>
+    </tr>
+
+</table>
+</center>
+
+
+{% block scripts %}
+<script>
+function calc() {
+    var q1, d1, q2, d2, efd1, efd2;
+
+    q1 = document.getElementsByName("q1")[0].value;
+    d1 = document.getElementsByName("d1")[0].value;
+    q2 = document.getElementsByName("q2")[0].value;
+    d2 = document.getElementsByName("d2")[0].value;
+
+    if (!isNaN(q1) & !isNaN(d1) & !isNaN(q2) & !isNaN(d2) & q1>=1 & q1<=100 & d1>=1 & d1<=100 & q2>=1 & q2<=100 & d2>=1 & d2<=100) {
+
+        if (q1 < d1) {
+            efd2 = Number(d2) + Math.round(0.8*(Number(d1) - Number(q1)));
+        } else {
+            efd2 = Number(d2);
+        }
+
+        if (q2 < d2) {
+            efd1 = Number(d1) + Math.round(0.8*(Number(d2) - Number(q2)));
+        } else {
+            efd1 = Number(d1);
+        }
+
+        total0 = "Own firm:";
+        total1 = "\n\t* effective demand:\t".concat(efd1);
+        total2 = "\n\t* revenue:\t".concat(4*Math.min(q1,efd1));
+        total3 = "\n\t* ordering costs:\t".concat(2*q1);
+        total4 = "\n\t*** Own profit:\t".concat(4*Math.min(efd1,q1)-2*q1);
+        total5 = "\n\nOther firm:\n\t* effective demand:\t".concat(efd2);
+        total6 = "\n\t* revenue:\t".concat(4*Math.min(q2,efd2));
+        total7 = "\n\t* ordering costs:\t".concat(2*q2);
+        total8 = "\n\t*** Other's profit:\t".concat(4*Math.min(efd2,q2)-2*q2);
+
+        alert(total0+total1+total2+total3+total4+total5+total6+total7+total8);
+
+    } else {
+
+        alert("Check your input values");
+
+    }
+}
+
+window.onload = function () {
+    document.getElementById("submit_button").onclick = calc;
+};
+</script>
+{% endblock %}
+
+</div>
+

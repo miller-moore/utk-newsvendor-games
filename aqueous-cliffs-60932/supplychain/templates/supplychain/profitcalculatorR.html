@@ -1,0 +1,417 @@
+{% load otree static %}
+
+<div class="instructions well well-lg">
+
+<h3>Retailer profit calculator</h3>
+<center>
+
+    <table border="1" cellspacing="3">
+
+        <tr>
+            <td rowspan="9" width="250pt" align="left">
+                <b>May supply (units): <span id="maysupply">0</span></b><br>
+                <input type="range" min="0" max="5000" value="0" class="slider" id="mayrange"><br>
+                <b>June supply (units): <span id="junesupply">0</span></b><br>
+                <input type="range" min="0" max="5000" value="0" class="slider" id="junerange"><br>
+                <b>July supply (units): <span id="julysupply">0</span></b><br>
+                <input type="range" min="0" max="5000" value="0" class="slider" id="julyrange"><br>
+                <b>August supply (units): <span id="augustsupply">0</span></b><br>
+                <input type="range" min="0" max="5000" value="0" class="slider" id="augustrange"><br>
+                <b>Wholesale price (£): <span id="wholesaleprice">0</span></b><br>
+                <input type="range" min="0" max="200" value="0" class="slider" id="wholesalerange"><br>
+            </td>
+            <td width="200pt">
+
+            </td>
+            <td width="60pt" align="center">
+                May&nbsp;
+            </td>
+            <td width="60pt" align="center">
+                Jun
+            </td>
+            <td width="60pt" align="center">
+                Jul
+            </td>
+            <td width="60pt" align="center">
+                Aug
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Demand (end of mo.)
+            </td>
+            <td align="center">
+                {{ demand.0 }}
+            </td>
+            <td align="center">
+                {{ demand.1 }}
+            </td>
+            <td align="center">
+                {{ demand.2 }}
+            </td>
+            <td align="center">
+                {{ demand.3 }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Inventory (start of mo.)
+            </td>
+            <td align="center">
+                <span id="mayinve">0</span>
+            </td>
+            <td align="center">
+                <span id="juneinve">0</span>
+            </td>
+            <td align="center">
+                <span id="julyinve">0</span>
+            </td>
+            <td align="center">
+                <span id="augustinve">0</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Sales
+            </td>
+            <td align="center">
+                <span id="maysales">0</span>
+            </td>
+            <td align="center">
+                <span id="junesales">0</span>
+            </td>
+            <td align="center">
+                <span id="julysales">0</span>
+            </td>
+            <td align="center">
+                <span id="augustsales">0</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Fixed order cost
+            </td>
+            <td align="center">
+                <span id="mayfoc">0</span>
+            </td>
+            <td align="center">
+                <span id="junefoc">0</span>
+            </td>
+            <td align="center">
+                <span id="julyfoc">0</span>
+            </td>
+            <td align="center">
+                <span id="augustfoc">0</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Variable order cost
+            </td>
+            <td align="center">
+                <span id="mayvoc">0</span>
+            </td>
+            <td align="center">
+                <span id="junevoc">0</span>
+            </td>
+            <td align="center">
+                <span id="julyvoc">0</span>
+            </td>
+            <td align="center">
+                <span id="augustvoc">0</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Holding cost
+            </td>
+            <td align="center">
+                <span id="mayhc">0</span>
+            </td>
+            <td align="center">
+                <span id="junehc">0</span>
+            </td>
+            <td align="center">
+                <span id="julyhc">0</span>
+            </td>
+            <td align="center">
+                <span id="augusthc">0</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Salvage revenue
+            </td>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+            <td>
+
+            </td>
+            <td align="center">
+                <span id="salvagep">0</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Monthly profit
+            </td>
+            <td align="center">
+                <span id="mayp">0</span>
+            </td>
+            <td align="center">
+                <span id="junep">0</span>
+            </td>
+            <td align="center">
+                <span id="julyp">0</span>
+            </td>
+            <td align="center">
+                <span id="augustp">0</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6" align="right">
+                Total profit: <span id="totprof">0</span>
+            </td>
+        </tr>
+
+    </table>
+</center>
+
+</div>
+
+
+{% block scripts %}
+<script>
+
+var mayslider = document.getElementById("mayrange");
+var mayoutput = document.getElementById("maysupply");
+var junslider = document.getElementById("junerange");
+var junoutput = document.getElementById("junesupply");
+var julslider = document.getElementById("julyrange");
+var juloutput = document.getElementById("julysupply");
+var augslider = document.getElementById("augustrange");
+var augoutput = document.getElementById("augustsupply");
+var wslider = document.getElementById("wholesalerange");
+var woutput = document.getElementById("wholesaleprice");
+
+var mayinvoutput = document.getElementById("mayinve");
+var juninvoutput = document.getElementById("juneinve");
+var julinvoutput = document.getElementById("julyinve");
+var auginvoutput = document.getElementById("augustinve");
+
+var maysalesoutput = document.getElementById("maysales");
+var junsalesoutput = document.getElementById("junesales");
+var julsalesoutput = document.getElementById("julysales");
+var augsalesoutput = document.getElementById("augustsales");
+
+var mayfocoutput = document.getElementById("mayfoc");
+var junfocoutput = document.getElementById("junefoc");
+var julfocoutput = document.getElementById("julyfoc");
+var augfocoutput = document.getElementById("augustfoc");
+
+var mayvocoutput = document.getElementById("mayvoc");
+var junvocoutput = document.getElementById("junevoc");
+var julvocoutput = document.getElementById("julyvoc");
+var augvocoutput = document.getElementById("augustvoc");
+
+var mayhcoutput = document.getElementById("mayhc");
+var junhcoutput = document.getElementById("junehc");
+var julhcoutput = document.getElementById("julyhc");
+var aughcoutput = document.getElementById("augusthc");
+
+var maypoutput = document.getElementById("mayp");
+var junpoutput = document.getElementById("junep");
+var julpoutput = document.getElementById("julyp");
+var augpoutput = document.getElementById("augustp");
+
+var salvagepoutput = document.getElementById("salvagep");
+
+var totprofoutput = document.getElementById("totprof");
+
+mayslider.oninput = function() {
+
+    var d1 = Math.round(this.value);
+    var d2 = Math.round(junslider.value);
+    var d3 = Math.round(julslider.value);
+    var d4 = Math.round(augslider.value);
+    var d5 = Math.round(wslider.value);
+
+    update(d1,d2,d3,d4,d5);
+}
+
+junslider.oninput = function() {
+
+    var d1 = Math.round(mayslider.value);
+    var d2 = Math.round(this.value);
+    var d3 = Math.round(julslider.value);
+    var d4 = Math.round(augslider.value);
+    var d5 = Math.round(wslider.value);
+
+    update(d1,d2,d3,d4,d5);
+}
+
+julslider.oninput = function() {
+
+    var d1 = Math.round(mayslider.value);
+    var d2 = Math.round(junslider.value);
+    var d3 = Math.round(this.value);
+    var d4 = Math.round(augslider.value);
+    var d5 = Math.round(wslider.value);
+
+    update(d1,d2,d3,d4,d5);
+}
+
+augslider.oninput = function() {
+
+    var d1 = Math.round(mayslider.value);
+    var d2 = Math.round(junslider.value);
+    var d3 = Math.round(julslider.value);
+    var d4 = Math.round(this.value);
+    var d5 = Math.round(wslider.value);
+
+    update(d1,d2,d3,d4,d5);
+}
+
+wslider.oninput = function() {
+
+    var d1 = Math.round(mayslider.value);
+    var d2 = Math.round(junslider.value);
+    var d3 = Math.round(julslider.value);
+    var d4 = Math.round(augslider.value);
+    var d5 = Math.round(this.value);
+
+    update(d1,d2,d3,d4,d5);
+}
+
+update = function(d1,d2,d3,d4,d5) {
+
+    // supply quantities that are presented above each slider
+    mayoutput.innerHTML = d1;
+    junoutput.innerHTML = d2;
+    juloutput.innerHTML = d3;
+    augoutput.innerHTML = d4;
+    woutput.innerHTML = d5;
+
+    // inventories
+    var mayinventory = d1;
+    var juninventory = d2 + Math.max(mayinventory - {{ demand.0|json }}, 0);
+    var julinventory = d3 + Math.max(juninventory - {{ demand.1|json }}, 0);
+    var auginventory = d4 + Math.max(julinventory - {{ demand.2|json }}, 0);
+    var salinventory = Math.max(auginventory - {{ demand.3|json }}, 0);
+
+    mayinvoutput.innerHTML = mayinventory;
+    juninvoutput.innerHTML = juninventory;
+    julinvoutput.innerHTML = julinventory;
+    auginvoutput.innerHTML = auginventory;
+
+    // sales
+    var maysales = Math.min(mayinventory, {{ demand.0|json }});
+    var junsales = Math.min(juninventory, {{ demand.1|json }});
+    var julsales = Math.min(julinventory, {{ demand.2|json }});
+    var augsales = Math.min(auginventory, {{ demand.3|json }});
+
+    maysalesoutput.innerHTML = maysales;
+    junsalesoutput.innerHTML = junsales;
+    julsalesoutput.innerHTML = julsales;
+    augsalesoutput.innerHTML = augsales;
+
+    // fixed order costs
+    var mayfoc = 0;
+    var junfoc = 0;
+    var julfoc = 0;
+    var augfoc = 0;
+
+    if (d1 > 0) { mayfoc = {{ Constants.rordercost|json }}; }
+    if (d2 > 0) { junfoc = {{ Constants.rordercost|json }}; }
+    if (d3 > 0) { julfoc = {{ Constants.rordercost|json }}; }
+    if (d4 > 0) { augfoc = {{ Constants.rordercost|json }}; }
+
+    mayfocoutput.innerHTML = mayfoc;
+    junfocoutput.innerHTML = junfoc;
+    julfocoutput.innerHTML = julfoc;
+    augfocoutput.innerHTML = augfoc;
+
+    // variable order costs
+    mayvocoutput.innerHTML = d5*d1;
+    junvocoutput.innerHTML = d5*d2;
+    julvocoutput.innerHTML = d5*d3;
+    augvocoutput.innerHTML = d5*d4;
+
+    // inventory holding costs
+    mayhc = {{ Constants.rholdingcost|json }}*mayinventory;
+    junhc = {{ Constants.rholdingcost|json }}*juninventory;
+    julhc = {{ Constants.rholdingcost|json }}*julinventory;
+    aughc = {{ Constants.rholdingcost|json }}*auginventory;
+
+    mayhcoutput.innerHTML = mayhc;
+    junhcoutput.innerHTML = junhc;
+    julhcoutput.innerHTML = julhc;
+    aughcoutput.innerHTML = aughc;
+
+    // monthly profits
+    var maypr = {{ Constants.rprice|json }}*maysales - mayfoc - d5*d1 - mayhc;
+    var junpr = {{ Constants.rprice|json }}*junsales - junfoc - d5*d2 - junhc;
+    var julpr = {{ Constants.rprice|json }}*julsales - julfoc - d5*d3 - julhc;
+    var augpr = {{ Constants.rprice|json }}*augsales - augfoc - d5*d4 - aughc;
+
+    maypoutput.innerHTML = maypr;
+    junpoutput.innerHTML = junpr;
+    julpoutput.innerHTML = julpr;
+    augpoutput.innerHTML = augpr;
+
+    // salvage revenue
+    var salpr = {{ Constants.salvageprice|json }}*salinventory;
+    salvagepoutput.innerHTML = salpr;
+
+    // total profit
+    totprofoutput.innerHTML = maypr + junpr + julpr + augpr + salpr;
+
+}
+
+</script>
+{% endblock %}
+
+
+
+{% block styles %}
+
+<style type="text/css">
+
+.slider {
+    -webkit-appearance: none;  /* Override default CSS styles
+    appearance: none;
+    width: 100%; /* Full-width */
+    height: 25px; /* Specified height */
+    background: #d3d3d3; /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default look */
+    appearance: none;
+    width: 20px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+.slider::-moz-range-thumb {
+    width: 20px; /* Set a specific slider handle width */
+    height: 25px; /* Slider handle height */
+    background: #4CAF50; /* Green background */
+    cursor: pointer; /* Cursor on hover */
+}
+
+</style>
+{% endblock %}

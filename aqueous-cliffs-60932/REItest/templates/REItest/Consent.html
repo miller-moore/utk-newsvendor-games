@@ -1,0 +1,42 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+Consent Information
+{% endblock %}
+
+{% block content %}
+<h1 style="font-size: 35px;">Consent Information</h1>
+
+<body>
+
+  {% formfield player.prolific_code with label="Please enter your Prolific Academic Participant ID here." %}
+
+  <!-- <br> -->
+  <p>The study is conducted by researchers at Loughborough University. We will be using the data from you in order to undertake this study and will act as the data controller for this study. This means that the University is responsible for looking after your information and using it properly. By moving to the next page, you agree that you understand and consent with the following:</p>
+
+  <ul>
+    <li>This study is designed to further scientific knowledge and that all procedures have been approved by the Loughborough University Ethics Approvals (Human Participants) Sub-Committee.</li>
+    <br>
+    <li>You are under no obligation to take part in the study, you have the right to withdraw from this study at any stage for any reason, and you will not be required to explain the reasons for withdrawing.</li>
+    <br>
+    <li>All the personal information you provide will be processed in accordance with data protection legislation on the public task basis and will be treated in strict confidence unless it is judged that confidentiality will have to be breached for the safety of the participant or others or for audit by regulatory authorities.</li>
+    <br>
+    <li>Information you provide will be used anonymously for publications, reports, and other research outputs.</li>
+  </ul>
+
+</body>
+
+<br>
+<button class="btn btn-primary btn-large">
+  Next
+</button>
+
+<style>
+  .otree-title {
+    font-size: 0;
+  }
+
+</style>
+
+{% endblock %}

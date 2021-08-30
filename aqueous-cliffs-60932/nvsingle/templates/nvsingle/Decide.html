@@ -1,0 +1,22 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Decide inventory level
+{% endblock %}
+
+
+{% block content %}
+
+    {% formfield player.units with label="How many units will you order to your inventory (from 1 to 100)? After you have made your decision, a demand value (from 1 to 100) will be randomly drawn and your profit will be determined according to the instructions below. You can use the profit calculator to experiment with different values of order and demand to see what is the hypothetical profit." %}
+
+    <p>Note that this is the only decision you make in this part. After your decision, the results will appear and you will move to Part III.</p>
+
+    {% next_button %}
+
+{% include Constants.profitcalculator %}
+
+{% include Constants.instructions_template %}
+
+{% endblock %}
+

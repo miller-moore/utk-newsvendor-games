@@ -1,0 +1,18 @@
+{% extends "global/Page.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+	That's it!
+{% endblock %}
+
+{% block content %}
+
+<p>Thank you for participating in our study. Your total monetary reward is £{{ total }}. It consists of £{{ payoff }} from Part 1, £1.20 from Part 2, and £3 from Part 3.</p>
+<p>Please note that your monetary reward will be paid in two parts, first the fixed part and then the remaininf as a bonus payment.</p>
+<p>You can now proceed back to Prolific Academic by following the link below.</p>
+<center>
+<p><a href=" {{ prolificurl }} ">Click here</a></p>
+</center>
+{% endblock %}
+
+

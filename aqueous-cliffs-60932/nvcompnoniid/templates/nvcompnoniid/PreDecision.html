@@ -1,0 +1,28 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Test questions -- results
+{% endblock %}
+
+{% block content %}
+
+<p>If you order 50 units to your inventory and the industry demand is 140, and the other firm orders 55 units, what is the effective demand at the other firm's inventory?</p>
+<ul>You answered {{ qu1 }}, which is {{ qu1res }} -- the correct answer is [initial allocation] + [reallocation] = 70 + 16 = 86</ul>
+<br>
+
+<p>If the industry demand is 100, and the other firm orders 50 units, what is the effective demand at your inventory?</p>
+<ul>You answered {{ qu2 }}, which is {{ qu2res }} -- the correct answer is [initial allocation] + [reallocation] =  50 + 0 = 50</ul>
+<br>
+
+<p>If you order 40 units to your inventory and the industry demand is 130, and the other firm orders 70 units, what is the other firm's revenue?</p>
+<ul>You answered {{ qu3 }}, which is {{ qu3res }} -- the correct answer is 4 × [order or effective demand, whichever is smaller] = 4 × 70 = 280</ul>
+<br>
+
+{% next_button %}
+
+{% include Constants.profitcalculator_template %}
+{% include Constants.instructions_template %}
+
+
+{% endblock %}

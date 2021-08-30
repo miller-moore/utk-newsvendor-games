@@ -1,0 +1,314 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+{% load staticfiles %}
+
+{% block content %}
+
+    <div class="outsideWrapper">
+        <div class="insideWrapper">
+            <img src="http://i.imgur.com/moEtopw.png" class="coveredImage" id="coveredImage">
+            <!-- insert canvas here -->
+        </div>
+    </div>
+
+    <center>
+
+        <p id="p1">Click on a location to set distribution point, then select four customer sites</p>
+
+        <input type="hidden" name="startx" id="hstartx">
+        <input type="hidden" name="starty" id="hstarty">
+        <input type="hidden" name="firstsite" id="hfirstsite">
+        <input type="hidden" name="secondsite" id="hsecondsite">
+        <input type="hidden" name="thirdsite" id="hthirdsite">
+        <input type="hidden" name="fourthsite" id="hfourthsite">
+        <input type="hidden" name="fifthsite" id="hfifthsite">
+
+        <button class="btn btn-primary btn-large">Submit your answer</button>
+        <button class="btn btn-primary btn-large" type="button" onclick="instructions()" style="line-height: 15px;"><span style="font-size: 25px; font-family: Georgia, serif;">i</span></button>
+
+    </center>
+
+{% endblock %}
+
+{% block scripts %}
+
+    <script>
+
+        var imageid = document.getElementById("coveredImage");
+        if (window.innerWidth > 550) {
+            imageid.insertAdjacentHTML("afterend", "<canvas id=myCanvas width=500px height=500px></canvas>");
+        } else {
+            imageid.insertAdjacentHTML("afterend", "<canvas id=myCanvas width=320px height=320px></canvas>");
+        }
+
+        function instructions() {
+            alert("You are in charge of route planning in a London company that uses a drone to deliver parcels. Possible customer destinations are shown in the map. The numbers assigned to each destination represent profit margins (in £1,000s) that you get from each customer.\n\nEach square in the grid of the map represents a one sq-km area. The drone can travel any straight distance in the map, including diagonals. For example, the distance between customers at Woolwich and Greenwich is 2.24 km.\n\nFirst you have to decide the location of the distribution point. This is where the parcels are loaded from a lorry onto the drone. The distribution point can be placed at any customer location. You can select the location by clicking/touching it.\n\nThen select four destinations where the drone will fly, such that your total profit is maximised.\n\nThe drone can travel a maximum route of 10 km.\n");
+        }
+
+        var canvas = document.getElementById("myCanvas");
+        var ctx = canvas.getContext("2d");
+        var w = canvas.width;
+        var h = canvas.height;
+
+        // DRAW THE GRID LINES
+        var i;
+        for (i = 0; i < 11; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0+i*(w/10), 0);
+            ctx.lineTo(0+i*(w/10), h);
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#555";
+            ctx.stroke();
+            ctx.moveTo(0, 0+i*(h/10));
+            ctx.lineTo(w, 0+i*(h/10));
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+        // DRAW THE LOCATIONS
+        var x = [1,2,4,5,7,7,7,8,8,9];
+        var y = [8,3,9,2,3,6,8,1,4,7];
+        var scores = [3,3,5,4,2,1,2,2,1,1];
+        var names = ['Bow','Millwall','Stratford','Greenwich','Woolwich','Beckton','East Ham','Shooters Hill','Pier','Barking'];
+
+        var i;
+        for (i = 0; i<10; i++) {
+            cirx = 0+x[i]*(w/10);
+            ciry = 0+(10-y[i])*(h/10);
+
+            ctx.beginPath();
+            ctx.arc(cirx, ciry, 12, 0, 2 * Math.PI, false);
+            ctx.fillStyle = '#cc0000';
+            ctx.fill();
+            ctx.font = '12pt Arial';
+            ctx.fillStyle = 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(scores[i], cirx, ciry);
+            ctx.closePath();
+        }
+
+        var xlocs = [];
+        var ylocs = [];
+        var namelist = [];
+
+        canvas.addEventListener('click', (e) => {
+            var rect = canvas.getBoundingClientRect();
+            var xx = e.clientX - rect.left; // 400 top-left corner must be zero
+            var yy = e.clientY - rect.top;  // 80 top-left corner must be zero
+
+            // CLEAR CANVAS AND REDRAW
+            ctx.clearRect(0,0,w,h);
+
+            // DRAW THE GRID LINES
+            var i;
+            for (i = 0; i < 11; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0+i*(w/10), 0);
+                ctx.lineTo(0+i*(w/10), h);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = "#555";
+                ctx.stroke();
+                ctx.moveTo(0, 0+i*(h/10));
+                ctx.lineTo(w, 0+i*(h/10));
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.closePath();
+            }
+
+            // LOCATION COORDINATES AND NAMES
+            var x = [1,2,4,5,7,7,7,8,8,9];
+            var y = [8,3,9,2,3,6,8,1,4,7];
+            var scores = [3,3,5,4,2,1,2,2,1,1];
+            var names = ['Bow','Millwall','Stratford','Greenwich','Woolwich','Beckton','East Ham','Shooters Hill','Pier','Barking'];
+
+            // DRAW ONLY RECENT LINES BETWEEN CUSTOMERS
+            if ( Math.sqrt((xx - x[0]*(w/10)) ** 2 + (yy - (10-y[0])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[0]);
+                xlocs.push(x[0]*(w/10));
+                ylocs.push((10-y[0])*(h/10));
+            } else if ( Math.sqrt((xx - x[1]*(w/10)) ** 2 + (yy - (10-y[1])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[1]);
+                xlocs.push(x[1]*(w/10));
+                ylocs.push((10-y[1])*(h/10));
+            } else if ( Math.sqrt((xx - x[2]*(w/10)) ** 2 + (yy - (10-y[2])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[2]);
+                xlocs.push(x[2]*(w/10));
+                ylocs.push((10-y[2])*(h/10));
+            } else if ( Math.sqrt((xx - x[3]*(w/10)) ** 2 + (yy - (10-y[3])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[3]);
+                xlocs.push(x[3]*(w/10));
+                ylocs.push((10-y[3])*(h/10));
+            } else if ( Math.sqrt((xx - x[4]*(w/10)) ** 2 + (yy - (10-y[4])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[4]);
+                xlocs.push(x[4]*(w/10));
+                ylocs.push((10-y[4])*(h/10));
+            } else if ( Math.sqrt((xx - x[5]*(w/10)) ** 2 + (yy - (10-y[5])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[5]);
+                xlocs.push(x[5]*(w/10));
+                ylocs.push((10-y[5])*(h/10));
+            } else if ( Math.sqrt((xx - x[6]*(w/10)) ** 2 + (yy - (10-y[6])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[6]);
+                xlocs.push(x[6]*(w/10));
+                ylocs.push((10-y[6])*(h/10));
+            } else if ( Math.sqrt((xx - x[7]*(w/10)) ** 2 + (yy - (10-y[7])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[7]);
+                xlocs.push(x[7]*(w/10));
+                ylocs.push((10-y[7])*(h/10));
+            } else if ( Math.sqrt((xx - x[8]*(w/10)) ** 2 + (yy - (10-y[8])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[8]);
+                xlocs.push(x[8]*(w/10));
+                ylocs.push((10-y[8])*(h/10));
+            } else if ( Math.sqrt((xx - x[9]*(w/10)) ** 2 + (yy - (10-y[9])*(h/10)) ** 2) < 12 ) {
+                namelist.push(names[9]);
+                xlocs.push(x[9]*(w/10));
+                ylocs.push((10-y[9])*(h/10));
+            }
+
+
+            if (namelist.length > 5) {
+                returnlist = namelist.slice(namelist.length-5, namelist.length)
+                ctx.moveTo(xlocs[xlocs.length-6], ylocs[ylocs.length-6]);
+                ctx.beginPath();
+                ctx.lineTo(xlocs[xlocs.length-5], ylocs[ylocs.length-5]); ctx.strokeStyle = "#FF0000"; ctx.lineWidth = 4; ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-4], ylocs[ylocs.length-4]); ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-3], ylocs[ylocs.length-3]); ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-2], ylocs[ylocs.length-2]); ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-1], ylocs[ylocs.length-1]); ctx.stroke();
+                ctx.closePath();
+            } else if (namelist.length == 5) {
+                returnlist = namelist
+                ctx.beginPath();
+                ctx.moveTo(xlocs[xlocs.length-5], ylocs[ylocs.length-5]);
+                ctx.lineTo(xlocs[xlocs.length-4], ylocs[ylocs.length-4]); ctx.strokeStyle = "#FF0000"; ctx.lineWidth = 4; ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-3], ylocs[ylocs.length-3]); ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-2], ylocs[ylocs.length-2]); ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-1], ylocs[ylocs.length-1]); ctx.stroke();
+                ctx.closePath();
+            } else if (namelist.length == 4) {
+                returnlist = namelist
+                ctx.beginPath();
+                ctx.moveTo(xlocs[xlocs.length-4], ylocs[ylocs.length-4]);
+                ctx.lineTo(xlocs[xlocs.length-3], ylocs[ylocs.length-3]); ctx.strokeStyle = "#FF0000"; ctx.lineWidth = 4; ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-2], ylocs[ylocs.length-2]); ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-1], ylocs[ylocs.length-1]); ctx.stroke();
+                ctx.closePath();
+            } else if (namelist.length == 3) {
+                returnlist = namelist
+                ctx.beginPath();
+                ctx.moveTo(xlocs[xlocs.length-3], ylocs[ylocs.length-3]);
+                ctx.lineTo(xlocs[xlocs.length-2], ylocs[ylocs.length-2]); ctx.strokeStyle = "#FF0000"; ctx.lineWidth = 4; ctx.stroke();
+                ctx.lineTo(xlocs[xlocs.length-1], ylocs[ylocs.length-1]); ctx.stroke();
+                ctx.closePath();
+            } else if (namelist.length == 2) {
+                returnlist = namelist
+                ctx.beginPath();
+                ctx.moveTo(xlocs[xlocs.length-2], ylocs[ylocs.length-2]);
+                ctx.lineTo(xlocs[xlocs.length-1], ylocs[ylocs.length-1]); ctx.strokeStyle = "#FF0000"; ctx.lineWidth = 4; ctx.stroke();
+                ctx.closePath();
+            } else if (namelist.length == 1) {
+                returnlist = namelist
+            }
+
+            // DRAW THE LOCATIONS
+            var i;
+            for (i = 0; i<10; i++) {
+                cirx = 0+x[i]*(w/10);
+                ciry = 0+(10-y[i])*(h/10);
+
+                ctx.beginPath();
+                ctx.arc(cirx, ciry, 12, 0, 2 * Math.PI, false);
+                ctx.fillStyle = '#cc0000';
+                ctx.fill();
+                ctx.font = '12pt Arial';
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(scores[i], cirx, ciry);
+                ctx.closePath();
+            }
+
+            document.getElementById("p1").innerHTML = returnlist;
+
+            document.getElementById("hstartx").value = xlocs[xlocs.length-5]/(w/10);
+            document.getElementById("hstarty").value = (10-ylocs[ylocs.length-5]/(h/10));
+            document.getElementById("hfirstsite").value = returnlist[0];
+            document.getElementById("hsecondsite").value = returnlist[1];
+            document.getElementById("hthirdsite").value = returnlist[2];
+            document.getElementById("hfourthsite").value = returnlist[3];
+            document.getElementById("hfifthsite").value = returnlist[4];
+
+        });
+
+    </script>
+
+{% endblock %}
+
+{% block styles %}
+    <style>
+
+        .otree-form-errors {
+            display: none;
+        }
+
+        body, html {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-color: #edffea;
+        }
+
+        .btn {
+            background-color: #216353;
+            border-color: #216353;
+        }
+
+        #p1 {
+            font-size: 12px;
+        }
+
+        .page-header {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding-top: 0px;
+        }
+
+        .outsideWrapper {
+            width: 500px;
+            height: 500px;
+            margin: auto;
+            align: center;
+        }
+
+        .insideWrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .coveredImage {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+
+        #myCanvas {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+
+        @media only screen and (max-width: 550px) {
+            .outsideWrapper {
+                width: 320px;
+                height: 320px;
+                margin: auto;
+                align: center;
+            }
+        }
+
+    </style>
+
+{% endblock %}

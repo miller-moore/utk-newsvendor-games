@@ -1,0 +1,308 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block content %}
+<header>
+    Day {{ player.round_number }}
+</header>
+
+
+
+
+
+<section>
+    <nav>
+        <b>Silver item (value £{{ Constants.price.1 }})</b><br>
+        Stock: {{ I.1 | to0}}<br>
+        Previous order: {{ prevQ.1 }}<br>
+        Previous demand: {{ prevD.1 | to0 }}<br>
+        Expected demand for next day: 3<br>
+        Annual holding cost: £{{ Constants.holdingcost.1 }} / item<br>
+        Annual backlog cost: £{{ Constants.backlogcost.1 }} / item<br>
+        <table><tr><td>Your order:</td><td>{% formfield player.QB %}</td></tr></table>
+    </nav>
+    <article>
+        <div id="chartContainerB" style="height: 200px; width: 100%;"></div>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    </article>
+    <nav>
+        <b>Total costs</b><br><br>
+        Holding costs<br><div class="div_holdingcost" style="width: {{ holdingcostpx.1 }};"> £{{ thc.1 | to2 }}</div>
+        Order costs<br><div class="div_orderingcost" style="width: {{ orderingcostpx.1 }};">£{{ toc.1 | to2 }}</div>
+        Backlog costs<br><div class="div_backlogcost" style="width: {{ backlogcostpx.1 }};">£{{ tbc.1 | to2 }}</div>
+        <br>
+        Cost efficiency score: {{ costscoreB | to2 }}
+    </nav>
+</section>
+
+
+
+
+{% if simple == 'no' %}
+
+
+<section style="background-color: #666;">&nbsp;</section>
+
+
+
+
+
+
+<section>
+    <nav>
+        <b>Gold item (value £{{ Constants.price.0 }})</b><br>
+        Stock: {{ I.0 | to0}}<br>
+        Previous order: {{ prevQ.0 }}<br>
+        Previous demand: {{ prevD.0 | to0 }}<br>
+        Expected demand for next day: 3<br>
+        Annual holding cost: £{{ Constants.holdingcost.0 }} / item<br>
+        Annual backlog cost: £{{ Constants.backlogcost.0 }} / item<br>
+        <table><tr><td>Your order:</td><td>{% formfield player.QA %}</td></tr></table>
+    </nav>
+    <article>
+        <div id="chartContainerA" style="height: 200px; width: 100%;"></div>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    </article>
+    <nav>
+        <b>Total costs</b><br><br>
+        Holding costs<br><div class="div_holdingcost" style="width: {{ holdingcostpx.0 }};"> £{{ thc.0 | to2 }}</div>
+        Order costs<br><div class="div_orderingcost" style="width: {{ orderingcostpx.0 }};">£{{ toc.0 | to2 }}</div>
+        Backlog costs<br><div class="div_backlogcost" style="width: {{ backlogcostpx.0 }};">£{{ tbc.0 | to2 }}</div>
+        <br>
+        Cost efficiency score: {{ costscoreA | to2 }}
+    </nav>
+</section>
+
+
+
+
+
+
+<section style="background-color: #666;">&nbsp;</section>
+
+
+
+
+
+
+
+<section>
+    <nav>
+        <b>Bronze item (value £{{ Constants.price.2 }})</b><br>
+        Stock: {{ I.2 | to0}}<br>
+        Previous order: {{ prevQ.2 }}<br>
+        Previous demand: {{ prevD.2 | to0 }}<br>
+        Expected demand for next day: 3<br>
+        Annual holding cost: £{{ Constants.holdingcost.2 }} / item<br>
+        Annual backlog cost: £{{ Constants.backlogcost.2 }} / item<br>
+        <table><tr><td>Your order:</td><td>{% formfield player.QC %}</td></tr></table>
+    </nav>
+    <article>
+        <div id="chartContainerC" style="height: 200px; width: 100%;"></div>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    </article>
+    <nav>
+        <b>Total costs</b><br><br>
+        Holding costs<br><div class="div_holdingcost" style="width: {{ holdingcostpx.2 }};"> £{{ thc.2 | to2 }}</div>
+        Order costs<br><div class="div_orderingcost" style="width: {{ orderingcostpx.2 }};">£{{ toc.2 | to2 }}</div>
+        Backlog costs<br><div class="div_backlogcost" style="width: {{ backlogcostpx.2 }};">£{{ tbc.2 | to2 }}</div>
+        <br>
+        Cost efficiency score: {{ costscoreC | to2 }}
+    </nav>
+</section>
+
+
+
+
+
+
+{% else %}
+
+    <input type="hidden" name="QA" value=0>
+    <input type="hidden" name="QC" value=0>
+
+{% endif %}
+
+
+
+<section style="background-color: #666;">&nbsp;</section>
+
+
+
+
+
+
+<section>
+    <center>
+        All orders have ordering cost of £{{ Constants.ordercost }}<br>
+        {% next_button %}
+    </center>
+</section>
+<footer>
+
+    {% include Constants.instructions_template %}
+</footer>
+
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+window.onload = function () {
+
+    CanvasJS.addColorSet("customColorSet1", ["#c4d4e0"]);
+    var datapointsB = [{y: {{ allIB.0 }}, label: 1}]
+    var i
+    var rounds = {{ Constants.num_rounds }}
+    for (i=1; i<rounds; i++) {
+        var yy = {{ allIB | safe }}
+        datapointsB.push({y: yy[i], label: i+1})
+    }
+
+    var chartB = new CanvasJS.Chart("chartContainerB", {
+	    animationEnabled: true,
+        theme: "theme1",
+  	    colorSet: "customColorSet1",
+	    axisY: {
+		    title: "Stock Level"
+	    },
+	    data: [{
+		    type: "column",
+		    showInLegend: false,
+		    dataPoints: datapointsB,
+	    }]
+    });
+    chartB.render();
+
+    CanvasJS.addColorSet("customColorSet1", ["#FFD700"]);
+    var datapointsA = [{y: {{ allIA.0 }}, label: 1}]
+    var i
+    var rounds = {{ Constants.num_rounds }}
+    for (i=1; i<rounds; i++) {
+        var yy = {{ allIA | safe }}
+        datapointsA.push({y: yy[i], label: i+1})
+    }
+
+    var chartA = new CanvasJS.Chart("chartContainerA", {
+	    animationEnabled: true,
+        theme: "theme1",
+  	    colorSet: "customColorSet1",
+	    axisY: {
+		    title: "Stock Level"
+	    },
+	    data: [{
+		    type: "column",
+		    showInLegend: false,
+		    dataPoints: datapointsA,
+	    }]
+    });
+    chartA.render();
+
+
+
+
+
+    CanvasJS.addColorSet("customColorSet1", ["#cd7f32"]);
+    var datapointsC = [{y: {{ allIC.0 }}, label: 1}]
+    var i
+    var rounds = {{ Constants.num_rounds }}
+    for (i=1; i<rounds; i++) {
+        var yy = {{ allIC | safe }}
+        datapointsC.push({y: yy[i], label: i+1})
+    }
+
+    var chartC = new CanvasJS.Chart("chartContainerC", {
+	    animationEnabled: true,
+        theme: "theme1",
+  	    colorSet: "customColorSet1",
+	    axisY: {
+		    title: "Stock Level"
+	    },
+	    data: [{
+		    type: "column",
+		    showInLegend: false,
+		    dataPoints: datapointsC,
+	    }]
+    });
+    chartC.render();
+
+}
+
+</script>
+
+{% endblock %}
+
+{% block styles %}
+<style type="text/css">
+
+header {
+  background-color: #666;
+  padding: 20px;
+  text-align: center;
+  font-size: 25px;
+  color: white;
+}
+
+section {
+  background: #ccc;
+}
+
+nav {
+  float: left;
+  width: 30%;
+  background: #ccc;
+  padding: 20px;
+}
+
+article {
+  float: left;
+  padding: 20px;
+  width: 40%;
+  background-color: #fff;
+}
+
+/* Clear floats after the columns */
+section:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* Style the footer */
+footer {
+  background-color: #777;
+  padding: 10px;
+  text-align: left;
+  color: white;
+}
+
+.div_holdingcost {
+  height: 24px;
+  background: #ff8080;
+  text-align: center;
+}
+
+.div_orderingcost {
+  height: 24px;
+  background: #ff8080;
+  text-align: center;
+}
+
+.div_backlogcost {
+  height: 24px;
+  background: #ff8080;
+  text-align: center;
+}
+
+/* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
+@media (max-width: 600px) {
+  nav, article {
+    width: 100%;
+    height: auto;
+  }
+}
+
+
+</style>
+
+{% endblock %}
