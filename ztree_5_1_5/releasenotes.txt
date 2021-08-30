@@ -1,0 +1,1472 @@
+================================================================================
+Release 5.1.5 - August 2, 2021
+================================================================================
+
+Bugfixes
+--------
+* Old treatment without session table let z-Tree crash
+* Old questionnaires let z-Tree crash
+* pos function let z-Tree crash
+
+================================================================================
+Release 4.2.2 - August 2, 2021
+================================================================================
+
+Bugfix
+------
+* pos function let z-Tree crash
+
+================================================================================
+Release 5.1.4 - June 19, 2021
+================================================================================
+
+Bugfixes
+--------
+* Separate Tables errors when treatment are not consecutive
+* Scheduling was not always called
+* Error in sorting in treatment command
+
+Improvements
+------------
+* Quicker plot text
+
+================================================================================
+Release 5.1.3 - March 9, 2021
+================================================================================
+
+Bugfixes
+--------
+* Welcome treatment does not work if clients are connected too quickly in a row.
+
+================================================================================
+Release 5.1.2 - March 8, 2021
+================================================================================
+
+Bugfixes
+--------
+* Rename table session in questionnaires
+* Rename table in filenames and urls
+* Rename table in labels (item, plot item) and in plot text
+* Renaming of session into clients table completed: questionnaire, expressions
+  in text, filenames and URLs.
+* Plot text: sometimes the text is not fully visible.
+* Welcome and dropout treatments were not tested before start.
+
+Improvements
+------------
+* When a welcome treatment is defined, it is automatically starts the
+  unconnected clients, i.e. those not yet in the clients table.
+* Variable LastClientNumber in the subjects table keeps the information of
+  dropped out clients.
+* Chat box: scrolls to the end if it has been at the end befor but keeps the
+  scroll position otherwise.
+* Button and Table dialog: <Return>-key is not entered in button text but ends
+  the dialog.
+* Question dialog: Resolution not fully visible.
+
+================================================================================
+Release 5.1.1 - February 23, 2021
+================================================================================
+
+Bugfixes
+--------
+* Fix in "Save all Tables" (missing table name)
+* Fix of "Sort Clients" and "Shuffle Clients"
+* State remaine in done when last subject leaves stage with clientremove()
+
+================================================================================
+Release 5.1.0 - February 17, 2021
+================================================================================
+
+Please see the extended release notes for version 5
+=> https://www.ztree.uzh.ch/static/doc/version_5_extended_releasenotes.pdf
+
+Stuff old users have to adjust to
+---------------------------------
+
+* IMPORTANT:
+  session table has been renamed to client.
+  But it is automatically done when you load an old treatment.
+* "Clients' Table" renamed to "Connection Monitor".
+* If line width is positive, an empty line color is black (not invisible).
+* No warning if payment file has not be written.
+
+Scheduling of treatments
+------------------------
+
+* "treatment" statement allows to...
+  - automatically run treatments
+  - define welcome treatment
+  - running treatment one after the other 
+  - dropout handling
+* function clientremove()
+* Menu command for clientremove()
+
+Treatment can run in parallel
+-----------------------------
+
+* Subjects that go into a treatment can be selected
+* Flexible number of subjects with Number Of Subjects = -1
+* Scheduling treatments with Number Of Subjects = 0
+
+New tables
+----------
+
+* treatments: scheduling information
+* clients: information about the clients (replaces session table; session is
+  automatically renamed to clients)
+* participations: which client participated in which periods of which treatment
+  (documents dropout): ParticipationID, ClientNumber, Subject, TreatmentNumber,
+  StartInPeriod, FinishedPerid (in questionnaire 0/1)
+* sessionglobals: a table with lifetime session and exactly one record
+* Questionnaire has access to the following tables: clients (default),
+  sessionglobals, treatments, participations
+
+New info in Tables
+------------------
+
+* State and remaining time can be accessed in the clients table. 
+* ClientNumber in subjects table
+* TreatmentID in globals table
+* globals variable Repetition (1,2,...) set if you use RepeatTreatment
+* added checks that ensure that system variables are not modified.
+
+Data storage
+------------
+
+* Backup file name (@123.ztt) more informative
+* Questionnaires
+  - output is also stored in xls file, and "Separate Table..." automatically
+    creates a table with all the questions.
+  - Address form is displayed whenever a field (first name ... email) is nonempty.
+  - Address info is appended to the address file if there are multiple address
+    screens.
+  - Subjects are individually ready when they have finished the questionnaire. 
+  - Added special Payment File; sorted by name and without clientID
+
+Smaller improvements
+--------------------
+
+* Leave Stage from menu leaves the stages that are relevant when you invoke the
+  command. When the program continues, then the stages that are now reached will
+  not be affected by this command.
+* Option /tablefontsize for server. It is useful for high resolution screens.
+* Command line option treatmentdir.
+* "/tree" removed in treatment menu
+* "Open..."dialog allows selecting multiple treatments and questionnaires.
+* utility to "Rename Table". Click on the table and choose the command
+
+Better Restore procedure
+------------------------
+
+* "Reload database" renamed to "Restore session"
+* restore brings clients at situation when z-Tree was left, not only at the
+  beginnig of the period.
+* Gamesafe stores all database changes. It is easier to use now. 
+* New Command "Save All Tables"
+* No more menu "Replay Leaf From GameSafe" (no longer necessary)
+
+Changes in Tools
+----------------
+
+* Separate tables makes also a questionnaires file
+* "Join questionnaires file..." replaces "Join *.sbj file..." 
+* Removed "Transpose *.sbj file..." 
+
+================================================================================
+Release 4.2.1 - October 29, 2020
+================================================================================
+
+Bugfix
+------
+* Parameters table crashing
+
+================================================================================
+Release 4.2.0 - September 2, 2020
+================================================================================
+
+New Feature
+-----------
+* Added Serbian to the list of supported languages
+
+Bugfix
+------
+* Labels are to small for Arabic text
+
+================================================================================
+Release 4.1.11 - August 21, 2019
+================================================================================
+
+Bugfixes
+--------
+* No messages sent for new records if connector is placed in background
+* Unknown variables in layout let z-Tree crash
+
+================================================================================
+Release 4.1.10 - August 7, 2019
+================================================================================
+
+Bugfix
+------
+* Compatibility problem with opening older versions
+
+================================================================================
+Release 4.1.9 - June 25, 2019
+================================================================================
+
+Bugfix
+------
+* Crash after a treatment is saved while running
+
+================================================================================
+Release 4.1.8 - June 4, 2019
+================================================================================
+
+Bugfix
+------
+* TotalProfit is not updated on client
+
+================================================================================
+Release 4.1.7 - February 22, 2019
+================================================================================
+
+Bugfixes
+--------
+* incompatibility of items with string variable from version < 4.0.11
+* export empty text fields
+* checker with variables not in the input (e.g. empty allowed) let z-Tree crash
+
+================================================================================
+Release 4.1.6 - November 12, 2018
+================================================================================
+
+Bugfixes
+--------
+* roundup(-.1,1) returns -0, which is displayed as -0
+* Unknown variable error on leaf if variable is only used on background screens
+* Crash with condition in box in waiting BG
+
+================================================================================
+Release 4.1.5 - October 5, 2018
+================================================================================
+
+Bugfix
+------
+* Starting a treatment when the screen from a previous run displays a plot box
+  let the leaf crash
+
+================================================================================
+Release 4.1.4 - September 19, 2018
+================================================================================
+
+Bugfix
+------
+* Error when importing a plot rect with variables in the picture file name.
+
+================================================================================
+Release 4.1.3 - September 16, 2018
+================================================================================
+
+Bugfix
+------
+* Added error message if table function has wrong type. Avoids resulting crash.
+
+================================================================================
+Release 4.1.2 - August 30, 2018
+================================================================================
+
+Bugfix
+------
+* Plot input in plot line is not stored
+
+================================================================================
+Release 4.1.1 - August 22, 2018
+================================================================================
+
+Improvements
+------------
+* Whole database transmitted to z-Leaf only once per period.
+
+Bugfix
+------
+* Crash with trigger in plot box
+
+================================================================================
+Release 4.1.0 - August 13, 2018
+================================================================================
+
+Improvements
+------------
+* Version compatibility check. If versions are incompatible zleaf is exited.
+* Layout can be empty in string output items.
+
+================================================================================
+Release 4.0.34 - July 27, 2018
+================================================================================
+
+Improvements
+------------
+* Layout in for string variables irrelevant (string is not cut to)
+
+Bugfix
+------
+* Crash with strings in output items.
+
+================================================================================
+Release 4.0.33 - July 15, 2018
+================================================================================
+
+Bugfix
+------
+* Number 9.3 appears in input variable like 9.3000000001, changed also in output file.
+
+================================================================================
+Release 4.0.32 - June 22, 2018
+================================================================================
+
+Bugfixes
+--------
+* Scope error after plot input.
+* External programs not checked.
+
+================================================================================
+Release 4.0.31 - June 19, 2018
+================================================================================
+
+Bugfix
+------
+* If "Start time of the period" is used, error at start of program
+
+================================================================================
+Release 4.0.30 - June 17, 2018
+================================================================================
+
+New Features
+------------
+* New functions stringinsert and stringdelete
+** stringinsert(str, at, strtoinsert)
+** stringdelete(str, at, len)
+
+Improvements
+------------
+* Layout of item streamlined (e.g. descender always visible).
+
+Bugfixes
+--------
+* Problem with input variable with scope in standard box
+* Input in contract grid boxes does not work
+
+================================================================================
+Release 4.0.29 - June 6, 2018
+================================================================================
+
+Improvements
+------------
+* Start time string shows always 3 digits for seconds (easier to parse)
+* Increased maximum size of programs from 32k to 1M
+
+Bugfixes
+--------
+* !text does not work for input items with large fonts (field too small)
+
+================================================================================
+Release 4.0.28 - May 30, 2018 
+================================================================================
+
+New Features
+------------
+* State in questionnaires now shown in Clients' Table
+* New function replacesall
+replaceall( s, s1, s2) replaces all occurrences of s1 in s by s2.
+example: s= replaceall( "ababxabyab","ab","123"); // "123123x123y123"
+
+
+Improvements
+------------
+* More space for variable in item dialog 
+
+Bugfixes
+--------
+* !text does not work without <>
+* State in questionnaire not shown
+* Check of "uses" variables not always working
+
+================================================================================
+Release 4.0.27 - May 27, 2018
+================================================================================
+
+Bugfixes
+--------
+* Crash with an array in contract table 
+* Variables in tables with lifetime session cannot be defined in the used field.
+
+================================================================================
+Release 4.0.26 - May 16, 2018
+================================================================================
+
+New Features
+------------
+New function optionswitch( option, option1, value1, option2, value2,...)
+Returns: the value corresponding to first best match of option with optioni.
+Types: option and optioni have to be of the same type and valuei have to be of
+the same type
+Example: optionswitch( 2,  0, "v0",  1, "v1",  3, "v3",  4, "v4") --> "v1"
+
+Bugfixes
+--------
+* Scope problem in lvalue
+* Import of uses in session table are ignored
+* DDX_Text fix fixed
+* Event time does not work in plot items
+
+================================================================================
+Release 4.0.25 - April 29, 2018
+================================================================================
+
+Bugfixes
+--------
+* Memory leak
+
+================================================================================
+Release 4.0.24 - April 28, 2018
+================================================================================
+
+Improvement
+-----------
+* Speedup DBReplace
+
+================================================================================
+Release 4.0.23 - April 26, 2018
+================================================================================
+
+Bugfixes
+--------
+* Divers
+
+================================================================================
+Release 4.0.22 - April 23, 2018
+================================================================================
+
+Improvement
+-----------
+
+* Multiple header boxes possible.
+
+Bugfixes
+--------
+* Divers
+
+================================================================================
+Release 4.0.21 - April 16, 2018
+================================================================================
+
+Bugfixes
+--------
+* ZTREE-192 Crash if item is opened with undefined stuff above
+* Crash if syntax error in item variable, e.g. max(1,2,3)
+
+================================================================================
+Release 4.0.20 - April 11, 2018
+================================================================================
+
+Bugfix
+--------
+* Old treatments occasionally crash when edited
+
+================================================================================
+Release 4.0.19 - April 10, 2018
+================================================================================
+
+Bugfixes
+--------
+* Old treatments with string input.
+* Checker update.
+
+================================================================================
+Release 4.0.18 - April 8, 2018
+================================================================================
+
+Bugfixes
+--------
+* Problem with old programs using new keywords like "real".
+
+================================================================================
+Release 4.0.17 - March 28, 2018
+================================================================================
+
+Bugfixes
+--------
+* problem with precompiled program
+
+================================================================================
+Release 4.0.16 - March 27, 2018
+================================================================================
+
+Improvement
+-----------
+* Active items work also in contract list boxes.
+
+================================================================================
+Release 4.0.15 - March 26, 2018
+================================================================================
+
+Bugfixes
+--------
+* output items in contract creation box should be in contracts table.
+* no error for expession in items, but error message on client.
+
+================================================================================
+Release 4.0.14 - March 25, 2018
+================================================================================
+
+Bugfix
+--------
+* Table loader: Check that all variable are defined (necessary for precompilation)
+
+================================================================================
+Release 4.0.13 - March 22, 2018
+================================================================================
+
+Bugfix
+--------
+* String as <|> variable
+
+================================================================================
+Release 4.0.12 - March 22, 2018
+================================================================================
+
+Bugfix
+--------
+* divers
+
+================================================================================
+Release 4.0.11 - March 18, 2018
+================================================================================
+Internal version
+
+Bugfix
+--------
+* divers
+
+New Feature
+-----------
+* connector info accepts variables
+* All types can be used in items
+* new string functions:
+** real countstringsubstrings( String s, String substring);
+** real countstringsubstringwithnonseparators(String  s, String substring, String separatorset);
+** real countstringsubwords(String s, String word); 
+** long countstringsubstringwithseparators(String s, String  word, String wordchars); 
+** real countstringletters(String s, String letterset); 
+
+================================================================================
+Release 4.0.10 - March 4, 2018
+================================================================================
+Internal version
+
+Bugfix
+--------
+* Size of plot point not updated 
+* Typos and layout in dialogs
+* In table functions
+* Check for !text options inconsistent with interpreter
+
+New Feature
+-----------
+* Loop variables can be modified in loop
+* Error message for checker at the end of the active screen (no longer supported)
+
+
+================================================================================
+Release 4.0.9 - February 27, 2018
+================================================================================
+Internal version
+
+New Feature
+-----------
+* connector can automatically reconnect
+* connector can be passive (i.e. listening)
+
+================================================================================
+Release 4.0.8 - February 22, 2018
+================================================================================
+Internal version
+
+Bugfix
+--------
+diverse bugs introduced with precompiling
+
+================================================================================
+Release 4.0.7 - February 20, 2018
+================================================================================
+Internal version
+
+Bugfix
+--------
+crash of with program in connector
+
+================================================================================
+Release 4.0.6 - February 19, 2018
+================================================================================
+Internal version
+
+Bugfix
+--------
+crash if x,y empty in point, rect or text.
+crash of triggers
+
+Improvements
+------------
+Plot rect: all combinations of 2 entries of x, width, left, right are admissible.
+Menu reorganization:
+- all connector stuff into connector menu
+- Plot box and slide show box _also_ in the graphics and slide show menu
+
+================================================================================
+Release 4.0.5 - January 4, 2018
+================================================================================
+
+Internal version
+
+Bugfix
+--------
+error in mixliner( red(), red()) and in outcolor
+
+
+================================================================================
+Release 4.0.4 - December 22, 2017
+================================================================================
+
+Internal version
+
+Bugfix
+--------
+Crash after plot input
+Float entries in dialog are filled into other fields
+Payment file not rounded
+
+================================================================================
+Release 4.0.3 - December 12, 2017
+================================================================================
+
+Internal version
+
+internal color functions (colorcomplexity and outcolor; no long term support guaranteed)
+
+================================================================================
+Release 4.0.2 - October 31, 2017
+================================================================================
+
+Internal version
+
+Bugfix
+--------
+buttom item creates strange entry in subjects table
+
+================================================================================
+Release 4.0.1 - October 6, 2017
+================================================================================
+
+Internal version
+
+Features
+--------
+* iterator replaced by for loop
+* colors and booleans can be used as variables 
+* arrays can contain also strings, booleans and colors
+* color functions and operations
+** color definitions
+*** rgb, rgb255, hsl, hsl255
+** black, white, red, green, blue, yellow
+** color functions
+*** getred[255], getgreen[255],getblue[255]
+*** gethue[255], saturation[255], lightness[255]
+*** getint
+** color operations
+*** mix(c1,c2,w1), mixlinear(c1,c2,w1)
+
+Improvements
+------------
+* Speed increase for programs and plot item display 
+* dragged item is always on top
+
+Bugfixes
+--------
+* Many introduced related to new features - but many already fixed
+
+
+================================================================================
+Release 3.7.4 - February 27, 2017
+================================================================================
+
+Internal version
+
+Bugfixes
+--------
+
+* [ZTREE-164] z-Leaf crashes when connector out's data changes (record modified
+  or added)
+
+================================================================================
+Release 3.7.3 - June 21, 2016
+================================================================================
+
+Internal version
+
+Bugfixes
+--------
+
+* [ZTREE-157] active item on screen is not updated when variable changes if
+  default value is set
+
+================================================================================
+Release 3.6.7 - June 21, 2016
+================================================================================
+
+Bugfixes
+--------
+
+* [ZTREE-157] active item on screen is not updated when variable changes if
+  default value is set
+
+================================================================================
+Release 3.7.2 - May 25, 2016
+================================================================================
+
+Internal version
+
+Bugfixes
+--------
+
+* [ZTREE-156] strange behavior of floating point entry fields in stage tree
+  dialogs (e.g. General Parameters)
+* [ZTREE- 109] no message shown if checker only contains a yes button  
+
+New Feature
+-----------
+
+* [ZTREE-155] added Croatian to the list of supported languages
+
+Development environment
+-----------------------
+
+* Switched to toolset v140 10.0.10586.0 due to a bug in the C Runtime
+  [ZTREE-156]
+
+================================================================================
+Release 3.6.6 - May 25, 2016
+================================================================================
+
+Bugfixes
+--------
+
+* [ZTREE-156] strange behavior of floating point entry fields in stage tree
+  dialogs (e.g. General Parameters)
+* [ZTREE- 109] no message shown if checker only contains a yes button  
+
+Development environment
+-----------------------
+
+* Switched back to toolset v120_xp due to a bug in the C Runtime [ZTREE-156]
+
+================================================================================
+Release 3.6.7 - June 21, 2016
+================================================================================
+
+Bugfixes
+--------
+
+* [ZTREE-157] active item on screen is not updated when variable changes if
+  default value is set
+
+================================================================================
+Release 3.6.6 - May 25, 2016
+================================================================================
+
+Bugfixes
+--------
+
+* [ZTREE-156] strange behavior of floating point entry fields in stage tree
+  dialogs (e.g. General Parameters)
+* [ZTREE- 109] no message shown if checker only contains a yes button  
+
+Development environment
+-----------------------
+
+* Switched back to toolset v120_xp due to a bug in the C Runtime [ZTREE-156]
+
+================================================================================
+Release 3.6.5 - May 3, 2016
+================================================================================
+
+New Feature
+-----------
+
+* [ZTREE-155] added Croatian to the list of supported languages
+
+================================================================================
+Release 3.7.1 - April 26, 2016
+================================================================================
+
+Internal version
+
+Bugfixes
+--------
+
+* [ZTREE-154] resize to fit does not always work
+* [ZTREE-149] allow -1 as format in text output of string variable
+
+Improvement
+-----------
+
+* [ZTREE-153] allow negativ values for position command line options
+
+================================================================================
+Release 3.6.4 - April 26, 2016
+================================================================================
+
+Bugfixes
+--------
+
+* [ZTREE-154] resize to fit does not always work
+
+Improvement
+-----------
+
+* [ZTREE-153] allow negativ values for position command line options
+
+================================================================================
+Release 3.6.3 - April 15, 2016
+================================================================================
+
+Bugfixes
+--------
+
+* [ZTREE-149] allow -1 as format in text output of string variable
+
+================================================================================
+Release 3.7.0 - March 23, 2016
+================================================================================
+
+Internal version
+
+New Features
+------------
+
+* connector
+
+================================================================================
+Release 3.6.2 - March 18, 2016
+================================================================================
+
+Bugfixes
+--------
+
+* [ZTREE-146] ztree crashes when RepeatTreatment is set
+* zleaf crashes on "Restart all clients"
+
+================================================================================
+Release 3.6.1 - March 17, 2016
+================================================================================
+
+Bugfixes
+--------
+
+* Restart of client does not work (bug introduced in version 3.6.0)
+
+================================================================================
+Release 3.6.0 - March 8, 2016
+================================================================================
+
+Bugfixes
+--------
+
+* [ZTREE-134] PNG not supported in multimedia box
+* [ZTREE-135] Scope operator not interpreted in text output
+* [ZTREE-136] Format is ignored in text output of string variable
+* [ZTREE-144] Table dumpers cannot be imported if they are in buttons
+
+Development environment
+-----------------------
+
+* Switched to Visual Studio 2015
+* Updated bison to version 3.0.4
+* Updated flex to version 2.5.39
+
+================================================================================
+Release 3.5.2 - August 20, 2015
+================================================================================
+
+Bugfixes
+--------
+
+* Restart All Clients does not work for clients with more than one IP address
+* Very wide texts in plot texts are not displayed
+* Table dumper does not dump more than one table
+* Text in input item for string variable does not wrap
+
+================================================================================
+Release 3.5.1 - March 16, 2015
+================================================================================
+
+Bugfixes
+--------
+
+* Absolut period start time is not recorded on timeout
+* Button text in checkers with a "no" button only can't be changed
+
+Improvements
+------------
+
+* Allow function names to be used as names for variables
+* Table dumper accepts variables in output file name
+
+================================================================================
+Release 3.5.0 - February 9, 2015
+================================================================================
+
+The file format for treatments has changed. Treatments created with this version
+can not be opened with older versions of z-Tree.
+
+Bugfixes
+--------
+
+* Radioline is reset on a click on another active item
+* Radio buttons can change after other subject's input
+* Value of radio buttons with empty label is not saved
+* Line height in chat box output is not adjusted to font size
+* Table dropdown list may not select the correct value
+
+New Features
+------------
+
+* Exact timing (frame) for slide shows
+* Function stringtonumber
+* Record absolute period start time
+* Event time in active items
+* ON-OFF trigger for boxes
+
+================================================================================
+Release 3.4.7 - July 22, 2014
+================================================================================
+
+Bugfixes
+--------
+
+* Fast mouse moves over plot inputs let z-Leaf freeze
+* Rounding numbers (assignment in program vs. input item)
+* Video in multimedia box has always a frame and a gray background that is
+  different from the other gray
+
+================================================================================
+Release 3.4.6 - May 8, 2014
+================================================================================
+
+Improvements
+------------
+
+* Enable TCP keep-alive
+* Disable Nagle's algorithm
+
+================================================================================
+Release 3.4.5 - May 6, 2014
+================================================================================
+
+Bugfixes
+--------
+
+* Special program like table loader and dumper do not work in plot input
+* z-Tree crashes in program editor (string handling syntax errors)
+* z-Tree crashes on the start of a treatment if z-Leafs are disconnected
+* Circle (plot pie) has a black border even if line size is set to 0
+
+Improvements
+------------
+
+* Input field is resized for the entry of large numbers
+* Strings with length > 250 won't be splitted no more
+
+================================================================================
+Release 3.4.4 - April 16, 2014
+================================================================================
+
+Bugfixes
+--------
+
+* Import of help box (forced distance to bottom, cuttbottom; text not escaped)
+* Program in plot input drag has wrong scope after first call
+* Memory leak in compiler
+
+Improvements
+------------
+
+* String variables can be used in layout
+* Single quotes can be used as text qualifier in layout strings
+* '\q' can be used as text qualifier in layout strings
+
+================================================================================
+Release 3.4.2 - September 6, 2013
+================================================================================
+
+Bugfixes
+--------
+
+* Text in plot text items is not escaped when exported.
+* Text formatted with RTF in labels is cut off at the bottom when large font
+  size is used.
+* Treatment with practice periods can't be imported.
+* z-Tree crashes if second parameter (precision) of function format(x, y) is
+  zero.
+* Pictures in mutlimedia boxes are placed off the box.
+* Condition of "Start if..." is not checked for a subject if this subject did
+  not participate in previous stage.
+
+Improvements
+------------
+
+* Table function find(a, s) can be used on string variables.
+* Escaping quotes, tabs, and newlines in texts (string variables) prevents
+  problems in Excel when reading the datafile.
+
+New Features
+------------
+
+* Function char(x) for finding the character or symbol for a code number.
+* Function code(s) for finding the code number of a character or symbol.
+
+Known Issues
+------------
+
+* z-Tree may crash in a program in a contract creation/list box.
+  If a program in a contracts creation box doesn't contain a condition, the
+  record number of the scope environment is set to the last record that has just
+  been inserted. If the program works on a table other than specified for the
+  contracts creation box, it must be ensured that the table contains at least as
+  many records as the table of the contracts creation box.
+
+================================================================================
+Release 3.4.1 - March 15, 2013
+================================================================================
+
+Bugfixes
+--------
+
+* RTF text in labels gets truncated (introduced with new programming environment
+  in version 3.4.0)
+
+================================================================================
+Release 3.4.0 - December 28, 2012
+================================================================================
+
+New Features - Support for Strings
+----------------------------------
+
+* text entry in input items: use !string in Layout.
+
+* output of sting variables: expression in Layout determines how much space
+  (number of characters) will be reserved for the string output
+
+* string functions
+
+  x, y, z: numbers
+  s, t, u: strings
+
++ mid(s, x, y)
+  Returns the middle of the string 's', starting at character number 'x' and
+  going for 'y' characters. The counting process starts at 1, that is the first
+  character which has a place value of 1.
+
++ pos(s, t, x)
+  Returns place number where string 't' occurs in string 's', starting the
+  counting process at number 'x'.
+
++ len(u)
+  Returns the number of characters in string 'u'.
+
++ upper(s)
+  Returns string 's' in capital letters.
+
++ lower(s)
+  Returns string 's' in lower case letters.
+
++ trim("    s    ") 		
+  Trims the outside spaces around text letters, but not spaces within the text.
+
++ format(x, y) 
+  Returns 'x' as a string variable rounded to the precision of 'y'.
+
++ if(a, s, t)
+  Returns string s if a evaluates to true, otherwise string t.
+
++ relational operators can be applied to pairs of sting expressions
+
+Please note
+-----------
+
+* we switched to a new programming environment (compiler, class library and
+  parser generator), please test your treatments thoroughly
+* two error messages for handling text input have been added, so you may have to
+  update the file with your own texts (position 14 and 15)
+
+  You have to enter at least %s characters into field \"%s\".
+  You cannot enter more than %s characters into field \"%s\".
+
+Known Issues
+------------
+
+* new error messages have not yet been translated for Mongolian
+
+================================================================================
+Release 3.3.12 - November 25, 2011
+================================================================================
+
+Bugfixes
+--------
+
+* tree crashes when table loader reads data that is not in the required format
+* resource leak in multimedia box
+* setting of enlarge to fit option of mutlimedia box has no effect
+
+New Features
+------------
+
+* added Bahasa Indonesia to the list of supported languages
+* added Melayu to the list of supported languages
+* added Vietnamese to the list of supported languages
+
+================================================================================
+Release 3.3.11 - January 17, 2011
+================================================================================
+
+Bugfixes
+--------
+
+* accessing variables in the subjects table with only the scope operator in 
+  programs which have the owner variable set does not work
+* variables in session table are not initialized
+* moving the mouse triggers mouse enter events (plot input) even when the object
+  beneath the mouse cursor didn't change
+
+================================================================================
+Release 3.3.10 - January 6, 2011
+================================================================================
+
+Bugfixes
+--------
+
+* text layout in right-to-left languages
+* sound did not stop after hide of multimedia box
+
+================================================================================
+Release 3.3.9 - November 25, 2010
+================================================================================
+
+Bugfixes
+--------
+
+* programs attached to a chat box are not exported
+* scope operator is not allowed/recognized in layout
+* buttons (layout !button in input items) in old treatment don't work in recent
+  versions
+* items in grid boxes disappear in right-to-left languages
+
+================================================================================
+Release 3.3.8 - January 29, 2010
+================================================================================
+
+Bugfixes
+--------
+
+* plot pies can't be dragged
+* click in plot rects doesn't take filling and frame into account
+* program for table summary in the background leads to a z-Tree crash
+
+New Feature
+-----------
+
+* added magyar to the list of supported languages
+
+================================================================================
+Release 3.3.7 - April 1, 2009
+================================================================================
+
+Bugfixes
+--------
+
+* items with 'empty allowed' are not correctly handled after a checker dialog
+* '!text' option in plot axis will crash z-leaf
+
+Improvement
+-----------
+* plot box gets input focus only when it is clicked and when it contains key
+  input items (revises change in version 3.3.1)
+
+================================================================================
+Release 3.3.6 - December 15, 2008
+================================================================================
+
+Bugfixes
+--------
+
+* missing data in stages with single entry (follow up bugfix in 3.3.5)
+
+================================================================================
+Release 3.3.5 - December 10, 2008
+================================================================================
+
+Bugfixes
+--------
+
+* missing data in stages with single entry
+* revised redraw of contract list box
+
+================================================================================
+Release 3.3.4 - November 19, 2008
+================================================================================
+
+Bugfix
+------
+
+* replay w/o gamesafe only works in first period
+
+================================================================================
+Release 3.3.3 - November 11, 2008
+================================================================================
+
+Bugfixes
+--------
+
+* editing of a program clears the condition of the program
+  (introduced in version 3.3.0)
+* positioning of cursor in plot box
+
+================================================================================
+Release 3.3.2 - November 3, 2008
+================================================================================
+
+Improvement
+-----------
+
+* prevent later commands from overtaking each other
+
+================================================================================
+Release 3.3.1 - October 17, 2008
+================================================================================
+
+Bugfix
+------
+
+* contract list box is not redrawn when rows are removed from list box
+  (introduced in version 3.3.0)
+
+Improvements
+------------
+
+* plot box with input item gets input focus on mouse enter (key press events)
+* key press when plot box has input focus doesn't cause a beep
+* insering and moving of items in the stage tree has been revised
+  (i.e. new points are placed into the selected plot graph)
+
+================================================================================
+Release 3.3.0 - September 5, 2008
+================================================================================
+
+The file format for treatments has changed. Treatments created with this version
+can not be opened with older versions of z-Tree.
+
+Bugfixes
+--------
+
+* leaf crashes after frequent redraw of contract list box
+* tree crashes before writing the payment file if variables in a question on
+  the address form don't exist in the session table
+* export of contract list box (selected table not written)
+* export of chat box (newlines stripped from output text)
+* spelling mistakes in message on waiting screen (German)
+
+Improvements
+------------
+
+* replay w/o gamesafe (with option to fall back on old restart procedure)
+* contract list box is only redrawn when data has changed
+
+New Features
+------------
+
+* 'Table Loader' reads in table data from text files
+* 'Table Dumper' writes table data into a text file
+* 'External Program' starts programs (command line) on server or clients
+* bitmap image as background in plot rectangles
+* 'Slide Show' with 'Slide Sequence' and 'Slide'
+* option 'Rewind' in multimedia box
+* logging of errors occurred on the client (new 'logfile' table)
+
+================================================================================
+Release 3.2.12 - April 29, 2008
+================================================================================
+
+Bugfix
+------
+
+* value of output items not shown if initial value is assigned in a program of
+  a button or an active item
+
+Improvement
+-----------
+
+* prevent overwriting of files from pevious sessions
+
+================================================================================
+Release 3.2.11 - March 04, 2008
+================================================================================
+
+Bugfix
+------
+
+* z-tree crashes if first subject suffers losses
+
+================================================================================
+Release 3.2.10 - December 05, 2007
+================================================================================
+
+Bugfixes
+--------
+
+* array variables in subjects table of first client are updated with default
+  values (Zeros) if more than one record changed
+* undefined variable in same() function crashes z-Tree
+
+================================================================================
+Release 3.2.9 - September 20, 2007
+================================================================================
+
+Bugfixes
+--------
+
+* "Reload database" only loads the data for the first session array variable
+* array variables in input items may crash z-Tree
+* (default) value is not shown for input items
+
+================================================================================
+Release 3.2.8 - June 5, 2007
+================================================================================
+
+New Feature
+-----------
+
+* String variables in output items
+
+================================================================================
+Release 3.2.7 - May 21, 2007
+================================================================================
+
+Bugfixes
+--------
+
+* Input is not processed if first stage in group has timeout -1 and some
+  subjects do not participate
+* “Clear Entry After OK” does not work
+* Expressions in size and position of boxes are not checked
+
+================================================================================
+Release 3.2.6 - May 10, 2007
+================================================================================
+
+Bugfixes
+--------
+
+* Performance problems, gsf-File getting very big (messages are sent more than
+  once in stage groups)
+* OLDsubjects query in if statement doesn't work (handling of return type of if
+  statement)
+* Import function error (detecting start of comment)
+* Content of container box is covered by container window (box order)
+
+Improvement
+-----------
+
+* Evaluation of expressions connected by & or | stops as soon as the truth or
+  falsehood of the result is known
+
+New Feature
+-----------
+
+* Added Mongolian to the list of supported languages
+
+================================================================================
+Release 3.2.5 - April 24, 2007
+================================================================================
+
+Improvements
+------------
+
+* Beautified layout of radioline and radiolinelabel in questionnaires
+* Resizing options in multimedia box are available to videos
+
+================================================================================
+Release 3.2.4 - April 17, 2007
+================================================================================
+
+Bugfixes
+--------
+
+* Questionnaire crash after import w/o save, close and reopen
+* After RepeatTreatment numPracticePeriods is negativ
+* Memory leak (messages sent to clients)
+
+Improvements
+------------
+
+* Size and position of program dialog is saved
+* Automatic silent checker to enforce unique contracts
+* Flicker-free drawing in plot window
+
+================================================================================
+Release 3.2.3 - March 7, 2007
+================================================================================
+
+Improvements
+------------
+
+* Size and position of boxes can be specified with expressions
+* Resizable program dialog
+
+================================================================================
+Release 3.2.2 - February 16, 2007
+================================================================================
+
+New Feature
+-----------
+
+* New options in Join Files... (ignore white space in keys, ignore leading zeros
+  in keys, store line w/o key)
+
+================================================================================
+Release 3.2.1 - February 12, 2007
+================================================================================
+
+Bugfixes
+--------
+
+* Variables are not transmitted to the clients if they are changed in a “start
+  if possible” stage program
+* Typos in set language
+
+================================================================================
+Release 3.2.0 - January 18, 2007
+================================================================================
+
+Improvement
+-----------
+
+* The box order was changed to "one on top of the previous". Compatibility is
+  guaranteed with a compatibility option in the background of the treatment.
+
+================================================================================
+Release 3.1.2 - January 2007
+================================================================================
+
+New Features
+------------
+
+See https://www.unizh.ch/iew/ztree/ssl-dir/wiki/index.php?n=Main.NewInVersion3
