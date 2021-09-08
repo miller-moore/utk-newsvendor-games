@@ -1,0 +1,30 @@
+{
+  "workbench.colorCustomizations": {
+    "titleBar.activeForeground": "#000",
+    "titleBar.inactiveForeground": "#000000CC",
+    "titleBar.activeBackground": "#005eff",
+    "titleBar.inactiveBackground": "#005eff"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
+    "editor.formatOnSaveMode": "file",
+    "editor.autoIndent": "full",
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true, // causes conflict between ms-python.python, which executes black as a final formatter, and isort (as configured pyproject.toml [tool.isort])
+      // "source.fixAll": true
+    }
+  },
+  "python.languageServer": "Pylance",
+  "python.pythonPath": "./venv/bin/python",
+  "python.formatting.provider": "black",
+  "python.formatting.blackPath": "black",
+  "python.formatting.blackArgs": [
+    "--target-version",
+    "py38",
+    "--line-length",
+    "128" // bump from 88
+  ],
+}
