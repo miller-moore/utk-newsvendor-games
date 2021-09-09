@@ -5,6 +5,9 @@
     "titleBar.activeBackground": "#005eff",
     "titleBar.inactiveBackground": "#005eff"
   },
+  "[html]": {
+    "editor.formatOnSave": false
+  },
   "[python]": {
     "editor.defaultFormatter": "ms-python.python",
     "editor.formatOnSaveMode": "file",

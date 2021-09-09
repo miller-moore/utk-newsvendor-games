@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+
+source "$(dirname "${0}")/init"
+cd $PROJECT_ROOT
+
+green() {
+    echo -e "\e[0;32m${1}\e[m"
+}
+italic() {
+    echo -e "\e[3m${1}\e[m"
+}
+
+# defaults
+PATTERN=
+ROOT_PATH=""
+FILE_PATTERN="\(.*[.]\)\(js\|jsx\|ts\|tsx\|sh\|json\|sql\|html\|css\|scss\|ejs\|py\)"
+FILE_PATTERN_EXCLUSION="\([.]git\|[.]vscode\|[.]yarn\|dist\|images\|logs\|node_modules\|tf-serving\|[.]ipynb\|__pycache__\).*"
+
+help() {
+    cat << EOF
+Usage: ${0##*/} [PATTERN] [-f file-pattern] [-e file-exclusion-pattern] [[path] | [-p path]]
+
+Return: records of form '<filename>:<lineno>:\t<line>' for lines that match $(green pattern) from files contained in $(green path).
+
+Options:
+    -p $(green path)                        Root directory containing files to include in the search for matching lines. Default $PROJECT_ROOT.
+    -f $(green file-pattern)                Include file lines if file name matches regular expression $(green file-pattern). The only other valid argument is $(italic ignore), which eliminates $(green file-pattern) from applying to file-based filters. Default '$FILE_PATTERN'.
+    -e $(green file-pattern-exclusion)      Exclude file lines if file name matches regular expression $(green file-exclusion-pattern). The only other valid argument is $(italic ignore), which eliminates $(green file-exclusion-pattern) from applying to file-based filters. Default '$FILE_PATTERN'.
+
+Example:
+    ${0##*/} uvicorn pyserver -f '.*\([.]py\)' -e '.*\(config[.]py\)'
+
+EOF
+
+    exit 0
+}
+HELP=$(eval "grep -E '[-]+(h|help)($|[ ].*$)' <<< '$*'")
+[ "$HELP" ] && help
+
+# PATTERN is first argument
+PATTERN="${1}"
+shift
+
+# Handle other options
+shopt -s extglob
+while [ "$#" -gt 0 ]; do
+    case $1 in
+    -h | --help) help ;;
+    -p)
+        [[ ${1#*=} =~ "-" ]] && shift && ROOT_PATH="${1}" || { ROOT_PATH="${1#*=}"; }
+        patharg=$ROOT_PATH
+        ROOT_PATH=$(realpath ${ROOT_PATH} 2> /dev/null >&1)
+        [ ! -d "${ROOT_PATH}" ] && die "ERROR: invalid argument provided for $(green path) (first position) - got ${patharg}." >&2
+        ;;
+    -f)
+        [[ ${1#*=} =~ "-" ]] && shift && FILE_PATTERN="${1}" || { FILE_PATTERN="${1#*=}"; }
+        [ "$FILE_PATTERN" = "ignore" ] && FILE_PATTERN=
+        ;;
+    -e)
+        [[ ${1#*=} =~ "-" ]] && shift && FILE_PATTERN_EXCLUSION="${1}" || { FILE_PATTERN_EXCLUSION="${1#*=}"; }
+        [ "$FILE_PATTERN_EXCLUSION" = "ignore" ] && FILE_PATTERN_EXCLUSION=
+        ;;
+    @(--)) # End of options. Break out of loop. NOTE: extglob pattern '@(--)' matches exactly one occurrence of '--'
+        shift && break
+        ;;
+    -?(-)!(-)*) # Warn for unknown options. NOTE: extglob pattern '-?(-)!(-)*' matches one or two consecutive '-' but no more and anything following
+        [[ ${1#*=} =~ "-" ]] \
+            && printf 'WARN: Unknown option (ignored): %s\n' "$1=$2" >&2 && shift \
+            || printf "WARN: Unknown option '%s' (ignoring)\n" "$1" >&2
+        ;;
+    *) # Default case. Break out of loop.
+        break
+        ;;
+    esac
+    shift
+done
+
+# If ROOT_PATH is empty, there should be a trailing argument that is the root path
+while [ "$#" -gt 0 ]; do
+    case $1 in
+    *) # Value-only arguments
+        if [ -d "${1}" ]; then
+            ROOT_PATH="${1}"
+            break
+        fi
+        printf "WARN: Unknown option '%s' (expected directory)\n" "$1" >&2
+        ;;
+    esac
+    shift
+done
+shopt -u extglob
+
+# verify ROOT_PATH
+[ ! -d "${ROOT_PATH}" ] && die "Root directory search path was invalid or not provided."
+
+# Prepare `find` command arguments
+BASE_PATH=$(basename ${ROOT_PATH})
+if [ -n "$FILE_PATTERN" ] && [ -n "$FILE_PATTERN_EXCLUSION" ]; then
+    findrgxp="\( -regex '.*${FILE_PATTERN}' -a ! -regex '.*$FILE_PATTERN_EXCLUSION' \)"
+elif [ -n "$FILE_PATTERN" ]; then
+    findrgxp="-regex '.*$FILE_PATTERN'"
+else
+    findrgxp="\( ! -regex '.*$FILE_PATTERN_EXCLUSION' \)"
+fi
+
+FINDEXE="$(which find)"
+[ -x /usr/local/opt/findutils/libexec/gnubin/find ] && FINDEXE="/usr/local/opt/findutils/libexec/gnubin/find"
+
+# find "$ROOT_PATH" -type f "$findrgxp" -print0 | xargs -0 -I"{}" -P 0 sh -c "grep -H -n -E '$PATTERN' {}" 2>&1
+
+cmd="$(
+    cat << EOF
+$FINDEXE ${ROOT_PATH} -type f $findrgxp -print0 | xargs -0 -I"{}" -P 0 sh -c "grep -H -n -E '$PATTERN' {}" 2>&1
+EOF
+)"
+echo "$cmd"
+
+eval "$cmd"
+
+# find "$DIR" -type f \( ! -regex "$EXCLUSION_RGXP" -a -regex "$INCLUSION_RGXP" \) -print0 | \
+#     xargs -0 -I"{}" -P 0 sh -c "grep -H -n -E '$PATTERN' {}" 2>&1
