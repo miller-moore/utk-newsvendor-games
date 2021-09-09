@@ -1,0 +1,25 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{# THIS HAS BEEN CHANGED ON 20/01/2020 FROM Part 2 TO Part 1 #}
+{% block title %} End of Part 1 {% endblock %}
+
+{% block content %}
+
+<p>Your average payoff over all the rounds is {{ averagepay }} and therefore your monetary reward from Part 1 is £{{
+    reward }}.
+    {# Your monetary reward from Part 2 will be computed after a sufficient number of participants have completed the
+    experiment. #}
+    In addition, you will receive reward from Part 2 that starts on the next page, and your baseline reward of £{{
+    baselinereward}}. You will be rewarded through Prolific Academic within 24 hours.</p>
+
+<p>Please answer three more questions concerning the inventory management task. In the questions we ask you to reflect
+    upon your motivations and feelings during the decision making.</p>
+
+{% formfield player.pecu label="How much did you care about maximizing your profit?" %}
+{% formfield player.nonpecu label="How much did you care about satisfying customer demand?" %}
+{% formfield player.conflict label="How conflicted did you feel between maximizing your profit and satisfying customer demand?" %}
+
+{% next_button %}
+
+{% endblock %}
