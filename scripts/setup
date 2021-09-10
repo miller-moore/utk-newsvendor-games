@@ -3,7 +3,7 @@
 PROJECT_ROOT=`cd "$(dirname ${0})"/../ && pwd`
 
 # add project directory to python sys.path - allows importing modules from the local project directory
-export PYTHONPATH=${PROJECT_ROOT} 
+export PYTHONPATH=${PROJECT_ROOT}
 VIRTUALENV_DIR=${PROJECT_ROOT}/venv
 
 # setup virtualenv & basic package management dependencies
@@ -21,3 +21,6 @@ fi
 
 # activate virtualenv
 source ${VIRTUALENV_DIR}/bin/activate
+
+# update python requirements
+pip install -r ${PROJECT_ROOT}/requirements.txt
