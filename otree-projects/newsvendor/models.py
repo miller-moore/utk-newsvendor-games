@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 from timeit import default_timer as timer
 
+import pandas as pd
 from otree.api import BaseConstants, BaseGroup, BasePlayer, BaseSubsession
 from otree.api import Currency as c
 from otree.api import currency_range, models, widgets
@@ -13,21 +14,21 @@ author = "IL"
 doc = """
 Newsvendor game
 Payoffs given in a payoff table
-High and low margin treatments
+High and low variance treatments
 """
 
 PATH = Path(__file__).resolve()
 
 
-def randomdemand(margin):
-    if margin == "low":
+def randomdemand(variance_option):
+    if variance_option == "low":
         return random.gauss(500, 50)
     return random.gauss(300, 100)
 
 
-def trueorderquantity(orderquantity, margin):
+def trueorderquantity(orderquantity, variance_option):
 
-    if margin == "low":
+    if variance_option == "low":
         toq = 500 + orderquantity * 50
     else:
         toq = 300 + orderquantity * 100
@@ -35,11 +36,11 @@ def trueorderquantity(orderquantity, margin):
     return toq
 
 
-def profit(demand, orderquantity, margin):
+def profit(demand, orderquantity, variance_option):
 
-    toq = trueorderquantity(orderquantity, margin)
+    toq = trueorderquantity(orderquantity, variance_option)
 
-    if margin == "low":
+    if variance_option == "low":
         if demand >= toq:
             prof = 7.28 * toq - 5.72 * toq
         else:
@@ -73,21 +74,28 @@ class Subsession(BaseSubsession):
     @staticmethod
     def creating_session(subsession):
 
-        ifile = open(PATH.parent / "randomdemand.csv", "rt")
-        dema = []
-        try:
-            reader = csv.reader(ifile)
-            for row in reader:
-                dema.append(list(map(int, row)))
-        finally:
-            ifile.close()
+        # ifile = open(PATH.parent / "randomdemand.csv", "rt")
+        # dema = []
+        # try:
+        #     reader = csv.reader(ifile)
+        #     for row in reader:
+        #         dema.append(list(map(int, row)))
+        # finally:
+        #     ifile.close()
 
-        if subsession.session.config["margin"] == "low":
-            subsession.session.vars["demand"] = dema[0]
+        # if subsession.session.config["variance_option"] == "low":
+        #     subsession.session.vars["demand"] = dema[0]
+
+        # else:
+        #     subsession.session.vars["demand"] = dema[1]
+
+        demand_df = pd.read_csv(PATH.parent / "static" / "demand_distributions.csv")
+
+        if subsession.session.config["variance_option"] == "low":
+            subsession.session.vars["demand"] = demand_df.d1.values.tolist()
 
         else:
-            subsession.session.vars["demand"] = dema[1]
-        # subsession.session.vars["demand"] = randomdemand(subsession.session.config["margin"])
+            subsession.session.vars["demand"] = demand_df.d2.values.tolist()
 
 
 class Group(BaseGroup):

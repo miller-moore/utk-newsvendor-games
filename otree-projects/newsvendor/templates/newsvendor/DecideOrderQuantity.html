@@ -36,9 +36,9 @@
 
     <script>
     function createTable() {
-        var margin = {{ margin }} ; //
+        var variance_option = {{ variance_option }} ; //
 
-        if (margin == 'low') {
+        if (variance_option == 'low') {
             var price = 7.28;
             var cost = 5.72;
         }
@@ -49,7 +49,7 @@
         var code = "<center><table class=pc cellpadding=5 width=700>";
         code += "<tr align=center><td width=80>Order</td><td width=80></td><td width=80></td><td width=80></td><td width=80>Demand</td><td width=80></td><td width=80></td><td width=80></td></tr>";
         code += "<tr align=center class=borderbottom><td> </td>";
-        if (margin == 'low') {
+        if (variance_option == 'low') {
             for (var j = 0; j < 7; j++) {
                 code += "<td><b>" + (500 + j*50) + "</b></td>";
             }
@@ -77,7 +77,7 @@
                 code += "<tr align=center>";
             }
 
-            if (margin == 'low') {
+            if (variance_option == 'low') {
                 code += "<td><b><input type=radio name={{ field.name }} value=" + i + "> " + (500 + i*50) + "</b></td>";
             }
             else {
@@ -85,7 +85,7 @@
             }
 
             for (var j = 0; j < 7; j++) {
-                if (margin == 'low') {
+                if (variance_option == 'low') {
                     var dem = (500 + j*50);
                     var quant = (500 + i*50);
                 }

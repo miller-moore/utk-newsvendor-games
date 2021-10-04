@@ -30,4 +30,7 @@
     "--line-length",
     "128" // bump from 88
   ],
+  "files.associations": {
+    "*.html": "jinja-html"
+  },
 }

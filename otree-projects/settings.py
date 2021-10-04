@@ -1,7 +1,7 @@
 from os import environ
 
 SESSION_CONFIGS = [
-    dict(name="games", app_sequence=["newsvendor"], num_demo_participants=1, margin="low"),
+    dict(name="games", app_sequence=["newsvendor"], num_demo_participants=1, variance_option="low"),
 ]
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs

@@ -68,13 +68,15 @@
         pence (i.e. in £ 1/100). For example, if your average profit over all the rounds is 897, your monetary reward
         from this part is £0.90 (rounded to the nearest whole pence). In addition, you will of course receive the reward
         from Part 2.</p>
-    <p>In addition to your rewards from the tasks in Parts 1 and 2, you will receive a baseline reward of £{{
+    <!-- <p>In addition to your rewards from the tasks in Parts 1 and 2, you will receive a baseline reward of £{{
+        baselinereward }}.</p> -->
+    <p>In addition to your rewards from the tasks in Parts 1 and 2, you will receive a baseline reward of ${{
         baselinereward }}.</p>
     <h2>Test questions</h2>
     <p>Please answer the following questions concerning the task. We just want to make sure that you have understood the
         above instructions correctly.</p>
 
-    {% if marginlow %}
+    {% if variance_is_low %}
     {% formfield player.check1low label=label1l %}
     {% formfield player.check2low label=label2l %}
     {% formfield player.check3low label=label3l %}
@@ -102,12 +104,12 @@
     {% block scripts %}
 
     <script>
-        var margin = {{ margin }};  //
+        var variance_option = {{ variance_option }};  //
 
         function createTable() {
 
 
-        if (margin == 'low') {
+        if (variance_option == 'low') {
             var price = 7.28;
             var cost = 5.72;
         }
@@ -118,7 +120,7 @@
         var code = "<center><table class=pc cellpadding=5 width=700>";
         code += "<tr align=center><td width=80>Order</td><td width=80></td><td width=80></td><td width=80></td><td width=80>Demand</td><td width=80></td><td width=80></td><td width=80></td></tr>";
         code += "<tr align=center class=borderbottom><td> </td>";
-        if (margin == 'low') {
+        if (variance_option == 'low') {
             for (var j = 0; j < 7; j++) {
                 code += "<td><b>" + (500 + j * 50) + "</b></td>";
             }
@@ -146,7 +148,7 @@
                 code += "<tr align=center>";
             }
 
-            if (margin == 'low') {
+            if (variance_option == 'low') {
                 code += "<td><b><input type=radio name=nameremoved value=" + i + "> " + (500 + i * 50) + "</b></td>";
             }
             else {
@@ -154,7 +156,7 @@
             }
 
             for (var j = 0; j < 7; j++) {
-                if (margin == 'low') {
+                if (variance_option == 'low') {
                     var dem = (500 + j * 50);
                     var quant = (500 + i * 50);
                 }
@@ -174,11 +176,11 @@
         }
         code += "</table></center><br><p>In the decision matrix, you indicate your order quantity decision by selecting a radio button from the left hand side column. The demand can be any value from the top row of the matrix. Then, your profit will be indicated by the intersection of the row you selected (your order quantity) and the column (demand value) that the computer draws randomly.</p> <p>The fractions below the demand values are the probabilities of each demand value. They indicate that there is a 1/7 probability that each demand will realize after you have made your order quantity decision. The demand in any round is independent of the demand in previous or later rounds. This means that if demand is high (low) in one round, it does not affect in any way whether the demand is high (low) in the next round.</p>";
 
-        if (margin == 'low') {
+        if (variance_option == 'low') {
             code += "<p>The possible demand realizations are 500, 550, 600, 650, 700, 750, or 800 units, each with equal probability. For example, if you order 600 units, your realized profits will be 208 (with probability 1/7), 572 (with probability 1/7), or 936 (with probability 1/7 + 1/7 + 1/7 + 1/7 + 1/7 = 5/7). If the realized demand is 550, your profit is 780 if you ordered 500 units, or 572 if you ordered 600 units.</p><p>If you realized a loss (a negative profit) in a round, this loss will be deducted from your reward (see determination of monetary reward below). Note that each decision situation you will face contains at least one alternative that avoids losses.</p>";
         }
 
-        if (margin == 'high') {
+        if (variance_option == 'high') {
             code += "<p>The possible demand realizations are 300, 400, 500, 600, 700, 800, or 900 units, each with equal probability. For example, if you order 500 units, your realized profits will be 344 (with probability 1/7), 522 (with probability 1/7), or 700 (with probability 1/7 + 1/7 + 1/7 + 1/7 + 1/7 = 5/7). If the realized demand is 400, your profit is 420 if you ordered 300 units, or 522 if you ordered 500 units.</p>";
         }
 

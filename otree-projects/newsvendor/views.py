@@ -6,20 +6,10 @@ from otree.api import currency_range, safe_json
 
 from . import models
 from ._builtin import Bot, Page, WaitPage
+from .demand import demand_distributions_csv
 from .models import Constants, profit, set_time, trueorderquantity
-
-# demand_distributions_csv = Path(__file__).resolve().parent / "templates" / "newsvendor" / "demand_distributions.csv"
-app_directory = Path(__file__).resolve().parent
-demand_distributions_csv = app_directory / "static" / "demand_distributions.csv"
-if not demand_distributions_csv.exists():
-    import numpy as np
-    import pandas as pd
-
-    mu, sigma1, sigma2 = 500, 50, 100
-    dist1 = np.random.normal(loc=mu, scale=sigma1, size=(int(1e6),))
-    dist2 = np.random.normal(loc=mu, scale=sigma2, size=(int(1e6),))
-    df = pd.DataFrame({"d1": dist1, "d2": dist2})
-    df.to_csv(demand_distributions_csv, header=True, index=False)
+from .treatment import (TREATMENT_GROUPS, TreatmentGroup,
+                        select_random_treatment_group)
 
 
 class FirstWelcomePage(Page):
@@ -52,19 +42,19 @@ class WelcomePage(Page):
     @staticmethod
     def vars_for_template(player):
 
-        if player.session.config["margin"] == "low":
-            marginlow = True
+        if player.session.config["variance_option"] == "low":
+            variance_is_low = True
             baselinereward = "0.12"
 
         else:
-            marginlow = False
+            variance_is_low = False
             baselinereward = "0.20"
 
         return {
             "session.vars['demand']": player.session.vars.get("demand"),
             "baselinereward": baselinereward,
-            "marginlow": marginlow,
-            "margin": safe_json(player.session.config["margin"]),
+            "variance_is_low": variance_is_low,
+            "variance_option": safe_json(player.session.config["variance_option"]),
             "label1l": "If your order quantity is 600 and the demand realization is 700, what is your profit?",
             "label2l": "If your order quantity is 600, what is the probability that your profit will be 936?",
             "label3l": "If your order quantity is 750, what is the probability that your profit will be 806?",
@@ -83,14 +73,14 @@ class DecideOrderQuantity(Page):
 
     @staticmethod
     def vars_for_template(player):
-        return {"round": player.round_number, "margin": safe_json(player.session.config["margin"])}
+        return {"round": player.round_number, "variance_option": safe_json(player.session.config["variance_option"])}
 
     @staticmethod
     def before_next_page(player, timeout_happened):
         player.endtime = set_time()
         player.demand = player.session.vars["demand"][player.round_number - 1]
-        player.trueorderquantity = trueorderquantity(player.orderquantity, player.session.config["margin"])
-        player.payoff = profit(player.demand, player.orderquantity, player.session.config["margin"])
+        player.trueorderquantity = trueorderquantity(player.orderquantity, player.session.config["variance_option"])
+        player.payoff = profit(player.demand, player.orderquantity, player.session.config["variance_option"])
         player.formatted_payoff = format(player.payoff, ".0f")
 
 
@@ -98,7 +88,7 @@ class Results(Page):
     @staticmethod
     def vars_for_template(player):
 
-        if player.session.config["margin"] == "low":
+        if player.session.config["variance_option"] == "low":
             demand = player.session.vars["demand"][player.round_number - 1]
             demandindex = (demand - 500) / 50
         else:
@@ -114,7 +104,7 @@ class Results(Page):
 
         return {
             "round": player.round_number,
-            "margin": safe_json(player.session.config["margin"]),
+            "variance_option": safe_json(player.session.config["variance_option"]),
             "orderqindex": safe_json(player.orderquantity),
             "demand": demand,
             "demandindex": safe_json(demandindex),
@@ -138,7 +128,7 @@ class FinalPage(Page):
     @staticmethod
     def vars_for_template(player):
 
-        if player.session.config["margin"] == "low":
+        if player.session.config["variance_option"] == "low":
             baselinereward = "0.12"
 
         else:
