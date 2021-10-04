@@ -1,2 +1,5 @@
-otree==5.4.0
+# otree==5.4.0
+otree
 pandas
+black
+rope
