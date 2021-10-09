@@ -3,3 +3,6 @@ otree
 pandas
 black
 rope
+pydantic
+scipy
+matplotlib
