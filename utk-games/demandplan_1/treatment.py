@@ -9,6 +9,8 @@ from otree.api import Currency
 from otree.currency import _CurrencyEncoder
 from pydantic import BaseConfig, BaseModel, StrBytes, conint, validator
 
+from .costs import Costs, get_costs
+
 # NOTE: disruption only applies two first minigame - everybody gets a disruption in the second minigame
 DISRUPTION_CHOICES = [True, False]
 VARIANCE_CHOICES = ["low", "high"]
@@ -16,21 +18,10 @@ VARIANCE_CHOICES = ["low", "high"]
 TREATMENT_COMBINATIONS = list(product(VARIANCE_CHOICES, DISRUPTION_CHOICES))
 
 
-class Costs(BaseModel):
-    retail_cost: Currency
-    wholesale_cost: Currency
-    holding_cost: Currency
-
-    class Config(BaseConfig):
-        json_encoders = dict(Currency=_CurrencyEncoder)
-        arbitrary_types_allowed = True
-
-
 class Treatment(BaseModel):
     idx: conint(strict=True, ge=1)
     variance_choice: str
     disruption_choice: bool
-
 
     @validator("idx")
     def check_idx(cls, v: Any) -> Any:
@@ -61,6 +52,7 @@ class Treatment(BaseModel):
             return ALL_TREATMENT_GROUPS[treatment_index]
         except KeyError:
             import traceback
+
             traceback.print_exc()
 
     @classmethod
@@ -70,13 +62,11 @@ class Treatment(BaseModel):
     def to_json(self) -> StrBytes:
         return self.json()
 
-
     def variance_is_low(self) -> bool:
         return self.variance_choice == "low"
 
     def disrupt_is_true(self) -> bool:
         return self.disruption_choice
-
 
     @property
     def costs(self) -> Costs:
@@ -86,7 +76,6 @@ class Treatment(BaseModel):
     def distribution_params(self) -> Tuple[float]:
         return get_distribution_params(self.variance_choice)
 
-    @property
     def rvs(self, size: Optional[int] = None) -> np.ndarray:
         """Return samples from the instance's Lognormal distribution (mu and sigma are set during init)"""
 
@@ -113,16 +102,6 @@ def get_distribution_params(variance_choice: str) -> Tuple[float]:
     else:
         mu, sigma = 6.15, 0.35
     return mu, sigma
-
-
-def get_costs(variance_choice: str) -> Tuple[Currency]:
-    Treatment.check_variance_choice(variance_choice)
-
-    if variance_choice == "low":
-        retail_cost, wholesale_cost, holding_cost = [3.00, 1.00, 0.05]
-    else:
-        retail_cost, wholesale_cost, holding_cost = [25.00, 14.00, 6.00]
-    return Costs(retail_cost=retail_cost, wholesale_cost=wholesale_cost, holding_cost=holding_cost)
 
 
 def json_dump_all_treatment_groups(**kwargs) -> str:

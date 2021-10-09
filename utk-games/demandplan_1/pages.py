@@ -1,35 +1,47 @@
+import json
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
-from typing import Optional, Type
+from typing import Any, Optional, Type
 
-from otree.api import Page, safe_json
+import numpy as np
+from otree.api import Page
+from otree.lookup import PageLookup, _get_session_lookups
+from otree.models import Session
+from rich import print
 
 from . import util
+from .demand import maybe_write_demand_data_csv
 from .models import Constants, Player
 from .treatment import Treatment
-from .util import demand_distributions_csv
 
 
-def get_page_name(page_cls: Type) -> str:
-    assert (
-        type(page_cls) is type and Page in page_cls.mro()
-    ), f"""page does not inherit from otree.api.Page - got type {type(page_cls)} (value: {page_cls!r})"""
-    return page_cls.__qualname__
+def default_error_message(player: Player, values: Any) -> Optional[str]:
+    """Returns an error message string to display as a form error message on the page."""
+    return
+    print(
+        f">> {Path(__file__).parent / Path(__file__).name}::default_form_error_message(player, values) >> Got form values: ",
+        values,
+    )
+    if values:
+        return f"Application server handler `{Path(__file__).parent / Path(__file__).name}::default_form_error_message(player, values)` received form values: {values}"
 
 
-def default_vars_for_template(self: Page, player: Player) -> dict:
+def default_vars_for_template(player: Player) -> dict:
+    session: Session = player.session
+    info: PageLookup = _get_session_lookups(session.code)[1]
+    page_class: Type = info.page_class
     _vars = dict(
-        page_name=get_page_name(self.__class__),
-        session_name=player.session.session_name,  # NOTE: See ../settings.py - can use `session.vars.get` syntax also
-        some_other_session_field=player.session.some_other_session_field,
-        demand_distributions_csv=str(
-            Path.joinpath(Path("/"), Path(demand_distributions_csv.parent.name), Path(demand_distributions_csv.name))
-        ),
+        game_number=Constants.game_number,
+        page_name=getattr(page_class, "__qualname__", "__name__"),
+        participantid=player.field_maybe_none("participantid"),
+        id_in_session=player.id_in_subsession,
+        session_vars=str(player.session.vars),
     )
     return _vars
 
 
-Page.vars_for_template = default_vars_for_template
+Page.vars_for_template = staticmethod(default_vars_for_template)
+Page.error_message = staticmethod(default_error_message)
 
 
 class Welcome(Page):
@@ -38,16 +50,26 @@ class Welcome(Page):
     form_fields = ["participantid"]
 
     @staticmethod
-    def before_next_page(player: Player, timeout_happened: bool = False):
-        super().before_next_page(player, timeout_happened)
-        player.participant.treatment = Treatment.choose().to_json()
+    def before_next_page(player: Player, timeout_happened: bool = False) -> None:
+
+        t = util.get_time()
+        player.starttime = t
+        player.starttime_iso = util.get_isotime(t)
+
+        treatment = Treatment.choose()
+        player.participant.treatment = treatment.to_json()
+
+        distribution_data: np.ndarray = treatment.rvs()
+
+        player.distribution_data = json.dumps(distribution_data.tolist())
 
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == 1
 
-    def vars_for_template(self, player: Player):
-        _vars = super().vars_for_template()
+    @staticmethod
+    def vars_for_template(player: Player) -> dict:
+        _vars = default_vars_for_template(player)
         # assign new vars here: _vars.update(...)
         return _vars
 
@@ -58,9 +80,18 @@ class Game(Page):
     form_fields = []
 
     @staticmethod
-    def is_displayed(player):
+    def is_displayed(player: Player):
         # Game page occurs for Constants.num_rounds beginning with 2 (round 1 is page Welcome)
-        return player.in_rounds(2, 2 + Constants.num_rounds)
+        return player.in_rounds(2, player.session_num_rounds)
+
+    @staticmethod
+    def before_next_page(player: Player, timeout_happened: bool = False) -> None:
+        super().before_next_page(player, timeout_happened)
+
+        if player.in_round(player.session_num_rounds):
+            t = util.get_time()
+            player.endtime = t
+            player.endtime_iso = util.get_isotime(t)
 
 
 class Results(Page):
@@ -69,9 +100,15 @@ class Results(Page):
     form_fields = []
 
     @staticmethod
-    def is_displayed(player):
+    def is_displayed(player: Player):
         # Results occurs after `2 + Constants.num_rounds` rounds
-        return player.in_round(Constants.num_rounds + 1)
+        return player.in_round(player.session_num_rounds)
+
+    @staticmethod
+    def vars_for_template(player: Player) -> dict:
+        _vars = default_vars_for_template(player)
+        _vars.update(endtime=player.endtime, endtime_iso=player.endtime_iso)
+        return _vars
 
 
 # class WelcomePage(Page):

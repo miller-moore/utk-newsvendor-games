@@ -4,11 +4,11 @@ import pandas as pd
 from otree.api import BaseConstants, BaseSubsession, Currency
 from otree.session import Session
 
+from . import util
 from .constants import APP_DIR, Constants
 from .models import Group, Player, Subsession
-from .pages import GamePage, WelcomePage
+from .pages import Game, Results, Welcome
 from .treatment import Treatment
-from .util import maybe_write_demand_distributions_csv
 
 author = (
     "Anne Dohmen - UTK Department of Supply Chain Management, Miller Moore - UTK Department of Business Analytics & Statistics"
@@ -33,7 +33,7 @@ Each participant is randomly assigned to one of four treatment groups:
 
 def creating_session(subsession: BaseSubsession) -> None:
 
-    from otree.api import settings
+    from otree import settings
 
     print("otree.settings: %s", str(settings.__dict__))
 
@@ -51,9 +51,5 @@ def creating_session(subsession: BaseSubsession) -> None:
     #     subsession.session.vars["demand"] = demand_df.d2.values.tolist()
 
 
-# TODO(add demand data to vars_for_template instead of this hack)
-# hack to make demand data available as static csv file in APP_DIR / "static" / "demand_distributions.csv"
-maybe_write_demand_distributions_csv()
-
-#
-page_sequence = [WelcomePage, GamePage]
+# main sequence of pages for this otree app
+page_sequence = [Welcome, Game, Results]

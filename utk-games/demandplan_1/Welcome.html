@@ -1,0 +1,30 @@
+{{ block title }}
+    {{ include Constants.title_template }}
+{{ endblock }}
+
+{{ block content }}
+
+    <p>
+
+        {{ Constants.doc }}
+    </p>
+
+    <br>
+
+    <p>
+        Please maximise your browser window, switch off phone/e-mail/music and anything else distracting.
+    </p>
+
+    <p>
+        By proceeding you consent to participate in this study. You understand that all data will be kept confidential by
+        the researcher.
+        Your personal information will not be stored with the data. You are free to withdraw at any time without giving a
+        reason.
+    </p>
+
+    {{ formfield "participantid" label="Please enter your Participant ID here:" }}
+
+    <center>
+        {{ next_button }}
+    </center>
+{{ endblock }}

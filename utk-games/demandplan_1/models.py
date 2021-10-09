@@ -20,9 +20,11 @@ class Group(BaseGroup):
 class Player(BasePlayer):
 
     ## keys
-    participantid = models.StringField()
+    participantid = models.StringField(label="Your participant ID:")
     starttime = models.FloatField()
     endtime = models.FloatField()
+    starttime_iso = models.StringField()
+    endtime_iso = models.StringField()
 
     ## session constants
     session_name_in_url = models.StringField(initial=Constants.name_in_url)
@@ -33,6 +35,7 @@ class Player(BasePlayer):
     ## participant treatment as serialized json string
     # NOTE: in roudn 1, assign to participant: player.participant.treatment = treatment.json(); reassign to player during each round thereafter to ensure propagation player.treatment = treatment.json()
     treatment = models.LongStringField()
+    distribution_data = models.LongStringField()
 
     ## Game results
     orderquantity = models.PositiveIntegerField(choices=[0, 1, 2, 3, 4, 5, 6], widget=widgets.RadioSelect())

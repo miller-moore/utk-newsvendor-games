@@ -1,5 +1,7 @@
+import json
 import time
 from collections import namedtuple
+from datetime import datetime
 from pathlib import Path
 from types import ModuleType
 from typing import Any, List, Optional, Set, Tuple, Union
@@ -11,33 +13,53 @@ from otree.api import BasePlayer, Currency, currency_range
 from pydantic import BaseConfig, BaseModel
 from scipy import stats
 
+from .costs import Costs
 
-def get_settings() -> dict:
+
+def get_settings() -> ModuleType:
+    """Dynamically imports and return the ``otree.settings`` module.
+
+    Before returning the settings module, a new function ``asdict`` is assigned to the module.
+    This function transforms the settings module into a dictionary of setting values by name,
+    and is added to the module so that ``get_settings`` can be used anywhere in the codebase
+    whenever either a dictionary of dynamically imported server settings is needed. ``asdict``
+    returns a dictionary that does not contain every object belonging to the module - only
+    objects considered to be a server setting.
+
+    Returns:
+        ``otree.settings``: [ModuleType]
+    """
+
     def asdict():
-        from otree import settings as self
+        from string import ascii_uppercase
 
-        return {k: v for k, v in self.__dict__.items() if not k.startswith("_") and k[0:1] == k.capitalize()[0:1]}
+        from otree import settings as settings_module
 
-    from otree import settings
+        # transform the module to a dictionary, attempting to include only setting objects
+        settings_dict = {}
+        for name, value in settings_module.__dict__.items():
+            if name.startswith("_"):
+                # don't include: private methods, private attributes, ModuleType dunder methods, etc are not settings
+                continue
 
-    if not hasattr(settings, "asdict"):
-        setattr(settings, "asdict", asdict)
+            # for conservatism, include the object if it's name obeys the naming convention rules for system environment variables
+            allowed_chars = set("_" + ascii_uppercase)
+            name_chars = set(name)
+            if name_chars.issubset(allowed_chars):
+                settings_dict.update({name: value})
 
-    return settings
+        return settings_dict
+
+    from otree import settings as settings_module
+
+    if not hasattr(settings_module, "asdict"):
+        setattr(settings_module, "asdict", asdict)
+
+    return settings_module
 
 
 def json_dump_settings(**kwargs) -> str:
-    import json
-
     return json.dumps(get_settings().asdict(), **kwargs)
-
-
-def maybe_write_demand_samples_csv(rvs: np.ndarray) -> None:
-    from .constants import Constants
-
-    if not Constants.demand_data_csv.exists():
-        df = pd.DataFrame({"rvs": rvs})
-        df.to_csv(Constants.demand_data_csv, header=True, index=False)
 
 
 def apply_distribution_disruption(player: BasePlayer):
@@ -132,11 +154,17 @@ def normalize_lognormal_samples(lognormal_rvs: np.ndarray) -> np.ndarray:
     return norm.rvs(len(lognormal_rvs))
 
 
-def get_time():
-    return time.time()
+def get_time() -> float:
+    return datetime.utcnow().timestamp()
 
 
-def compute_profit(player: Any) -> float:
+def get_isotime(timestamp: Optional[float] = None) -> str:
+    if timestamp:
+        return datetime.fromtimestamp(timestamp).isoformat(timespec="auto")
+    return datetime.utcnow().isoformat(timespec="auto")
+
+
+def compute_profit(player: Any, costs: Costs) -> float:
     """Compute & return the planner's profit at the end of each game (single playthrough).
 
     Parameters

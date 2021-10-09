@@ -6,3 +6,4 @@ rope
 pydantic
 scipy
 matplotlib
+rich
