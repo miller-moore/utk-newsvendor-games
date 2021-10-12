@@ -13,7 +13,83 @@ from otree.api import BasePlayer, Currency, currency_range
 from pydantic import BaseConfig, BaseModel
 from scipy import stats
 
-from .costs import Costs
+
+def compute_profit(player: Any) -> float:
+    """Compute & return the planner's profit at the end of each game (single playthrough).
+
+    Parameters
+    ----------
+    player: BasePlayer
+        The player
+
+    ## Important attributes
+    retail_cost : float
+        Rc - get from low/high variance options
+    wholesale_cost : float
+        Wc - get from low/high variance options
+    holding_cost : float
+        Hc - get from low/high variance options
+    excess_quantity : float
+        Eq - get from player cache
+    order_quantity : float
+        Oq - get from player's input each round
+    demand_quantity : float
+        Dq - draw dynamically from distribution
+
+    # Pseudo-code:
+    if sq + oq > dq:
+        # we still have an excess
+        rev = Dq * Rc
+        sq = sq + oq - dq
+        costs = oq * Wc + sq * Hc
+        return rev - costs
+    else:
+        rev = ( sq + oq ) * Rc
+        costs = oq * Wc
+        return rev - costs
+
+    Returns
+    -------
+    float
+        Profit amount
+    """
+
+    from .models import Costs
+
+    # get from player treatment group & map to values defined in above dictionaries
+    Rc, Wc, Hc = Costs.tuple()
+
+    # NOTE: get excess_stock from participant's cache (round_i - 1)
+    Eq_1 = player.cache.get("excess_stock")
+    # Oq: get from page input
+    Oq = None
+    # Dq: draw from the lognorm
+    Dq = None
+
+    # update the player's excess_stock for next round
+    player.cache["excess_stock"] = Eq_1 + Oq - Dq
+
+    if Eq_1 + Oq > Dq:
+        return Dq * Rc - Oq * Wc - player.cache["excess_stock"] * Hc
+    return (Eq_1 + Oq) * Rc - Oq * Wc
+
+
+def get_demand_data_csv_path(as_asset_url: bool, participantid: str) -> str:
+    from .models import STATIC_DIR, Constants
+
+    assert type(as_asset_url) is bool, f"local must be boolean - got {type(as_asset_url)}"
+    file_name = f"demand_data_{participantid}.csv"
+    if as_asset_url:
+        return str(Path(Constants.url_prefix) / file_name)
+    return str(STATIC_DIR / file_name)
+
+
+def maybe_write_demand_data_csv(data: np.ndarray, participantid: str) -> None:
+    local_path = Path(get_demand_data_csv_path(as_static_url=False, participantid=participantid))
+    if local_path.exists():
+        print(f"""[yellow]WARNING[/]: demand csv data already exists for participant with id: {participantid}""")
+    df = pd.DataFrame({"data": data})
+    df.to_csv(local_path, header=True, index=False)
 
 
 def get_settings() -> ModuleType:
@@ -154,66 +230,11 @@ def normalize_lognormal_samples(lognormal_rvs: np.ndarray) -> np.ndarray:
     return norm.rvs(len(lognormal_rvs))
 
 
-def get_time() -> float:
-    return datetime.utcnow().timestamp()
-
-
-def get_isotime(timestamp: Optional[float] = None) -> str:
-    if timestamp:
-        return datetime.fromtimestamp(timestamp).isoformat(timespec="auto")
-    return datetime.utcnow().isoformat(timespec="auto")
-
-
-def compute_profit(player: Any, costs: Costs) -> float:
-    """Compute & return the planner's profit at the end of each game (single playthrough).
-
-    Parameters
-    ----------
-    player: BasePlayer
-        The player
-
-    ## Important attributes
-    retail_cost : float
-        Rc - get from low/high variance options
-    wholesale_cost : float
-        Wc - get from low/high variance options
-    holding_cost : float
-        Hc - get from low/high variance options
-    excess_quantity : float
-        Eq - get from player cache
-    order_quantity : float
-        Oq - get from player's input each round
-    demand_quantity : float
-        Dq - draw dynamically from distribution
-
-    # Pseudo-code:
-    if Eq + Oq > Dq:
-        return Dq * Rc - Oq * Wc - ( Eq + Oq - Dq ) * Hc
-    else:
-        return ( Eq + Oq ) * Rc - Oq * Wc
-
-    Returns
-    -------
-    float
-        Profit amount
-    """
-
-    # get from player treatment group & map to values defined in above dictionaries
-    Rc, Wc, Hc = retail_cost, wholesale_cost, holding_cost
-
-    # NOTE: get excess_stock from participant's cache (round_i - 1)
-    Eq_1 = player.cache.get("excess_stock")
-    # Oq: get from page input
-    Oq = None
-    # Dq: draw from the lognorm
-    Dq = None
-
-    # update the player's excess_stock for next round
-    player.cache["excess_stock"] = Eq_1 + Oq - Dq
-
-    if Eq_1 + Oq > Dq:
-        return Dq * Rc - Oq * Wc - player.cache["excess_stock"] * Hc
-    return (Eq_1 + Oq) * Rc - Oq * Wc
+def get_time(iso: bool = False) -> float:
+    t = datetime.utcnow()
+    if not iso:
+        return t.timestamp()
+    return t.isoformat()
 
 
 def reorderLegend(ax=None, order=None, key=None, unique=False, **legend_kwargs):

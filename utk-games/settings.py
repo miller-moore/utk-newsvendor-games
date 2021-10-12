@@ -2,11 +2,13 @@ from os import environ
 
 # NOTE: participant fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#participant-fields
 # NOTE: participant fields are stored internally as participant.vars, but also participant.xyz is same as participant.vars['xyz']
-PARTICIPANT_FIELDS = ["treatment"]
+
+# This allows to set any type of data to player.participant (not constrained to oTree's orm column types)
+PARTICIPANT_FIELDS = ["starttime", "treatment", "unit_costs", "demand_rvs", "stock_units", "game_results", "endtime"]
 
 # NOTE: session fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#session-fields
 # NOTE: session fields are stored internally in session.vars
-SESSION_FIELDS = ["session_name", "some_other_session_field", "game_number"]
+SESSION_FIELDS = ["global_var_1", "global_var_2"]
 
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
@@ -18,23 +20,14 @@ SESSION_CONFIG_DEFAULTS = dict(
     use_secure_urls=True,
     real_world_currency_per_point=1.00,
     participation_fee=0.00,
-    # NOTE: custom fields - see SESSION_FIELDS list below to init these as extra session attributes
-    game_number=2,
-    session_name="SweetSessionNameBro",
-    some_other_session_field="'this here is the value for some other session field my man'",
 )
 
 SESSION_CONFIGS = [
-    # dict(
-    #     name="public_goods",
-    #     app_sequence=["public_goods"],
-    #     num_demo_participants=3,
-    # ),
     dict(
-        name="demandplan",
-        app_sequence=["demandplan_1"],  # , "demandplan_2"],
+        name="demandplanning",
+        display_name="Demand Planning Game",
         num_demo_participants=1,
-        participation_fee=0.35,
+        app_sequence=["demandplanning"],
     ),
 ]
 
@@ -45,7 +38,7 @@ LANGUAGE_CODE = "en"
 
 # e.g. EUR, GBP, CNY, JPY
 REAL_WORLD_CURRENCY_CODE = "USD"
-USE_POINTS = True
+USE_POINTS = False
 
 ADMIN_USERNAME = "admin"
 # for security, best to set admin password in an environment variable

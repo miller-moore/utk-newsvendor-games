@@ -1,0 +1,80 @@
+{{ block title }}
+    {# {{ include Constants.title_template }} #}
+
+    Round {{ round_number }} results
+{{ endblock }}
+
+{{ block content }}
+
+    <!-- chart of demand distribution -->
+    <!-- cost parameters -->
+    <!-- form for order quantity input -->
+    <!-- *historical* time series chart with 2 bars: actual demand & quantity ordered - see "Becker-Peth Layout.pdf" -->
+    <!-- *historical* (beneath time series chart): display total profit  -->
+    <!-- submit button - show "#display-card" -->
+    <!-- summary of this round's results: display new table "on_submit" that shows: oq, dq, & profit -->
+
+    <p> Anne: fill-in text here </p>
+
+    {# <center>
+        <button class="btn btn-primary">Submit</button>
+    </center> #}
+    <script>
+        function show() {
+            // var elem = document.getElementById("display-card");
+            var el = this;
+            el.style.display = "block";
+        }
+
+        function hide() {
+            var el = this;
+            el.style.display = "none";
+        }
+    </script>
+
+    <center>
+        {{ next_button }}
+    </center>
+
+{# {% block content %}
+
+    <p>
+        You ordered {{ player.trueorderquantity }} items.
+        Demand was {{ demand }}.
+        {{ demandtext }}
+        Your profit is {{ player.formatted_payoff }}.
+    </p>
+
+    <center>
+
+        <div id="tabledata"></div>
+
+        <br>
+
+        {% next_button %}
+
+    </center>
+
+    <h2>History</h2>
+
+    <center>
+
+        <table width=300>
+            <tr valign="bottom" align="center">
+                <td>Round</td><td>Order<br>quantity</td><td>Customer<br>demand</td><td>Profit</td>
+            </tr>
+            {% for p in player_in_all_rounds %}
+                <tr align="center">
+                    <td>{{ p.round_number }}</td>
+                    <td>{{ p.trueorderquantity }}</td>
+                    <td>{{ p.demand }}</td>
+                    <td>{{ p.formatted_payoff }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+    </center>
+
+{% endblock %} #}
+
+{{ endblock }}

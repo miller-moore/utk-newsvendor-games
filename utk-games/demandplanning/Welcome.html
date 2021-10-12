@@ -1,0 +1,95 @@
+{{ block title }}
+    {# {{ include Constants.title_template }} #}
+    Demand Planning Game: Welcome
+{{ endblock }}
+
+{{ block content }}
+
+
+    <p> Anne: fill-in text here </p>
+
+    {# <div>
+        {{ include Constants.style_template }}
+
+        <h3 class="page-header">Overview</h3>
+
+        <p>
+        This study is designed to better understand demand planner biases. Participants will play two demand planning games at { NUM_PLANNING_PERIODS } rounds per game for a total of { NUM_PLANNING_PERIODS * 2 } rounds. </p>
+
+        <p>
+        Each round represents a single planning period, e.g. a single business month. In each game, excess inventory levels of prior planning periods accumulate and are not reset between periods. In each round, you choose the quantity of goods to
+        purchase at the start of the period based on your expectations for market demand during the period. At the end of the period, results
+        such as cumulative excess inventory levels are computed and stored for later reference as needed to calculate final results at game completion, e.g., cumulative retail, wholesale, holding costs, payoff, etc. </p>
+
+        <p>
+        Market demand is simulated each round as a random sample from a statistical distribution . At the start of each game, the planner is randomly assigned
+        one of two predefined log-normal distributions which do not change between rounds of the game unless a "demand disruption" occurs, which randomly occurs
+        to half of all participats of the study. The distributions are demarcated by significantly different variance magnitudes. As such, the distribution
+        assigned to the player will be categorized as either the "low" or the "high" variability distribution. </p>
+
+        <p>
+        A chart of the participant's distribution is displayed on the page at all times during the game and does not change during the game, unless a disruption occurs. Statistical
+        demand distributions are well-characterized for many markets and therefore should be made available to game participants as similar information is
+        expected to be available to industry planners in the course of their real jobs. </p>
+
+        <p>
+        On entering the study, participants are randomly assigned one of the following four treatment groups: </p>
+
+        <table id="treatment-table">
+            <thead>
+                <tr>
+                    <th scope="col" colspan="2"></th>
+                    <th scope="col" colspan="2">Disrupt Market Demand Distribution<br>during 1<sup>st</sup> Game</th>
+                </tr>
+                <tr>
+                    <th scope="col" colspan="2"></th>
+                    <th scope="col">YES</th>
+                    <th scope="col">NO</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="rowgroup" rowspan="2">Market Demand<br>Distribution Variability</th>
+                    <th scope="row">HIGH</th>
+                    <td>group 1</td>
+                    <td>group 2</td>
+                </tr>
+                <tr>
+                    <th scope="row">LOW</th>
+                    <td>group 3</td>
+                    <td>group 4</td>
+                </tr>
+            </tbody>
+            <caption id="table-caption">
+                Notes:
+                <ul>
+                    <li>If the participant should experience a disruption according to their treatment during the 1<sup>st</sup> game, then upon entering period {int(3/4 * NUM_PLANNING_PERIODS)}, the participant's original distribution is replaced with one defined by a different set of parameters. The new distribution is used to draw a random sample of market demand in each planning period remaining in the 1<sup>st</sup> game.
+                    </li>
+                    <li>In the 2<sup>nd</sup> game, regardless of treatment group, all participants experience a disruption to their market demand distribution upon entering period {int(1/4 * NUM_PLANNING_PERIODS)}.
+                    </li>
+                </ul>
+            </caption>
+        </table>
+
+
+        <h2 class="page-header">General Instructions</h2>
+
+        <p>
+            Please maximise your browser window and eliminate any distractions to the greatest extent practicable, e.g., switch off phone/e-mail/music.
+        </p>
+
+        <p>
+            By proceeding you consent to participate in this study. You understand that all data will be kept confidential by
+            the researcher.
+            Your personal information will not be stored with the data. You are free to withdraw at any time without giving a
+            reason.
+        </p>
+
+        {{ formfield "participantid" label="Please enter your Participant ID here:" }}
+
+    </div> #}
+
+    <center>
+        {{ next_button }}
+    </center>
+{{ endblock }}
