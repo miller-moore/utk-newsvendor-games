@@ -59,7 +59,7 @@
                         <tr id="row-demand">
                             <th scope="row">Realized demand</th>
                         </tr>
-                        <tr id="row-profit">
+                        <tr id="row-cumulative-profit">
                             <th scope="row">Cumulative profit</th>
                         </tr>
                     </tbody>
@@ -69,10 +69,10 @@
         </div>
     </div>
 
-    <p>
+    {# <p>
         <br>
         Cumulative profit from prior rounds:  <strong>{{ total_profit }}</strong>
-    </p>
+    </p> #}
     <p>
         {{ formfield 'ou' label="How many units will you order?" }}
     </p>
@@ -270,7 +270,7 @@
         }
     </script>
 
-    <!-- sample d3 barchart -->
+    <!-- d3 sample bar chart -->
     <script>
 
         function plotHistory() {
@@ -414,7 +414,11 @@
             });
 
 
-            var data = js_vars.history;
+            var data = JSON.parse(JSON.stringify(js_vars.history));
+            data.forEach(d => {
+                d.ou = !d.ou? 0: d.ou;
+                d.du = !d.du? 0: d.du;
+            });
             var groups = data.map(d => d.period);
             var subgroups = Object.keys(data[0]).filter(key => ["ou","du"].includes(key));
 
@@ -470,26 +474,56 @@
 
     <!-- Becker-Peth table -->
     <script>
-        var histTableHeader = $("#history-table thead tr");
-        var histTableStockRow = $("#row-stock");
-        var histTableStockOrder = $("#row-order");
-        var histTableStockDemand = $("#row-demand");
-        var histTableStockProfit = $("#row-profit");
-        for (var p=1; p < js_vars.rounds + 1; p++) {
-            histTableHeader.append(`<th scope="col">${p}</th>`);
-            histTableStockRow.append(`<td id="row-stock-${p}"></td>`);
-            histTableStockOrder.append(`<td id="row-order-${p}"></td>`);
-            histTableStockDemand.append(`<td id="row-demand-${p}"></td>`);
-            histTableStockProfit.append(`<td id="row-profit-${p}"></td>`);
-        }
+        function updateTable() {
+            // var width = $("#distribution-card").width();
+            var histTable = $("#history-table")
+            var histTableHeader = $("#history-table thead tr");
+            var histTableStockRow = $("#row-stock");
+            var histTableStockOrder = $("#row-order");
+            var histTableStockDemand = $("#row-demand");
+            var histTableStockProfit = $("#row-cumulative-profit");
+            for (var i=0; i < js_vars.history.length; i++) {
+                var h = js_vars.history[i];
+                var p = h.period;
+                var su = h.su === null ? '': h.su;
+                var ou = h.ou === null? '': h.ou;
+                var du = h.du === null? '': h.du;
+                var cumulative_profit = h.cumulative_profit === null? '': h.cumulative_profit;
+                var formatted_cumulative_profit = h.formatted_cumulative_profit === null? '': h.formatted_cumulative_profit;
 
+                histTableHeader.append(`<th scope="col">${p}</th>`);
+                histTableStockRow.append(`<td id="row-stock-${p}">${su}</td>`);
+                histTableStockOrder.append(`<td id="row-order-${p}">${ou}</td>`);
+                histTableStockDemand.append(`<td id="row-demand-${p}">${du}</td>`);
+                // histTableStockProfit.append(`<td id="row-cumulative-profit-${p}">${cumulative_profit}</td>`);
+                histTableStockProfit.append(`<td id="row-cumulative-profit-${p}">${formatted_cumulative_profit}</td>`);
+            }
+
+            if($("#history-table").width() < $("#distribution-card").width()) {
+                $("#history-table").width($("#distribution-card").width());
+            }
+        }
+        /*for (var i=0; i < js_vars.history.length; i++) {
+            var h = js_vars.history[i];
+            var p = h.period;
+            var su = !h.su? 0: h.su;
+            var ou = !h.ou? 0: h.ou;
+            var du = !h.du? 0: h.du;
+            var cumulative_profit = !h.cumulative_profit? 0: h.cumulative_profit;
+
+            console.log(`${i}, ${JSON.stringify(h)}, ${su}, ${ou}, ${du}, ${cumulative_profit}`)
+        }
+        */
     </script>
 
     <script>
         plotDistribution();
         // plotHistory();
         plotHistory2();
+        updateTable();
 
-        /** TODO: add table here */
+        if($("#history-table").width() < $("#distribution-card").width()) {
+            $("#history-table").width($("#distribution-card").width());
+        }
     </script>
 {{ endblock }}

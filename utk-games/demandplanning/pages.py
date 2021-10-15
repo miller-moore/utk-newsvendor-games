@@ -31,10 +31,6 @@ def validate_order_quantitty(val: Any) -> None:
         return dict(ou=f"order quantity is expected to be a number")
 
 
-def init_game_history() -> List[Dict[str, Any]]:
-    return [dict(period=i + 1, ou=0, du=0, su=0, profit=0) for i in range(ROUNDS)]
-
-
 register_form_field_validator(field_name="ou", validator=validate_order_quantitty)
 
 
@@ -120,6 +116,33 @@ Page.error_message = staticmethod(print_form_values)
 Page.js_vars = staticmethod(default_js_vars)
 
 
+def frontend_format_currency(currency: Currency, as_integer: bool = False) -> str:
+    import re
+
+    symbol = re.sub(r"([^0-9.]+)(.*)", "\\1", str(currency))
+    if as_integer:
+        decimals = 0
+    else:
+        decimals = len(str(currency).split(".")[1])
+    c_str = f"{symbol}{float(str(currency).replace(symbol,'')):,.{decimals}f}"
+    return c_str
+
+
+def init_game_history() -> List[Dict[str, Any]]:
+    return [
+        dict(
+            period=i + 1,
+            su=0 if i == 0 else None,
+            ou=None,
+            du=None,
+            profit=None,
+            cumulative_profit=None,
+            formatted_cumulative_profit=None,
+        )
+        for i in range(ROUNDS)
+    ]
+
+
 class Welcome(Page):
     @staticmethod
     def is_displayed(player: Player):
@@ -163,16 +186,12 @@ class Decide(Page):
 
         game_number = game_of_round(player.round_number)
         game_rounds = rounds_for_game(game_number)
+        unit_costs = player.participant.unit_costs
+        su_prior = player.participant.stock_units
         print(
             f"[purple]Decide Page. Round number: {player.round_number}, Game number: {game_number}, Game rounds: {[game_rounds[0], game_rounds[-1]]}"
         )
 
-        _vars = default_vars_for_template(player)
-
-        unit_costs = player.participant.unit_costs
-        su_prior = player.participant.stock_units
-
-        # prev_player = player.in_round(player.round_number - 1)
         d = dict(
             rcpu=unit_costs.rcpu,
             wcpu=unit_costs.wcpu,
@@ -186,15 +205,18 @@ class Decide(Page):
             profit=player.field_maybe_none("profit"),
             total_profit=Currency(sum(p.profit for p in player.in_rounds(game_rounds[0], player.round_number - 1))),
         )
+        _vars = default_vars_for_template(player).copy()
         _vars.update(d)
         return _vars
 
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
 
-        unit_costs = player.participant.unit_costs
+        game_number = game_of_round(player.round_number)
+        game_rounds = rounds_for_game(game_number)
 
         # unit costs
+        unit_costs = player.participant.unit_costs
         rcpu = float(unit_costs.rcpu)
         wcpu = float(unit_costs.wcpu)
         hcpu = float(unit_costs.hcpu)
@@ -224,11 +246,24 @@ class Decide(Page):
         player.du = du
 
         # update participant fields
+
+        # stock units
         player.participant.stock_units = su_new
 
+        # cumulative profit
+        cumulative_profit = sum(p.profit for p in player.in_rounds(game_rounds[0], player.round_number - 1)) + player.profit
+
+        # history
         idx = round_of_game(player.round_number) - 1
         hist = player.participant.history[idx]
-        hist.update(ou=player.ou, du=player.du, su=player.su)
+        hist.update(
+            ou=player.ou,
+            du=player.du,
+            su=player.su,
+            profit=float(player.profit),
+            cumulative_profit=cumulative_profit,
+            formatted_cumulative_profit=frontend_format_currency(cumulative_profit, as_integer=True),
+        )
         player.participant.history[idx] = hist
         print("%s" % player.participant.history)
 
@@ -257,7 +292,7 @@ class Results(Page):
             ou=int(round(player.ou)),
             su=int(round(player.participant.stock_units)),
             profit=player.profit,
-            # profit=f"{player.profit:,.0f}",
+            formatted_profit=frontend_format_currency(player.profit),
         )
         _vars.update(d)
         return _vars

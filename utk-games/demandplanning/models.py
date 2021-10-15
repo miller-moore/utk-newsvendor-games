@@ -15,7 +15,7 @@ from . import util
 from .treatment import Treatment, UnitCosts
 
 GAMES = 2
-ROUNDS = 2
+ROUNDS = 3
 RVS_SIZE = int(1e5)
 APP_DIR = Path(__file__).resolve().parent
 APP_NAME = APP_DIR.name
@@ -65,14 +65,14 @@ def should_disrupt_next_round(player: "Player") -> bool:
     return any(conditions)
 
 
-def jinja2_include_path(html_filename: str) -> str:
-    """Return a string of the path to a template file for jinja2 include expressions, e.g., {{ include "my-html-include-template" }}."""
+def django_include_template(html_filename: str) -> str:
+    """Return a string of the path to a template file for django include expressions, e.g., {{ include "my-html-include-template" }}."""
     assert html_filename.endswith(".html"), f"""html_filename does not endwith {".html"!r}"""
 
     # strict file path (must exist)
     filepath = (APP_DIR / html_filename).resolve(strict=True)
 
-    # return string for jinja2 include expression: {{ include "include_path" }}
+    # return string for django include expression: {{ include "include_path" }}
     include_path = str(Path(APP_DIR.name) / filepath.name)
     return include_path
 
@@ -102,9 +102,9 @@ class Constants(ConstantsBase):
     ]
     static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
 
-    # template paths for jinja2 include
-    style_template = jinja2_include_path("style.html")
-    title_template = jinja2_include_path("title.html")
+    # template paths for django include
+    style_template = django_include_template("style.html")
+    title_template = django_include_template("title.html")
 
 
 ConstantsBase.__setattr__ = orig_constants_meta_setattr
