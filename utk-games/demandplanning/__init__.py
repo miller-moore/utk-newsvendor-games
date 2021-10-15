@@ -12,25 +12,10 @@ from .models import APP_DIR, Constants, Group, Player, Subsession
 from .pages import page_sequence
 from .treatment import Treatment
 
-# from otree.templating.nodes import Node, gettext, register
-# @register('submit_button')
-# class SubmitButton(Node):
-#     def wrender(self, context):
-#         SUBMIT_BTN_TEXT = gettext('Submit')
-#         return f'''
-#         <p>
-#             <button class="otree-btn-next btn btn-primary">{SUBMIT_BTN_TEXT}</button>
-#         </p>
-#         '''
-
+# NOTE: if time, research how to register template function, see `register` in module `otree.templating.nodes`
 # from django import template
 # register = template.Library()
 # @register.simple_tag()
 # def addup(*args):
 #     ""{% addup 1 2 3 %}""
 #     return sum(*args)
-
-
-print(
-    "[blue]TODO[/]: things that need to be in the data card window are described in display_window.html." "\n\n",
-)

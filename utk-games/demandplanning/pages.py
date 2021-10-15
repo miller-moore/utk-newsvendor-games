@@ -1,8 +1,9 @@
 import json
+import random
 from decimal import ROUND_HALF_UP, Decimal
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Optional, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import numpy as np
 from otree.api import Currency, Page
@@ -11,40 +12,30 @@ from otree.models import Participant, Session
 from rich import print
 
 from . import util
-from .models import (
-    GAMES,
-    ROUNDS,
-    RVS_SIZE,
-    Constants,
-    Player,
-    game_of_round,
-    is_disruption_round,
-    is_end_of_game,
-    rounds_for_game,
-)
+from .models import (ALLOW_DISRUPTION, GAMES, ROUNDS, RVS_SIZE, Constants,
+                     Player, game_of_round, is_end_of_game, round_of_game,
+                     rounds_for_game, should_disrupt_next_round)
 from .treatment import Treatment, UnitCosts
 
+FORM_FIELD_VALIDATORS: Dict[str, Callable] = {}
 
-def default_vars_for_template(player: Player) -> dict:
-    session: Session = player.session
-    info: PageLookup = _get_session_lookups(session.code)[player.round_number]
-    page_class: Type = info.page_class
-    participant: Participant = player.participant
-    _vars = dict(
-        page_name=getattr(page_class, "__qualname__", "__name__"),
-        round_number=player.round_number,
-        game_number=game_of_round(player.round_number),
-        session_code=session.code,
-        session_vars=str(session.vars),
-        participant_code=participant.code,
-        participant_vars=str({k: v for k, v in participant.vars.items() if k != "demand_rvs"}),
-        # participant_session_id=participant.session_id,
-        # participant_id=participant.id,
-        # participant_id_in_session=participant.id_in_session,
-        # player_id=player.id,
-        # player_id_in_subsession=player.id_in_subsession,  # equals ``participant.id_in_session``
-    )
-    return _vars
+
+def register_form_field_validator(field_name: str, validator: Callable) -> None:
+    assert isinstance(field_name, str), f"field_name is not str - got {field_name} ({type(field_name)})"
+    assert isinstance(validator, Callable), f"validator is not Callable - got {validator} ({type(validator)})"
+    FORM_FIELD_VALIDATORS[field_name] = validator
+
+
+def validate_order_quantitty(val: Any) -> None:
+    if not isinstance(val, np.number):
+        return dict(ou=f"order quantity is expected to be a number")
+
+
+def init_game_history() -> List[Dict[str, Any]]:
+    return [dict(period=i + 1, ou=0, du=0, su=0, profit=0) for i in range(ROUNDS)]
+
+
+register_form_field_validator(field_name="ou", validator=validate_order_quantitty)
 
 
 def print_form_values(player: Player, values: Any) -> None:
@@ -83,8 +74,45 @@ def decorate_error_message(func) -> Callable:
     return wrapped_error_message_handler
 
 
+def default_vars_for_template(player: Player) -> dict:
+    session: Session = player.session
+    info: PageLookup = _get_session_lookups(session.code)[player.round_number]
+    page_class: Type = info.page_class
+    participant: Participant = player.participant
+
+    treatment: Treatment = player.participant.vars.get("treatment", None)
+
+    _vars = dict(
+        games=GAMES,
+        rounds=ROUNDS,
+        page_name=getattr(page_class, "__qualname__", "__name__"),
+        round_number=player.round_number,
+        game_number=game_of_round(player.round_number),
+        round_of_game=round_of_game(player.round_number),
+        session_code=session.code,
+        participant_code=participant.code,
+        is_end_of_game=is_end_of_game(player.round_number),
+        is_disruption_next_round=should_disrupt_next_round(player),
+        is_done=player.round_number == Constants.num_rounds,
+        starttime=player.participant.vars.get("starttime", None),
+        history=player.participant.vars.get("history", None),
+        variance=treatment.variance_choice if treatment else None,
+        # session_vars=str(session.vars),
+        # participant_vars=str({k: v for k, v in participant.vars.items() if k != "demand_rvs"}),
+        # participant_session_id=participant.session_id,
+        # participant_id=participant.id,
+        # participant_id_in_session=participant.id_in_session,
+        # player_id=player.id,
+        # player_id_in_subsession=player.id_in_subsession,  # equals ``participant.id_in_session``
+    )
+    return _vars
+
+
 def default_js_vars(player: Player) -> dict:
-    return dict(demand_rvs=player.participant.vars.get("demand_rvs"))
+    _vars = default_vars_for_template(player).copy()
+
+    _vars.update(demand_rvs=player.participant.vars.get("demand_rvs"))
+    return _vars
 
 
 Page.vars_for_template = staticmethod(default_vars_for_template)
@@ -110,6 +138,7 @@ class Welcome(Page):
         player.participant.unit_costs = unit_costs
         player.participant.demand_rvs = demand_rvs
         player.participant.game_results = []
+        player.participant.history = init_game_history()
 
         player.starttime = starttime
         player.endtime = None
@@ -131,6 +160,13 @@ class Decide(Page):
 
     @staticmethod
     def vars_for_template(player: Player):
+
+        game_number = game_of_round(player.round_number)
+        game_rounds = rounds_for_game(game_number)
+        print(
+            f"[purple]Decide Page. Round number: {player.round_number}, Game number: {game_number}, Game rounds: {[game_rounds[0], game_rounds[-1]]}"
+        )
+
         _vars = default_vars_for_template(player)
 
         unit_costs = player.participant.unit_costs
@@ -138,11 +174,6 @@ class Decide(Page):
 
         # prev_player = player.in_round(player.round_number - 1)
         d = dict(
-            is_end_of_game_round=is_end_of_game(player.round_number),
-            is_disruption_round=is_disruption_round(player.round_number),
-            is_done=player.round_number == Constants.num_rounds,
-            starttime=player.participant.starttime,
-            # demand_rvs_json=json.dumps(player.participant.demand_rvs),
             rcpu=unit_costs.rcpu,
             wcpu=unit_costs.wcpu,
             hcpu=unit_costs.hcpu,
@@ -153,16 +184,14 @@ class Decide(Page):
             revenue=player.field_maybe_none("revenue"),
             cost=player.field_maybe_none("cost"),
             profit=player.field_maybe_none("profit"),
+            total_profit=Currency(sum(p.profit for p in player.in_rounds(game_rounds[0], player.round_number - 1))),
         )
         _vars.update(d)
         return _vars
 
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
-        import random
 
-        player.du = random.choice(player.participant.demand_rvs)
-        player.su = player.participant.stock_units
         unit_costs = player.participant.unit_costs
 
         # unit costs
@@ -171,9 +200,11 @@ class Decide(Page):
         hcpu = float(unit_costs.hcpu)
 
         # unit quantities
-        su = player.su
-        ou = player.ou
-        du = player.du
+        su = round(player.participant.stock_units)
+        du = round(random.choice(player.participant.demand_rvs))
+        ou = round(player.ou)
+
+        # rcpu, wcpu, hcpu = [25.00, 14.00, 6.00]
 
         # compute revenue, cost, profit
         if su + ou > du:
@@ -188,8 +219,31 @@ class Decide(Page):
         player.cost = Currency(cost)
         player.profit = Currency(profit)
 
-        # update su_prior for next round
-        player.participant.stock_units = su
+        su_new = max(0, ou + su - du)
+        player.su = su_new
+        player.du = du
+
+        # update participant fields
+        player.participant.stock_units = su_new
+
+        idx = round_of_game(player.round_number) - 1
+        hist = player.participant.history[idx]
+        hist.update(ou=player.ou, du=player.du, su=player.su)
+        player.participant.history[idx] = hist
+        print("%s" % player.participant.history)
+
+        # player.participant.history[game_of_round(player.round_number) - 1][player.round_number - 1] = dict(ou=ou, du=du, su=su)
+        # print(
+        #     f"game_of_round(player.round_number) - 1: {game_of_round(player.round_number) - 1}, len(player.participant.history): {len(player.participant.history)}, len(player.participant.history\[game_of_round(player.round_number) - 1\]): {len(player.participant.history[game_of_round(player.round_number) - 1])}, player.participant.history\[game_of_round(player.round_number) - 1\]: {player.participant.history[game_of_round(player.round_number) - 1]}"
+        # )
+
+        # for dct in player.participant.history:
+        #     if dct.get("group") == "ou":
+        #         dct[round_of_game(player.round_number)] = player.ou
+        #     elif dct.get("group") == "du":
+        #         dct[round_of_game(player.round_number)] = player.du
+        #     elif dct.get("group") == "su":
+        #         dct[round_of_game(player.round_number)] = player.su
 
 
 class Results(Page):
@@ -197,12 +251,13 @@ class Results(Page):
     def vars_for_template(player: Player):
         _vars = default_vars_for_template(player)
         d = dict(
-            is_end_of_game=is_end_of_game(player.round_number),
-            is_done=player.round_number == Constants.num_rounds,
-            is_disruption_round=is_disruption_round(player.round_number),
             revenue=player.revenue,
             cost=player.cost,
+            du=int(round(player.du)),
+            ou=int(round(player.ou)),
+            su=int(round(player.participant.stock_units)),
             profit=player.profit,
+            # profit=f"{player.profit:,.0f}",
         )
         _vars.update(d)
         return _vars
@@ -210,20 +265,34 @@ class Results(Page):
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
         if is_end_of_game(player.round_number):
+            # results = player.participant.round_results
             player.participant.stock_units = 0
             game_number = game_of_round(player.round_number)
             rounds = rounds_for_game(game_number)
             game_rev, game_cost, game_profit = 0, 0, 0
             for p in player.in_rounds(rounds[0], rounds[-1]):
                 game_rev += p.revenue
-                game_rev += p.cost
+                game_cost += p.cost
                 game_profit += p.profit
             player.participant.game_results.append(dict(revenue=game_rev, cost=game_cost, profit=game_profit))
-
-        if is_disruption_round(player.round_number + 1):
-            player.participant.demand_rvs = player.participant.treatment.get_demand_rvs(RVS_SIZE, disrupt=True)
+            player.participant.history = init_game_history()
 
         player.endtime = util.get_time()
+
+
+class Disruption(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return should_disrupt_next_round(player)
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        return dict(ALLOW_DISRUPTION=ALLOW_DISRUPTION)
+
+    @staticmethod
+    def before_next_page(player: Player, timeout_happened):
+        if ALLOW_DISRUPTION:
+            player.participant.demand_rvs = player.participant.treatment.get_demand_rvs(RVS_SIZE, disrupt=True)
 
 
 class FinalResults(Page):
@@ -233,7 +302,7 @@ class FinalResults(Page):
 
     @staticmethod
     def vars_for_template(player: Player) -> dict:
-        _vars = default_vars_for_template(player)
+        _vars = default_vars_for_template(player).copy()
         _vars.update(
             is_done=player.round_number == Constants.num_rounds,
             next_game=game_of_round(player.round_number) + 1,

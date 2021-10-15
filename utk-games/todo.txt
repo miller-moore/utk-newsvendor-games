@@ -1,0 +1,17 @@
+DISRUPTION QUESTION: If disruption should occur, can we display a new page to describe the event?
+
+Change round number in title to reflect within game round.
+
+A. Stack visualizations vertically
+
+B. Make them all smaller
+
+C. Plot order:
+  1) Move demand distribution to top
+  2) History chart
+      - add bar for stock units
+  3) Make table from Becker-Peth
+      - exclude first 3 rows (price/cost)
+      - keep other rows
+      - add cumulative profit row
+

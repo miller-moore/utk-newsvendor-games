@@ -1,0 +1,18 @@
+{{ block title }}
+    Uh oh!
+{{ endblock }}
+
+{{ block content }}
+
+    <p> Market demand has been disrupted! </p>
+
+    {{ if ALLOW_DISRUPTION == False }}
+        <p> But not really... this is just a page test (ALLOW_DISRUPTION == False). The participant's distribution will not change.
+        </p>
+    {{endif}}
+
+    <center>
+        {{ next_button }}
+    </center>
+
+{{ endblock }}

@@ -4,7 +4,16 @@ from os import environ
 # NOTE: participant fields are stored internally as participant.vars, but also participant.xyz is same as participant.vars['xyz']
 
 # This allows to set any type of data to player.participant (not constrained to oTree's orm column types)
-PARTICIPANT_FIELDS = ["starttime", "treatment", "unit_costs", "demand_rvs", "stock_units", "game_results", "endtime"]
+PARTICIPANT_FIELDS = [
+    "starttime",
+    "treatment",
+    "unit_costs",
+    "demand_rvs",
+    "stock_units",
+    "game_results",
+    "history",
+    "endtime",
+]
 
 # NOTE: session fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#session-fields
 # NOTE: session fields are stored internally in session.vars

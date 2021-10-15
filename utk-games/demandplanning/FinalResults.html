@@ -1,38 +1,26 @@
 {{ block title }}
-    {# {{ include Constants.title_template }} #}
-
-    is_done: {{ is_done }}
-    next_game: {{ next_game }}
-
-    {% if is_done %}
-        Game {{ next_game }} begins
-    {% else %}
-        That was it!
-    {% endif %}
-
+    End of Game {{ game_number }}
 {{ endblock }}
 
 {{ block content }}
 
-    <!-- chart of demand distribution -->
-    <!-- cost parameters -->
-    <!-- form for order quantity input -->
-    <!-- *historical* time series chart with 2 bars: actual demand & quantity ordered - see "Becker-Peth Layout.pdf" -->
-    <!-- *historical* (beneath time series chart): display total profit  -->
-    <!-- submit button - show "#display-card" -->
-    <!-- summary of this round's results: display new table "on_submit" that shows: oq, dq, & profit -->
+    <h4>Game {{ game_number}} results</h4>
 
-    <p> Anne: fill-in text here </p>
+    <p> [... add game results here ...]</p>
 
-    {% if is_done == 'false' %}
+    <br>
+
+    {{ if not is_done }}
         <p>
-            Now the unit cost is increased to 9. Please use the profit calculator to see how this affects your total profit.
+            Game {{ next_game }} begins next.
         </p>
         <center>
-            {% next_button %}
+            {{ next_button }}
         </center>
-    {% else %}
-        Thanks for playing!
-    {% endif %}
+    {{ else }}
+        <p>
+            Thanks for playing!
+        </p>
+    {{ endif }}
 
 {{ endblock }}
