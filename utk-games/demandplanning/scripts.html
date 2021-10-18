@@ -455,7 +455,7 @@
             var du = h.du === null? '': h.du;
             var cumulative_profit = h.cumulative_profit === null? '': h.cumulative_profit;
             //var formatted_cumulative_profit = h.formatted_cumulative_profit === null? '': h.formatted_cumulative_profit;
-            var formatted_cumulative_profit = cumulative_profit === null? '': formatCurrency(cumulative_profit);
+            var formatted_cumulative_profit = cumulative_profit === ''? '': formatCurrency(cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
 
             histTableHeader.append(`<th scope="col">${p}</th>`);
             histTableStockRow.append(`<td id="row-stock-${p}">${su}</td>`);

@@ -1,19 +1,16 @@
-TODO: Update README with instructions for setting up environment.
+1. Update README with instructions for setting up environment.
 
-DISRUPTION QUESTION: If disruption should occur, can we display a new page to describe the event?
+2. Verify disruption page works as expected
 
-Change round number in title to reflect within game round.
+3. Put table of some properties next to demand disribution chart. Include:
+    a. Per unit costs (3 different rows): wholesale, retail, holding
 
-A. Stack visualizations vertically
+4. Amounts ordered/demanded barchart:
+    a. add legend
+    b. fix error that doesn't show
 
-B. Make them all smaller
+5. Becker-Path History table:
+    a. get profits in this round (above cumulative profit)
+    b. fix stock levels before order (last is pushed first, incorrectly)
 
-C. Plot order:
-  1) Move demand distribution to top
-  2) History chart
-      - add bar for stock units
-  3) Make table from Becker-Peth
-      - exclude first 3 rows (price/cost)
-      - keep other rows
-      - add cumulative profit row
 
