@@ -14,12 +14,14 @@ pip install -r requirements.txt
 ### To run otree devserver (if workspace and virtual environment are setup per above instructions):
 ```bash
 # go to the git repository (i.e., the workspace)
-cd utk-newsvendor-games 
+cd utk-newsvendor-games
 # update local 'master' branch with 'origin/master'
 git checkout master # just in case - should already be on 'master' branch
 git pull # synchronize local branch
-# activate the virtual environment 
+# activate the virtual environment
 source venv/bin/activate
+# ensure pip requirements are also synchronized
+pip install -r requirements.txt
 # go to the app directory
 cd utk-games
 # run otree
