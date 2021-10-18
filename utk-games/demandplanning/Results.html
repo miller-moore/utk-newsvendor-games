@@ -1,8 +1,10 @@
 {{ block title }}
-    Round {{ round_of_game }} results
+    Round {{ game_round }} results
 {{ endblock }}
 
 {{ block content }}
+
+    {{ include Constants.style_template }}
 
     <p> Anne: fill-in text here </p>
 
@@ -11,12 +13,21 @@
             <li>Demand was <strong>{{ du }}</strong> units.</li>
             <li>You ordered <strong>{{ ou }}</strong> units.</li>
             <li>You will have <strong>{{ su }}</strong> units in inventory next period.</li>
-            <li>You earned <strong>{{ profit }}</strong> in profit this round.</li>
+            {# <li>You earned <strong>{{ profit }}</strong> in profit this round.</li> #}
+            <li>You earned <strong id="roundProfit"></strong> in profit this round.</li>
         </ul>
     </p>
+
 
     <center>
         {{ next_button }}
     </center>
 
+    {{ include Constants.scripts_template }}
+
+    <script>
+        $("#roundProfit").text(formatCurrency(js_vars.profit, { maximumFractionDigits: 0 }));
+    </script>
 {{ endblock }}
+
+

@@ -4,9 +4,24 @@
 {{ endblock }}
 
 {{ block content }}
-
+    {{ include Constants.style_template }}
 
     <p> Anne: fill-in text here </p>
+
+    <h4 class="page-header">General Instructions</h4>
+
+    <p>
+        Please maximise your browser window and eliminate any distractions to the greatest extent practicable, e.g., switch off phone/e-mail/music.
+    </p>
+
+    <p>
+        By proceeding you consent to participate in this study. You understand that all data will be kept confidential by
+        the researcher.
+        Your personal information will not be stored with the data. You are free to withdraw at any time without giving a
+        reason.
+    </p>
+
+    {# {{ formfield "participantid" label="Please enter your Participant ID here:" }} #}
 
     {# <div>
         {{ include Constants.style_template }}
@@ -71,25 +86,12 @@
             </caption>
         </table>
 
-
-        <h2 class="page-header">General Instructions</h2>
-
-        <p>
-            Please maximise your browser window and eliminate any distractions to the greatest extent practicable, e.g., switch off phone/e-mail/music.
-        </p>
-
-        <p>
-            By proceeding you consent to participate in this study. You understand that all data will be kept confidential by
-            the researcher.
-            Your personal information will not be stored with the data. You are free to withdraw at any time without giving a
-            reason.
-        </p>
-
-        {{ formfield "participantid" label="Please enter your Participant ID here:" }}
-
     </div> #}
 
     <center>
         {{ next_button }}
     </center>
+
+    {{ include Constants.scripts_template }}
 {{ endblock }}
+

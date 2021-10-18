@@ -4,6 +4,8 @@
 
 {{ block content }}
 
+    {{ include Constants.style_template }}
+
     <p> Market demand has been disrupted! </p>
 
     {{ if ALLOW_DISRUPTION == False }}
@@ -15,4 +17,6 @@
         {{ next_button }}
     </center>
 
+    {{ include Constants.scripts_template }}
 {{ endblock }}
+

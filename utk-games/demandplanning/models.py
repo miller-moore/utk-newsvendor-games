@@ -103,8 +103,9 @@ class Constants(ConstantsBase):
     static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
 
     # template paths for django include
-    style_template = django_include_template("style.html")
     title_template = django_include_template("title.html")
+    style_template = django_include_template("style.html")
+    scripts_template = django_include_template("scripts.html")
 
 
 ConstantsBase.__setattr__ = orig_constants_meta_setattr

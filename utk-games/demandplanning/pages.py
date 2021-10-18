@@ -12,26 +12,54 @@ from otree.models import Participant, Session
 from rich import print
 
 from . import util
-from .models import (ALLOW_DISRUPTION, GAMES, ROUNDS, RVS_SIZE, Constants,
-                     Player, game_of_round, is_end_of_game, round_of_game,
-                     rounds_for_game, should_disrupt_next_round)
+from .models import (
+    ALLOW_DISRUPTION,
+    GAMES,
+    ROUNDS,
+    RVS_SIZE,
+    Constants,
+    Player,
+    game_of_round,
+    is_end_of_game,
+    round_of_game,
+    rounds_for_game,
+    should_disrupt_next_round,
+)
 from .treatment import Treatment, UnitCosts
 
 FORM_FIELD_VALIDATORS: Dict[str, Callable] = {}
 
 
-def register_form_field_validator(field_name: str, validator: Callable) -> None:
-    assert isinstance(field_name, str), f"field_name is not str - got {field_name} ({type(field_name)})"
+def register_form_validator(form_field: str, validator: Callable) -> None:
+    assert isinstance(form_field, str), f"field_name is not str - got {form_field} ({type(form_field)})"
     assert isinstance(validator, Callable), f"validator is not Callable - got {validator} ({type(validator)})"
-    FORM_FIELD_VALIDATORS[field_name] = validator
+    FORM_FIELD_VALIDATORS[form_field] = validator
 
 
-def validate_order_quantitty(val: Any) -> None:
-    if not isinstance(val, np.number):
-        return dict(ou=f"order quantity is expected to be a number")
+def validate_participantid(val: Any) -> None:
+    """Validate values of form_field "participantid" provided to the client."""
+
+    form_field = "participantid"
+    expect_type = str
+    got = val
+    got_type = type(val)
+    if not isinstance(val, expect_type):
+        return {form_field: f"{form_field} is expected to be {expect_type} - got {got} (type: {got_type})"}
 
 
-register_form_field_validator(field_name="ou", validator=validate_order_quantitty)
+def validate_ou(val: Any) -> None:
+    """Validate values for form_field "ou" (order quantity) provided by the client."""
+
+    form_field = "ou"
+    expect_type = np.number
+    got = val
+    got_type = type(val)
+    if not isinstance(val, expect_type):
+        return {form_field: f"{form_field} (order quantity) is expected to be {expect_type} - got {got} (type: {got_type})"}
+
+
+# register_form_validator(form_field="participantid", validator=validate_participantid)
+register_form_validator(form_field="ou", validator=validate_ou)
 
 
 def print_form_values(player: Player, values: Any) -> None:
@@ -71,20 +99,30 @@ def decorate_error_message(func) -> Callable:
 
 
 def default_vars_for_template(player: Player) -> dict:
+
+    from otree import settings
+
     session: Session = player.session
     info: PageLookup = _get_session_lookups(session.code)[player.round_number]
     page_class: Type = info.page_class
+    page_name = getattr(page_class, "__qualname__", "__name__")
     participant: Participant = player.participant
+    round_number = player.round_number
+    game_number = game_of_round(player.round_number)
+    game_round = round_of_game(player.round_number)
+    game_rounds = rounds_for_game(game_number)
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
     _vars = dict(
+        language_code=settings.LANGUAGE_CODE,
+        real_world_currency_code=settings.REAL_WORLD_CURRENCY_CODE,
         games=GAMES,
         rounds=ROUNDS,
-        page_name=getattr(page_class, "__qualname__", "__name__"),
-        round_number=player.round_number,
-        game_number=game_of_round(player.round_number),
-        round_of_game=round_of_game(player.round_number),
+        page_name=page_name,
+        round_number=round_number,
+        game_number=game_number,
+        game_round=game_round,
         session_code=session.code,
         participant_code=participant.code,
         is_end_of_game=is_end_of_game(player.round_number),
@@ -101,6 +139,11 @@ def default_vars_for_template(player: Player) -> dict:
         # player_id=player.id,
         # player_id_in_subsession=player.id_in_subsession,  # equals ``participant.id_in_session``
     )
+
+    print(
+        f"[yellow]{page_name} Page:  Round number: {player.round_number}, Game number: {game_number}, Game's last round: {game_rounds[-1]}, Round in game: {game_round}[/]"
+    )
+
     return _vars
 
 
@@ -137,13 +180,16 @@ def init_game_history() -> List[Dict[str, Any]]:
             du=None,
             profit=None,
             cumulative_profit=None,
-            formatted_cumulative_profit=None,
+            # formatted_cumulative_profit=None,
         )
         for i in range(ROUNDS)
     ]
 
 
 class Welcome(Page):
+    # form_model = "player"
+    # form_fields = ["participantid"]
+
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == 1
@@ -188,9 +234,6 @@ class Decide(Page):
         game_rounds = rounds_for_game(game_number)
         unit_costs = player.participant.unit_costs
         su_prior = player.participant.stock_units
-        print(
-            f"[purple]Decide Page. Round number: {player.round_number}, Game number: {game_number}, Game rounds: {[game_rounds[0], game_rounds[-1]]}"
-        )
 
         d = dict(
             rcpu=unit_costs.rcpu,
@@ -262,7 +305,7 @@ class Decide(Page):
             su=player.su,
             profit=float(player.profit),
             cumulative_profit=cumulative_profit,
-            formatted_cumulative_profit=frontend_format_currency(cumulative_profit, as_integer=True),
+            # formatted_cumulative_profit=frontend_format_currency(cumulative_profit, as_integer=True),
         )
         player.participant.history[idx] = hist
         print("%s" % player.participant.history)
@@ -284,15 +327,32 @@ class Decide(Page):
 class Results(Page):
     @staticmethod
     def vars_for_template(player: Player):
-        _vars = default_vars_for_template(player)
+
+        _vars = default_vars_for_template(player).copy()
         d = dict(
             revenue=player.revenue,
             cost=player.cost,
             du=int(round(player.du)),
             ou=int(round(player.ou)),
             su=int(round(player.participant.stock_units)),
-            profit=player.profit,
-            formatted_profit=frontend_format_currency(player.profit),
+            profit=float(player.profit),
+            # formatted_profit=frontend_format_currency(player.profit, as_integer=True),
+        )
+        _vars.update(d)
+        return _vars
+
+    @staticmethod
+    def js_vars(player: Player):
+
+        _vars = default_js_vars(player).copy()
+        d = dict(
+            revenue=player.revenue,
+            cost=player.cost,
+            du=int(round(player.du)),
+            ou=int(round(player.ou)),
+            su=int(round(player.participant.stock_units)),
+            profit=float(player.profit),
+            # formatted_profit=frontend_format_currency(player.profit, as_integer=True),
         )
         _vars.update(d)
         return _vars
