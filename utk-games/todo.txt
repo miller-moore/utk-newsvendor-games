@@ -1,16 +1,14 @@
-1. Update README with instructions for setting up environment.
 
-2. Verify disruption page works as expected
-
-3. Put table of some properties next to demand disribution chart. Include:
+- Put table of some properties next to demand disribution chart. Include:
     a. Per unit costs (3 different rows): wholesale, retail, holding
 
-4. Amounts ordered/demanded barchart:
+- Amounts ordered/demanded barchart:
     a. add legend
     b. fix error that doesn't show
 
-5. Becker-Path History table:
+- Becker-Path History table:
     a. get profits in this round (above cumulative profit)
     b. fix stock levels before order (last is pushed first, incorrectly)
 
 
+- Verify disruption page works as expected
