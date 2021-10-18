@@ -1,3 +1,0 @@
-- Amounts ordered/demanded barchart:
-    a. add legend
-    b. fix error that doesn't show bars
