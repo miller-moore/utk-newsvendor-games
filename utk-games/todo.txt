@@ -1,7 +1,5 @@
 TODO: Update README with instructions for setting up environment.
 
-second change
-
 DISRUPTION QUESTION: If disruption should occur, can we display a new page to describe the event?
 
 Change round number in title to reflect within game round.
