@@ -15,12 +15,12 @@ if [ ! -d ${VIRTUALENV_DIR} ]; then
             pyenv local "${py39}"
         fi
     fi
-    python -m venv ${VIRTUALENV_DIR}
-    pip install -U pip wheel setuptools
+    python3 -m venv ${VIRTUALENV_DIR}
 fi
 
 # activate virtualenv
 source ${VIRTUALENV_DIR}/bin/activate
+pip install -U pip wheel setuptools
 
 # update python requirements
 pip install -r ${PROJECT_ROOT}/requirements.txt
