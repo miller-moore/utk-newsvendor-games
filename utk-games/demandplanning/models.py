@@ -56,11 +56,28 @@ def should_disrupt_next_round(player: "Player") -> bool:
     assert treatment, f"no 'treatment' attribute exists on player.participant"
 
     game_number = game_of_round(player.round_number)
-    next_game_round = round_of_game(player.round_number)
+    game_round = round_of_game(player.round_number)
 
     conditions = [
-        treatment.disrupt_is_true() and game_number == 1 and next_game_round == int(3 / 4 * ROUNDS),
-        game_number == 2 and next_game_round == int(1 / 4 * ROUNDS),
+        treatment.disrupt_is_true() and game_number == 1 and (game_round + 1) == int(3 / 4 * ROUNDS) + 1,
+        game_number == 2 and (game_round + 1) == int(1 / 4 * ROUNDS) + 1,
+    ]
+    return any(conditions)
+
+
+def is_disrupt_round(player: "Player") -> bool:
+    if player.round_number == 1:
+        return False
+
+    treatment = player.participant.vars.get("treatment", None)
+    assert treatment, f"no 'treatment' attribute exists on player.participant"
+
+    game_number = game_of_round(player.round_number)
+    game_round = round_of_game(player.round_number)
+
+    conditions = [
+        treatment.disrupt_is_true() and game_number == 1 and game_round == int(3 / 4 * ROUNDS) + 1,
+        game_number == 2 and game_round == int(1 / 4 * ROUNDS) + 1,
     ]
     return any(conditions)
 
@@ -95,6 +112,7 @@ class Constants(ConstantsBase):
 
     # custom constants
     num_games = GAMES
+    rounds_per_game = ROUNDS
     app_name = APP_DIR.name
     authors = [
         "Anne Dohmen, University of Tennessee - Knoxville, Department of Supply Chain Management",
@@ -102,10 +120,14 @@ class Constants(ConstantsBase):
     ]
     static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
 
+    allow_disruption = ALLOW_DISRUPTION
+    rvs_size = RVS_SIZE
+
     # template paths for django include
     title_template = django_include_template("title.html")
     style_template = django_include_template("style.html")
     scripts_template = django_include_template("scripts.html")
+    visualizations_template = django_include_template("visualizations.html")
 
 
 ConstantsBase.__setattr__ = orig_constants_meta_setattr

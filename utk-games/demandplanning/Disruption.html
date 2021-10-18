@@ -1,16 +1,22 @@
 {{ block title }}
-    Uh oh!
+    Uh oh! An exogenous event has disrupted market demand!
 {{ endblock }}
 
 {{ block content }}
 
     {{ include Constants.style_template }}
 
-    <p> Market demand has been disrupted! </p>
+    <p>
+        Market demand in a given period follows a different distribution than before!
+    </p>
 
-    {{ if ALLOW_DISRUPTION == False }}
-        <p> But not really... this is just a page test (ALLOW_DISRUPTION == False). The participant's distribution will not change.
+
+    {{ if not Constants.allow_disruption }}
+        <br>
+        <p><strong>THIS IS JUST A TEST (ALLOW_DISRUPTION is False):</strong> the demand distribution will not actually change.
         </p>
+        <p>Set ALLOW_DISRUPTION = True (file 'demandplanning/models.py') to allow the disruption's affect to change the participant's demand distribution.</p>
+        <br>
     {{endif}}
 
     <center>

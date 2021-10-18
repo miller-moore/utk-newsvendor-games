@@ -13,13 +13,10 @@ from rich import print
 
 from . import util
 from .models import (
-    ALLOW_DISRUPTION,
-    GAMES,
-    ROUNDS,
-    RVS_SIZE,
     Constants,
     Player,
     game_of_round,
+    is_disrupt_round,
     is_end_of_game,
     round_of_game,
     rounds_for_game,
@@ -27,6 +24,25 @@ from .models import (
 )
 from .treatment import Treatment, UnitCosts
 
+
+def init_game_history() -> List[Dict[str, Any]]:
+    return [
+        dict(
+            period=i + 1,
+            su_before=0 if i == 0 else None,
+            su_after=None,
+            ou=None,
+            du=None,
+            revenue=None,
+            cost=None,
+            profit=None,
+            cumulative_profit=None,
+        )
+        for i in range(Constants.rounds_per_game)
+    ]
+
+
+# Form validation:
 FORM_FIELD_VALIDATORS: Dict[str, Callable] = {}
 
 
@@ -105,7 +121,7 @@ def default_vars_for_template(player: Player) -> dict:
     session: Session = player.session
     info: PageLookup = _get_session_lookups(session.code)[player.round_number]
     page_class: Type = info.page_class
-    page_name = getattr(page_class, "__qualname__", "__name__")
+    page_name = getattr(page_class, "__qualname__", getattr(page_class, "__name__", None))
     participant: Participant = player.participant
     round_number = player.round_number
     game_number = game_of_round(player.round_number)
@@ -114,11 +130,16 @@ def default_vars_for_template(player: Player) -> dict:
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
+    unit_costs = player.participant.vars.get("unit_costs", None)
+    rcpu = float(unit_costs.rcpu) if unit_costs else None
+    wcpu = float(unit_costs.wcpu) if unit_costs else None
+    hcpu = float(unit_costs.hcpu) if unit_costs else None
+
     _vars = dict(
         language_code=settings.LANGUAGE_CODE,
         real_world_currency_code=settings.REAL_WORLD_CURRENCY_CODE,
-        games=GAMES,
-        rounds=ROUNDS,
+        games=Constants.num_games,
+        rounds=Constants.rounds_per_game,
         page_name=page_name,
         round_number=round_number,
         game_number=game_number,
@@ -127,17 +148,22 @@ def default_vars_for_template(player: Player) -> dict:
         participant_code=participant.code,
         is_end_of_game=is_end_of_game(player.round_number),
         is_disruption_next_round=should_disrupt_next_round(player),
+        is_disruption_round=is_disrupt_round(player),
         is_done=player.round_number == Constants.num_rounds,
         starttime=player.participant.vars.get("starttime", None),
+        variance_choice=treatment.variance_choice if treatment else None,
+        disruption_choice=treatment.disruption_choice if treatment else None,
+        rcpu=rcpu,
+        wcpu=wcpu,
+        hcpu=hcpu,
+        su_prior=player.participant.vars.get("stock_units"),
+        su=player.field_maybe_none("su"),
+        ou=player.field_maybe_none("ou"),
+        du=player.field_maybe_none("du"),
+        revenue=player.field_maybe_none("revenue"),
+        cost=player.field_maybe_none("cost"),
+        profit=player.field_maybe_none("profit"),
         history=player.participant.vars.get("history", None),
-        variance=treatment.variance_choice if treatment else None,
-        # session_vars=str(session.vars),
-        # participant_vars=str({k: v for k, v in participant.vars.items() if k != "demand_rvs"}),
-        # participant_session_id=participant.session_id,
-        # participant_id=participant.id,
-        # participant_id_in_session=participant.id_in_session,
-        # player_id=player.id,
-        # player_id_in_subsession=player.id_in_subsession,  # equals ``participant.id_in_session``
     )
 
     print(
@@ -147,16 +173,8 @@ def default_vars_for_template(player: Player) -> dict:
     return _vars
 
 
-def default_js_vars(player: Player) -> dict:
-    _vars = default_vars_for_template(player).copy()
-
-    _vars.update(demand_rvs=player.participant.vars.get("demand_rvs"))
-    return _vars
-
-
-Page.vars_for_template = staticmethod(default_vars_for_template)
 Page.error_message = staticmethod(print_form_values)
-Page.js_vars = staticmethod(default_js_vars)
+Page.vars_for_template = staticmethod(default_vars_for_template)
 
 
 def frontend_format_currency(currency: Currency, as_integer: bool = False) -> str:
@@ -171,21 +189,6 @@ def frontend_format_currency(currency: Currency, as_integer: bool = False) -> st
     return c_str
 
 
-def init_game_history() -> List[Dict[str, Any]]:
-    return [
-        dict(
-            period=i + 1,
-            su=0 if i == 0 else None,
-            ou=None,
-            du=None,
-            profit=None,
-            cumulative_profit=None,
-            # formatted_cumulative_profit=None,
-        )
-        for i in range(ROUNDS)
-    ]
-
-
 class Welcome(Page):
     # form_model = "player"
     # form_fields = ["participantid"]
@@ -195,11 +198,17 @@ class Welcome(Page):
         return player.round_number == 1
 
     @staticmethod
+    def vars_for_template(player: Player):
+        _vars = default_vars_for_template(player).copy()
+        _vars.update(page_name="Welcome")
+        return _vars
+
+    @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
         treatment = Treatment.choose()
         starttime = util.get_time()
         unit_costs = treatment.get_unit_costs()
-        demand_rvs = treatment.get_demand_rvs(RVS_SIZE)
+        demand_rvs = treatment.get_demand_rvs(Constants.rvs_size)
 
         player.participant.treatment = treatment
         player.participant.starttime = starttime
@@ -214,12 +223,34 @@ class Welcome(Page):
         player.rcpu = unit_costs.rcpu
         player.wcpu = unit_costs.wcpu
         player.hcpu = unit_costs.hcpu
-        player.su = 0
+        player.su = None
         player.ou = None
         player.du = None
         player.revenue = None
         player.cost = None
         player.profit = None
+
+
+class Disruption(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_disrupt_round(player)
+
+    @staticmethod
+    def vars_for_template(player: Player):
+        _vars = default_vars_for_template(player).copy()
+        _vars.update(page_name="Disruption", allow_disruption=Constants.allow_disruption)
+        return _vars
+
+    @staticmethod
+    def js_vars(player: Player):
+        _vars = Disruption.vars_for_template(player).copy()
+        return _vars
+
+    @staticmethod
+    def before_next_page(player: Player, timeout_happened):
+        if Constants.allow_disruption:
+            player.participant.demand_rvs = player.participant.treatment.get_demand_rvs(Constants.rvs_size, disrupt=True)
 
 
 class Decide(Page):
@@ -229,27 +260,19 @@ class Decide(Page):
 
     @staticmethod
     def vars_for_template(player: Player):
-
-        game_number = game_of_round(player.round_number)
-        game_rounds = rounds_for_game(game_number)
-        unit_costs = player.participant.unit_costs
-        su_prior = player.participant.stock_units
-
-        d = dict(
-            rcpu=unit_costs.rcpu,
-            wcpu=unit_costs.wcpu,
-            hcpu=unit_costs.hcpu,
-            su_prior=su_prior,
-            su=player.field_maybe_none("su"),
-            ou=player.field_maybe_none("ou"),
-            du=player.field_maybe_none("du"),
-            revenue=player.field_maybe_none("revenue"),
-            cost=player.field_maybe_none("cost"),
-            profit=player.field_maybe_none("profit"),
-            total_profit=Currency(sum(p.profit for p in player.in_rounds(game_rounds[0], player.round_number - 1))),
-        )
         _vars = default_vars_for_template(player).copy()
-        _vars.update(d)
+        idx = round_of_game(player.round_number) - 1
+        hist = player.participant.history[idx]
+        if hist.get("su_before") is None:
+            hist.update(su_before=player.participant.stock_units)
+        player.participant.history[idx] = hist
+        _vars.update(page_name="Decide", history=player.participant.history)
+        return _vars
+
+    @staticmethod
+    def js_vars(player: Player) -> dict:
+        _vars = Decide.vars_for_template(player).copy()
+        _vars.update(demand_rvs=player.participant.vars.get("demand_rvs"))
         return _vars
 
     @staticmethod
@@ -268,8 +291,6 @@ class Decide(Page):
         su = round(player.participant.stock_units)
         du = round(random.choice(player.participant.demand_rvs))
         ou = round(player.ou)
-
-        # rcpu, wcpu, hcpu = [25.00, 14.00, 6.00]
 
         # compute revenue, cost, profit
         if su + ou > du:
@@ -299,68 +320,61 @@ class Decide(Page):
         # history
         idx = round_of_game(player.round_number) - 1
         hist = player.participant.history[idx]
+        if hist.get("su_before") is None:
+            hist.update(su_before=su)
         hist.update(
-            ou=player.ou,
-            du=player.du,
-            su=player.su,
-            profit=float(player.profit),
-            cumulative_profit=cumulative_profit,
+            ou=ou,
+            du=du,
+            su_after=su_new,
+            revenue=float(revenue),
+            cost=float(cost),
+            profit=float(profit),
+            cumulative_profit=float(cumulative_profit),
             # formatted_cumulative_profit=frontend_format_currency(cumulative_profit, as_integer=True),
         )
         player.participant.history[idx] = hist
         print("%s" % player.participant.history)
 
-        # player.participant.history[game_of_round(player.round_number) - 1][player.round_number - 1] = dict(ou=ou, du=du, su=su)
-        # print(
-        #     f"game_of_round(player.round_number) - 1: {game_of_round(player.round_number) - 1}, len(player.participant.history): {len(player.participant.history)}, len(player.participant.history\[game_of_round(player.round_number) - 1\]): {len(player.participant.history[game_of_round(player.round_number) - 1])}, player.participant.history\[game_of_round(player.round_number) - 1\]: {player.participant.history[game_of_round(player.round_number) - 1]}"
-        # )
-
-        # for dct in player.participant.history:
-        #     if dct.get("group") == "ou":
-        #         dct[round_of_game(player.round_number)] = player.ou
-        #     elif dct.get("group") == "du":
-        #         dct[round_of_game(player.round_number)] = player.du
-        #     elif dct.get("group") == "su":
-        #         dct[round_of_game(player.round_number)] = player.su
-
 
 class Results(Page):
     @staticmethod
     def vars_for_template(player: Player):
-
-        _vars = default_vars_for_template(player).copy()
-        d = dict(
-            revenue=player.revenue,
-            cost=player.cost,
-            du=int(round(player.du)),
-            ou=int(round(player.ou)),
-            su=int(round(player.participant.stock_units)),
-            profit=float(player.profit),
-            # formatted_profit=frontend_format_currency(player.profit, as_integer=True),
-        )
-        _vars.update(d)
+        _vars = Decide.vars_for_template(player).copy()
+        _vars.update(page_name="Results")
         return _vars
 
     @staticmethod
     def js_vars(player: Player):
+        _vars = Results.vars_for_template(player).copy()
+        _vars.update(demand_rvs=player.participant.vars.get("demand_rvs"))
+        return _vars
 
-        _vars = default_js_vars(player).copy()
-        d = dict(
-            revenue=player.revenue,
-            cost=player.cost,
-            du=int(round(player.du)),
-            ou=int(round(player.ou)),
-            su=int(round(player.participant.stock_units)),
-            profit=float(player.profit),
-            # formatted_profit=frontend_format_currency(player.profit, as_integer=True),
+
+class FinalResults(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_end_of_game(player.round_number)
+
+    @staticmethod
+    def vars_for_template(player: Player) -> dict:
+        _vars = Decide.vars_for_template(player).copy()
+        _vars.update(
+            page_name="FinalResults",
+            is_done=player.round_number == Constants.num_rounds,
+            next_game=game_of_round(player.round_number) + 1,
+            game_results=player.participant.game_results,
         )
-        _vars.update(d)
+        return _vars
+
+    @staticmethod
+    def js_vars(player: Player) -> dict:
+        _vars = FinalResults.vars_for_template(player).copy()
+        _vars.update(demand_rvs=player.participant.vars.get("demand_rvs"))
         return _vars
 
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
         if is_end_of_game(player.round_number):
-            # results = player.participant.round_results
             player.participant.stock_units = 0
             game_number = game_of_round(player.round_number)
             rounds = rounds_for_game(game_number)
@@ -372,44 +386,9 @@ class Results(Page):
             player.participant.game_results.append(dict(revenue=game_rev, cost=game_cost, profit=game_profit))
             player.participant.history = init_game_history()
 
-        player.endtime = util.get_time()
-
-
-class Disruption(Page):
-    @staticmethod
-    def is_displayed(player: Player):
-        return should_disrupt_next_round(player)
-
-    @staticmethod
-    def vars_for_template(player: Player):
-        return dict(ALLOW_DISRUPTION=ALLOW_DISRUPTION)
-
-    @staticmethod
-    def before_next_page(player: Player, timeout_happened):
-        if ALLOW_DISRUPTION:
-            player.participant.demand_rvs = player.participant.treatment.get_demand_rvs(RVS_SIZE, disrupt=True)
-
-
-class FinalResults(Page):
-    @staticmethod
-    def is_displayed(player: Player):
-        return is_end_of_game(player.round_number)
-
-    @staticmethod
-    def vars_for_template(player: Player) -> dict:
-        _vars = default_vars_for_template(player).copy()
-        _vars.update(
-            is_done=player.round_number == Constants.num_rounds,
-            next_game=game_of_round(player.round_number) + 1,
-            game_results=player.participant.game_results,
-        )
-        return _vars
-
-    @staticmethod
-    def before_next_page(player: Player, **kwargs) -> None:
-        player.endtime = util.get_time()
+            player.endtime = util.get_time()
 
 
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [Welcome, Decide, Results, FinalResults]
+page_sequence = [Welcome, Disruption, Decide, Results, FinalResults]

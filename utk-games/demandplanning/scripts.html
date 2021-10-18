@@ -59,38 +59,47 @@
 </script>
 
 
-<!-- distribution chart -->
+<!-- distribution-curve -->
 <script>
 
-    function plotDistribution() {
-        var chartId = "#distribution-chart";
+    function resizeDistributionCurveSvg() {
+        var aspect = 460 / 400;
+        var width = $('#distribution-curve').width() * 1.05;
+        var height = width / aspect;
+
+        $('#distribution-curve-svg').css({
+            'width': `${width}px`,
+            'height': `${height}px`
+        });
+    }
+
+    function plotDistributionCurve() {
+        var chartId = "#distribution-curve";
         var width = 460, height = 400;
         var aspect = width / height;
-        // var chart = d3.select(chartId)
+        var chart = d3.select(chartId);
 
-        d3.select(window)
-            .on("resize", function() {
-                var chart = d3.select(chartId);
-                if(chart) {
-                    var targetWidth = chart.node().getBoundingClientRect().width;
-                    chart.attr("width", targetWidth);
-                    chart.attr("height", targetWidth / aspect);
-                }
-            });
+        function resizer() {
+            var chart = d3.select("#distribution-curve");
+            if(chart && chart.node()) {
+                var targetWidth = chart.node().getBoundingClientRect().width;
+                chart.attr("width", targetWidth);
+                chart.attr("height", targetWidth / aspect);
+            }
+        }
 
-
-        // var width = $("#distribution-chart").width(), height = $("#distribution-chart").height();
+        d3.select(window).on("resize", resizer);
 
 
-        // width = $('#chart-card').width() / 2;
+        // var width = $("#distribution-curve").width(), height = $("#distribution-curve").height();
 
         // set the dimensions and margins of the graph
-        var margin = { top: 30, right: 30, bottom: 30, left: 50 },
-            width = width - margin.left - margin.right,
-            height = height - margin.top - margin.bottom;
+        var margin = { top: 30, right: 30, bottom: 30, left: 50 };
+        //var width = width - margin.left - margin.right;
+        //var height = height - margin.top - margin.bottom;
 
         // append the svg object to the body of the page
-        /*const svg = d3.select("#distribution-chart")
+        /*const svg = d3.select("#distribution-curve")
             .append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
@@ -98,33 +107,26 @@
             .attr("transform", `translate(${margin.left},${margin.top})`);
         */
 
-        var svg = d3.select("#distribution-chart").append("svg")
+        var svg = d3.select("#distribution-curve").append("svg")
             //.attr("width", width + margin.left + margin.right)
             //.attr("height", height + margin.top + margin.bottom)
-            .attr("id", "distribution-svg")
+            .attr("id", "distribution-curve-svg")
             .attr("width", "100%")
             .attr("height", "100%")
-            .attr("viewBox", `0 0 ${width} ${height}`)
+            .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
             .attr("preserveAspectRatio", "none")
             .append("g")
                 .attr("transform",`translate(${margin.left},${margin.top})`);
 
-        var width = $('#distribution-card').width()*.95;
-        var height = width / aspect;
 
-        $('#distribution-svg').css({
-            //'width': $('#history-card').width() + 'px',
-            //'height': $('#history-card').height() + 'px'
-            'width': `${width}px`,
-            'height': `${height}px`
-        });
+        resizeDistributionCurveSvg();
 
 
         var data = js_vars.demand_rvs;
 
 
         // add the x Axis
-        var xmax = js_vars.variance === "high"? 1400: 1000;
+        var xmax = js_vars.variance_choice === "high"? 1400: 1000;
         var xAxis = d3.scaleLinear()
             .domain([0, xmax])
             .range([0, width]);
@@ -223,130 +225,72 @@
         };
     }
     function showLoadingMessage() {
-        $('#distribution-chart #loading-message').show();
+        $('#distribution-curve-loading-message').show();
     }
     function hideLoadingMessage() {
-        $('#distribution-chart #loading-message').hide();
+        $('#distribution-curve-loading-message').hide();
     }
 </script>
 
-<!-- d3 sample bar chart -->
-<script>
 
-    function plotHistory() {
+<!-- unit-costs-table -->
+<script>
+    function updateUnitCostsTable() {
+        var costsTable = $("#unit-costs-table")
+        var costsWholesaleRow = $("#row-wcpu");
+        var costsRetailRow = $("#row-rcpu");
+        var costsHoldingRow = $("#row-hcpu");
+        var wcpu = formatCurrency(js_vars.wcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
+        var rcpu = formatCurrency(js_vars.rcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
+        var hcpu = formatCurrency(js_vars.hcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
+
+        costsWholesaleRow.append(`<td id="row-wcpu">${wcpu}</td>`);
+        costsRetailRow.append(`<td id="row-rcpu">${rcpu}</td>`);
+        costsHoldingRow.append(`<td id="row-hcpu">${hcpu}</td>`);
+
+    }
+</script>
+
+<!-- amounts-ordered-demanded-barchart -->
+<script>
+    function resizeAmountsOrderedDemandedBarchartSvg() {
+        var aspect = 460 / 400;
+
+        //var height = $('#amounts-ordered-demanded-barchart').height();
+        //var width = height * aspect;
+
+        var width = $('#amounts-ordered-demanded-barchart').width();
+        var height = width / aspect;
+
+        $('#game-history-svg').css({
+            'width': `${width}px`,
+            'height': `${height}px`
+        });
+    }
+    function plotAmountsOrderedDemandedBarchart() {
+        var chartId = "#amounts-ordered-demanded-barchart";
         var width = 460, height = 400;
         var aspect = width / height;
-        var chart = d3.select("#distribution-chart");
+        var chart = d3.select("#amounts-ordered-demanded-barchart");
 
-        d3.select(window)
-            .on("resize", function() {
-                var chart = d3.select("#distribution-chart");
+        function resizer() {
+            var chart = d3.select("#amounts-ordered-demanded-barchart");
+            if(chart && chart.node()) {
                 var targetWidth = chart.node().getBoundingClientRect().width;
                 chart.attr("width", targetWidth);
                 chart.attr("height", targetWidth / aspect);
-            });
+            }
+        }
 
-        // var width = $("#history-chart").width(), height = $("#history-chart").height();
-
-        // width = $('#chart-card').width() / 2;
-
-        // set the dimensions and margins of the graph
-        var margin = {top: 10, right: 30, bottom: 20, left: 50},
-            width = width - margin.left - margin.right,
-            height = height - margin.top - margin.bottom;
-
-        // append the svg object to the body of the page
-        var svg = d3.select("#history-chart").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-                .attr("transform",`translate(${margin.left},${margin.top})`);
-
-        // Parse the Data
-        d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_stacked.csv").then(function(data) {
-
-            window.d = data;
-
-            // List of subgroups = header of the csv files = soil condition here
-            var subgroups = data.columns.slice(1);
-
-            // List of groups = species here = value of the first column called group -> I show them on the X axis
-            const groups = data.map(d => d.group)
-
-            //console.log(groups)
-
-            // Add X axis
-            const x = d3.scaleBand()
-                .domain(groups)
-                .range([0, width])
-                .padding([0.2])
-            svg.append("g")
-                .attr("transform", `translate(0, ${height})`)
-                .call(d3.axisBottom(x).tickSize(0));
-
-            // Add Y axis
-            const y = d3.scaleLinear()
-                .domain([0, 40])
-                .range([ height, 0 ]);
-            svg.append("g")
-                .call(d3.axisLeft(y));
-
-            // Another scale for subgroup position?
-            const xSubgroup = d3.scaleBand()
-                .domain(subgroups)
-                .range([0, x.bandwidth()])
-                .padding([0.05])
-
-            // color palette = one color per subgroup
-            const color = d3.scaleOrdinal()
-                .domain(subgroups)
-                .range(['#e41a1c','#377eb8','#4daf4a'])
-
-            // Show the bars
-            svg.append("g")
-                .selectAll("g")
-                // Enter in data = loop group per group
-                .data(data)
-                .join("g")
-                .attr("transform", d => `translate(${x(d.group)}, 0)`)
-                .selectAll("rect")
-                .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-                .join("rect")
-                .attr("x", d => xSubgroup(d.key))
-                .attr("y", d => y(d.value))
-                .attr("width", xSubgroup.bandwidth())
-                .attr("height", d => height - y(d.value))
-                .attr("fill", d => color(d.key));
-
-        });
-    }
-</script>
-
-<!-- Becker-Peth history barchart -->
-<script>
-    function plotBeckerPethHistoryChart() {
-        var chartId = "#history-chart";
-        var width = 460, height = 400;
-        var aspect = width / height;
-        // var chart = d3.select(chartId)
-
-        d3.select(window)
-            .on("resize", function() {
-                var chart = d3.select(chartId);
-                if(chart) {
-                    var targetWidth = chart.node().getBoundingClientRect().width;
-                    chart.attr("width", targetWidth);
-                    chart.attr("height", targetWidth / aspect);
-                }
-            });
+        d3.select(window).on("resize", resizer);
 
         // set the dimensions and margins of the graph
-        var margin = {top: 10, right: 30, bottom: 30, left: 50},
-            width = width - margin.left - margin.right,
-            height = height - margin.top - margin.bottom;
+        var margin = {top: 50, right: 60, bottom: 30, left: 50};
+        //var width = width - margin.left - margin.right;
+        //var height = height - margin.top - margin.bottom;
 
         // append the svg object to the body of the page
-        /*var svg = d3.select("#history-chart")
+        /*var svg = chart
             .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -354,136 +298,176 @@
                 .attr("transform",
                     "translate(" + margin.left + "," + margin.top + ")");
         */
-        var svg = d3.select("#history-chart").append("svg")
+        var svg = chart.append("svg")
             //.attr("width", width + margin.left + margin.right)
             //.attr("height", height + margin.top + margin.bottom)
-            .attr("id", "history-svg")
+            .attr("id", "amounts-ordered-demanded-svg")
             .attr("width", "100%")
             .attr("height", "100%")
-            .attr("viewBox", `0 0 ${width} ${height}`)
+            .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
             .attr("preserveAspectRatio", "none")
             .append("g")
                 .attr("transform",`translate(${margin.left},${margin.top})`);
 
-        /*var height = $('#history-card').height()*.95;
-        var width = aspect * height;
-        */
-        var width = $('#history-card').width()*.95;
-        var height = width / aspect;
 
-        $('#history-svg').css({
-            //'width': $('#history-card').width() + 'px',
-            //'height': $('#history-card').height() + 'px'
-            'width': `${width}px`,
-            'height': `${height}px`
-        });
+        resizeAmountsOrderedDemandedBarchartSvg();
 
 
         var data = JSON.parse(JSON.stringify(js_vars.history));
+        var removeKeys = Object.keys(data[0]).filter(k => !["du", "ou", "period"].includes(k));
         data.forEach(d => {
-            d.ou = !d.ou? 0: d.ou;
-            d.du = !d.du? 0: d.du;
+            d.ou = d.ou === null? 0: d.ou;
+            d.du = d.du === null? 0: d.du;
+            for (var i in removeKeys) {
+                delete d[removeKeys[i]];
+            }
         });
+        var ymax = Math.max(...data.map(d => d.ou), ...data.map(d => d.du));
         var groups = data.map(d => d.period);
         var subgroups = Object.keys(data[0]).filter(key => ["ou","du"].includes(key));
 
         // Add X axis
-        var x = d3.scaleBand()
+        var xAxis = d3.scaleBand()
             .domain(groups)
             .range([0, width])
             .padding([0.2]);
-
         svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x).tickSize(0));
+            .attr("transform", `translate(0, ${height})`)
+            .call(d3.axisBottom(xAxis).tickSize(0));
 
         // Add Y axis
-        var y = d3.scaleLinear()
-            .domain([0, 1000])
+        var yAxis = d3.scaleLinear()
+            .domain([0, ymax? ymax: 100])
             .range([ height, 0 ]);
-
+        var yticks = yAxis.ticks(10);
+        var stepSize = yticks[1] - yticks[0]
+        yAxis = yAxis.domain([0, yticks[yticks.length-1] + stepSize])
         svg.append("g")
-            .call(d3.axisLeft(y));
+            .call(d3.axisLeft(yAxis));
 
         // Another scale for subgroup position?
         var xSubgroup = d3.scaleBand()
             .domain(subgroups)
-            .range([0, x.bandwidth()])
+            .range([0, xAxis.bandwidth()])
             .padding([0.05]);
+
+        var ouColor = '#377eb8';
+        var duColor = '#4daf4a';
 
         // color palette = one color per subgroup
         var color = d3.scaleOrdinal()
             .domain(subgroups)
-            .range(['#e41a1c','#377eb8','#4daf4a'])
+            .range([ouColor, duColor])
+
 
         // Show the bars
         svg.append("g")
             .selectAll("g")
             // Enter in data = loop group per group
             .data(data)
-            .enter()
-            .append("g")
-            .attr("transform", function(d) { return "translate(" + x(d.group) + ",0)"; })
+            .join("g")
+                .attr("transform", d => `translate(${xAxis(d.period)}, 0)`)
             .selectAll("rect")
             .data(function(d) { return subgroups.map(function(key) { return {key: key, value: d[key]}; }); })
-            .enter().append("rect")
-            .attr("x", function(d) { return xSubgroup(d.key); })
-            .attr("y", function(d) { return y(d.value); })
-            .attr("width", xSubgroup.bandwidth())
-            .attr("height", function(d) { return height - y(d.value); })
-            .attr("fill", function(d) { return color(d.key); });
+            .join("rect")
+                .attr("x", function(d) { return xSubgroup(d.key); })
+                .attr("y", function(d) { return yAxis(d.value); })
+                .attr("width", xSubgroup.bandwidth())
+                .attr("height", function(d) { return height - yAxis(d.value); })
+                .attr("fill", function(d) { return color(d.key); })
+
+        // Handmade legend
+        svg.append("circle").attr("cx", width - margin.right*1.5 - 20).attr("cy", -10).attr("r", 6).style("fill", ouColor);
+        svg.append("circle").attr("cx", width - margin.right*1.5 - 20).attr("cy", 20).attr("r", 6).style("fill", duColor);
+        svg.append("text").attr("x", width - margin.right*1.5).attr("y", -10).text("Order quantity").style("font-size", "15px").attr("alignment-baseline","middle")
+        svg.append("text").attr("x", width - margin.right*1.5).attr("y", 20).text("Demand quantity").style("font-size", "15px").attr("alignment-baseline","middle")
 
     };
 
 </script>
 
-<!-- Becker-Peth table -->
+<!-- game-history-table -->
 <script>
-    function updateBeckerPethTable() {
-        // var width = $("#distribution-card").width();
-        var histTable = $("#history-table")
-        var histTableHeader = $("#history-table thead tr");
-        var histTableStockRow = $("#row-stock");
-        var histTableStockOrder = $("#row-order");
-        var histTableStockDemand = $("#row-demand");
-        var histTableStockProfit = $("#row-cumulative-profit");
+    function updateGameHistoryTable() {
+        var histTable = $("#game-history-table")
+        var histTableHeader = $("#game-history-table thead tr");
+        var histTableStockRow = $("#game-history-table #row-stock");
+        var histTableOrderRow = $("#game-history-table #row-order");
+        var histTableDemandRow = $("#game-history-table #row-demand");
+        var histTableProfitRow = $("#game-history-table #row-profit");
+        var histTableCProfitRow = $("#game-history-table #row-cprofit");
         for (var i=0; i < js_vars.history.length; i++) {
             var h = js_vars.history[i];
             var p = h.period;
-            var su = h.su === null ? '': h.su;
+            var su = h.su_before === null ? '': h.su_before;
             var ou = h.ou === null? '': h.ou;
             var du = h.du === null? '': h.du;
-            var cumulative_profit = h.cumulative_profit === null? '': h.cumulative_profit;
-            //var formatted_cumulative_profit = h.formatted_cumulative_profit === null? '': h.formatted_cumulative_profit;
-            var formatted_cumulative_profit = cumulative_profit === ''? '': formatCurrency(cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
+            var profit = h.profit === null? '': formatCurrency(h.profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
+            var cumulative_profit = h.cumulative_profit === null? '': formatCurrency(h.cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
 
             histTableHeader.append(`<th scope="col">${p}</th>`);
-            histTableStockRow.append(`<td id="row-stock-${p}">${su}</td>`);
-            histTableStockOrder.append(`<td id="row-order-${p}">${ou}</td>`);
-            histTableStockDemand.append(`<td id="row-demand-${p}">${du}</td>`);
-            histTableStockProfit.append(`<td id="row-cumulative-profit-${p}">${formatted_cumulative_profit}</td>`);
+            histTableStockRow.append(`<td id="game-history-stock-${p}">${su}</td>`);
+            histTableOrderRow.append(`<td id="game-history-order-${p}">${ou}</td>`);
+            histTableDemandRow.append(`<td id="game-history-demand-${p}">${du}</td>`);
+            histTableProfitRow.append(`<td id="game-history-profit-${p}">${profit}</td>`);
+            histTableCProfitRow.append(`<td id="game-history-cprofit-${p}">${cumulative_profit}</td>`);
         }
 
-        if($("#history-table").width() < $("#distribution-card").width()) {
-            $("#history-table").width($("#distribution-card").width());
-        }
     }
-    /*for (var i=0; i < js_vars.history.length; i++) {
-        var h = js_vars.history[i];
-        var p = h.period;
-        var su = !h.su? 0: h.su;
-        var ou = !h.ou? 0: h.ou;
-        var du = !h.du? 0: h.du;
-        var cumulative_profit = !h.cumulative_profit? 0: h.cumulative_profit;
+</script>
 
-        console.log(`${i}, ${JSON.stringify(h)}, ${su}, ${ou}, ${du}, ${cumulative_profit}`)
+
+<!-- final-results-table -->
+<script>
+    function updateFinalResultsTable() {
+        var finalResultsTable = $("#final-results-table")
+        var finalResultsStockRow = $("#final-results-table #row-stock");
+        var finalResultsOrderRow = $("#final-results-table #row-order");
+        var finalResultsDemandRow = $("#final-results-table #row-demand");
+        var finalResultsProfitRow = $("#final-results-table #row-profit");
+        var h = js_vars.history[js_vars.history.length-1];
+        var su = h.su_after === null ? '': h.su_after;
+        var ou = h.ou === null? '': h.ou;
+        var du = h.du === null? '': h.du;
+        //var profit = h.profit === null? '': formatCurrency(h.profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
+        var cumulative_profit = h.cumulative_profit === null? '': formatCurrency(h.cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
+
+        finalResultsStockRow.append(`<td id="final-results-stock">${su}</td>`);
+        finalResultsOrderRow.append(`<td id="final-results-order">${ou}</td>`);
+        finalResultsDemandRow.append(`<td id="final-results-demand">${du}</td>`);
+        finalResultsProfitRow.append(`<td id="final-results-profit">${cumulative_profit}</td>`);
+
     }
-    */
 </script>
 
 <script>
-    plotDistribution();
-    // plotHistory();
-    plotBeckerPethHistoryChart();
-    updateBeckerPethTable();
+    if (window.location.href.includes('/Decide/')) {
+        plotDistributionCurve();
+        updateUnitCostsTable();
+        plotAmountsOrderedDemandedBarchart();
+        updateGameHistoryTable();
+
+        // var width = $("#participant-properties-row").width();
+        var width = $("#distribution-curve").width();
+
+        if($("#amounts-ordered-demanded-barchart").width() < width) {
+            $("#amounts-ordered-demanded-barchart").width(width);
+            $("#amounts-ordered-demanded-barchart").height(width / (460/400));
+            resizeAmountsOrderedDemandedBarchartSvg();
+        }
+
+        if($("#game-history-table").width() < width) {
+            $("#game-history-table").width(width);
+        }
+    } else {
+        $("#distribution-unit-costs-row").hide();
+        $("#history-row").hide();
+    }
+
+    if (window.location.href.includes('/FinalResults/')) {
+        updateFinalResultsTable();
+    } else {
+        $("#final-results-row").hide();
+    }
+
 </script>

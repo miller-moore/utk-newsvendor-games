@@ -6,22 +6,20 @@
 
     {{ include Constants.style_template }}
 
-    <h4>Game {{ game_number}} results</h4>
+    <p> Anne: fill-in text here </p>
+    <br><br><br>
 
-    <p> [... add game results here ...]</p>
+    {{ include Constants.visualizations_template }}
 
-
+    <br>
     {{ if not is_done }}
-        <p>
-            Game {{ next_game }} begins next.
-        </p>
+        <h6>Game {{ next_game }} begins next.</h6>
+
         <center>
             {{ next_button }}
         </center>
     {{ else }}
-        <p>
-            Thanks for playing!
-        </p>
+        <h6>Thanks for playing!</h6>
     {{ endif }}
 
     {{ include Constants.scripts_template }}
