@@ -15,7 +15,7 @@ from . import util
 from .treatment import Treatment, UnitCosts
 
 GAMES = 2
-ROUNDS = 3
+ROUNDS = 12
 RVS_SIZE = int(1e5)
 APP_DIR = Path(__file__).resolve().parent
 APP_NAME = APP_DIR.name
