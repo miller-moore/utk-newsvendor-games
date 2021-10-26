@@ -12,35 +12,10 @@ from otree.models import Participant, Session
 from rich import print
 
 from . import util
-from .models import (
-    Constants,
-    Player,
-    game_of_round,
-    is_disrupt_round,
-    is_end_of_game,
-    round_of_game,
-    rounds_for_game,
-    should_disrupt_next_round,
-)
+from .models import (Constants, Player, game_of_round, is_disrupt_round,
+                     is_end_of_game, round_of_game, rounds_for_game,
+                     should_disrupt_next_round)
 from .treatment import Treatment, UnitCosts
-
-
-def init_game_history() -> List[Dict[str, Any]]:
-    return [
-        dict(
-            period=i + 1,
-            su_before=0 if i == 0 else None,
-            su_after=None,
-            ou=None,
-            du=None,
-            revenue=None,
-            cost=None,
-            profit=None,
-            cumulative_profit=None,
-        )
-        for i in range(Constants.rounds_per_game)
-    ]
-
 
 # Form validation:
 FORM_FIELD_VALIDATORS: Dict[str, Callable] = {}
@@ -156,6 +131,7 @@ def default_vars_for_template(player: Player) -> dict:
         rcpu=rcpu,
         wcpu=wcpu,
         hcpu=hcpu,
+        optimal_order_quantity=max(0, round(treatment.get_optimal_order_quantity() - player.participant.vars.get("stock_units", 0))) if treatment else None,
         su_prior=player.participant.vars.get("stock_units"),
         su=player.field_maybe_none("su"),
         ou=player.field_maybe_none("ou"),
@@ -164,6 +140,7 @@ def default_vars_for_template(player: Player) -> dict:
         cost=player.field_maybe_none("cost"),
         profit=player.field_maybe_none("profit"),
         history=player.participant.vars.get("history", None),
+        game_results=player.participant.vars.get("game_results", None),
     )
 
     print(
@@ -187,6 +164,23 @@ def frontend_format_currency(currency: Currency, as_integer: bool = False) -> st
         decimals = len(str(currency).split(".")[1])
     c_str = f"{symbol}{float(str(currency).replace(symbol,'')):,.{decimals}f}"
     return c_str
+
+
+def init_game_history() -> List[Dict[str, Any]]:
+    return [
+        dict(
+            period=i + 1,
+            su_before=0 if i == 0 else None,
+            su_after=None,
+            ou=None,
+            du=None,
+            revenue=None,
+            cost=None,
+            profit=None,
+            cumulative_profit=None,
+        )
+        for i in range(Constants.rounds_per_game)
+    ]
 
 
 class Welcome(Page):
@@ -349,6 +343,27 @@ class Results(Page):
         _vars.update(demand_rvs=player.participant.vars.get("demand_rvs"))
         return _vars
 
+    @staticmethod
+    def before_next_page(player: Player, **kwargs) -> None:
+        if is_end_of_game(player.round_number):
+            ## NOTE: old "game_results" data
+            ## game_number = game_of_round(player.round_number)
+            ## rounds = rounds_for_game(game_number)
+            ## game_rev, game_cost, game_profit = 0, 0, 0
+            ## for p in player.in_rounds(rounds[0], rounds[-1]):
+            ##     game_rev += p.revenue
+            ##     game_cost += p.cost
+            ##     game_profit += p.profit
+            ## player.participant.game_results.append(dict(revenue=game_rev, cost=game_cost, profit=game_profit))
+
+            # NOTE: new "game_results" = game history
+            player.participant.game_results.append(player.participant.history)
+
+            player.participant.history = init_game_history()
+            player.participant.stock_units = 0
+
+            player.endtime = util.get_time()
+
 
 class FinalResults(Page):
     @staticmethod
@@ -362,7 +377,7 @@ class FinalResults(Page):
             page_name="FinalResults",
             is_done=player.round_number == Constants.num_rounds,
             next_game=game_of_round(player.round_number) + 1,
-            game_results=player.participant.game_results,
+            game_results=player.participant.vars.get("game_results", None),
         )
         return _vars
 
@@ -372,21 +387,21 @@ class FinalResults(Page):
         _vars.update(demand_rvs=player.participant.vars.get("demand_rvs"))
         return _vars
 
-    @staticmethod
-    def before_next_page(player: Player, **kwargs) -> None:
-        if is_end_of_game(player.round_number):
-            player.participant.stock_units = 0
-            game_number = game_of_round(player.round_number)
-            rounds = rounds_for_game(game_number)
-            game_rev, game_cost, game_profit = 0, 0, 0
-            for p in player.in_rounds(rounds[0], rounds[-1]):
-                game_rev += p.revenue
-                game_cost += p.cost
-                game_profit += p.profit
-            player.participant.game_results.append(dict(revenue=game_rev, cost=game_cost, profit=game_profit))
-            player.participant.history = init_game_history()
+    # @staticmethod
+    # def before_next_page(player: Player, **kwargs) -> None:
+    #     if is_end_of_game(player.round_number):
+    #         player.participant.stock_units = 0
+    #         game_number = game_of_round(player.round_number)
+    #         rounds = rounds_for_game(game_number)
+    #         game_rev, game_cost, game_profit = 0, 0, 0
+    #         for p in player.in_rounds(rounds[0], rounds[-1]):
+    #             game_rev += p.revenue
+    #             game_cost += p.cost
+    #             game_profit += p.profit
+    #         player.participant.game_results.append(dict(revenue=game_rev, cost=game_cost, profit=game_profit))
+    #         player.participant.history = init_game_history()
 
-            player.endtime = util.get_time()
+    #         player.endtime = util.get_time()
 
 
 # main sequence of pages for this otree app

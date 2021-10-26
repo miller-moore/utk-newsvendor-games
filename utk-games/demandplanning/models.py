@@ -75,9 +75,14 @@ def is_disrupt_round(player: "Player") -> bool:
     game_number = game_of_round(player.round_number)
     game_round = round_of_game(player.round_number)
 
+    # occurrence_round_game_1 = int(3 / 4 * ROUNDS) + 1
+    # occurrence_round_game_2 = int(1 / 4 * ROUNDS) + 1
+
+    occurrence_round_game_1 = occurrence_round_game_2 = int(1 / 2 * ROUNDS) + 1
+
     conditions = [
-        treatment.disrupt_is_true() and game_number == 1 and game_round == int(3 / 4 * ROUNDS) + 1,
-        game_number == 2 and game_round == int(1 / 4 * ROUNDS) + 1,
+        treatment.disrupt_is_true() and game_number == 1 and game_round == occurrence_round_game_1,
+        game_number == 2 and game_round == occurrence_round_game_2,
     ]
     return any(conditions)
 
@@ -124,7 +129,6 @@ class Constants(ConstantsBase):
     rvs_size = RVS_SIZE
 
     # template paths for django include
-    title_template = django_include_template("title.html")
     style_template = django_include_template("style.html")
     scripts_template = django_include_template("scripts.html")
     visualizations_template = django_include_template("visualizations.html")

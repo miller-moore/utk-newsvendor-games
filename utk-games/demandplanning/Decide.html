@@ -1,5 +1,5 @@
 {{ block title }}
-    Round {{ game_round }}
+    Order Quantity: Game {{ game_number }}, Period {{ game_round }}
 {{ endblock }}
 
 {{ block content }}
@@ -10,8 +10,20 @@
 
     {{ include Constants.visualizations_template }}
 
+    <br>
+    <h4>Decision</h4>
     <p>
-        {{ formfield 'ou' label="How many units will you order?" }}
+        {# How many units do you wish to order?  #}
+        {# Note: according to forecasting software, this period's optimal order quantity is <strong>{{ optimal_order_quantity }}</strong>. #}
+        {# {{ formfield 'ou' label="" }} #}
+        {{ formfield 'ou' label="How many units will you order?"}}
+        <script>
+            var label = $('label[for="id_ou"]');
+            var labelText = label.text();
+            var noteText = `<span>Note: according to commercial forecasting software, the optimal order quantity in this period is <strong>${js_vars.optimal_order_quantity}</strong>.</span>`;
+            label.html(`<span>${noteText}<br><br>${labelText}</span>`);
+        </script>
+
     </p>
 
     <center>

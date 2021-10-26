@@ -1,4 +1,2 @@
-- In FinalResults.html, add per game results (duplicate table for game 1 and game 2)
-- In FinalResults.html, report total profit across both games
+- The other games ...
 
-- Fix game history table formatting - runs off screen

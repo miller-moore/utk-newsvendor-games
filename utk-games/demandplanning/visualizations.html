@@ -1,174 +1,131 @@
 {# demandplanning/visualizations.html #}
 
-<!-- distribution-curve & unit-costs-table-->
-<div class="row" id="distribution-unit-costs-row">
-    <div class="col-sm-6">
-        <div class="card">
-            <div class="card-body">
-                <!-- div class="justify-content-center text-center" -->
-                <h5 class="card-title">Demand Distribution</h5>
-                <div id="distribution-curve">
-                    <p id="distribution-curve-loading-message" style="font-size:0.8rem;"><br>&nbsp;Loading Demand Distribution...&nbsp;</p>
-                    <!-- Add a slider -->
-                    <!-- <input type="range" name="mySlider" id=mySlider min="10" max="100" value="50"> -->
+<!-- scenario-info-container-->
+<div class="row no-gutters" id="scenario-info-container">
+    <h4 class="p-0">Scenario Information</h4>
+
+    <ul class="ml-2">
+
+        <li>
+            <h6 class="mt-2 card-title">Demand probability distribution:</h6>
+
+            <!-- distribution-curve -->
+            <div class="col-6">
+                <div class="card border-0" id="distribution-card">
+                    <div class="card-body">
+                        {# <h6 class="card-title text-center">Demand Distribution</h6> #}
+                        <div id="distribution-curve">
+                            <p id="distribution-curve-loading-message" style="font-size:0.8rem;"><br>&nbsp;Loading Demand Distribution...&nbsp;</p>
+                            <!-- Add a slider -->
+                            <!-- <input type="range" name="mySlider" id=mySlider min="10" max="100" value="50"> -->
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="col-sm-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Unit Costs</h5>
-                <br>
-                <table id="unit-costs-table" class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="row"></th>
-                            <th scope="col">Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr id="row-wcpu">
-                            <th scope="row">Wholesale cost / unit</th>
-                        </tr>
-                        <tr id="row-rcpu">
-                            <th scope="row">Retail cost / unit</th>
-                        </tr>
-                        <tr id="row-hcpu">
-                            <th scope="row">Holding cost / unit</th>
-                        </tr>
-                    </tbody>
-                </table>
+        </li>
+
+        <li>
+            <h6 class="mt-2 card-title">Current unit costs:</h6>
+
+            <!-- unit-costs-table -->
+            <div class="d-flex col-auto p-0 m-0">
+                <div class="card border-0">
+                    <div class="card-body">
+                        {# <h6 class="card-title text-center">Unit Costs</h6> #}
+                        <table id="unit-costs-table">
+                            <thead></thead>
+                            <!-- thead>
+                                <tr>
+                                    <th scope="row"></th>
+                                    <th scope="col" data-halign="right" data-align="right"></th>
+                                </tr>
+                            </!-->
+                            <tbody>
+                                <tr id="row-wcpu">
+                                    <th scope="row"><strong>Wholesale</strong></th>
+                                </tr>
+                                <tr id="row-rcpu">
+                                    <th scope="row"><strong>Retail</strong></th>
+                                </tr>
+                                <tr id="row-hcpu">
+                                    <th scope="row"><strong>Holding</strong></th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        </li>
+    </ul>
 </div>
 
-<!-- game-history-table & amounts-ordered-demanded-barchart -->
-<div class="row" id="history-row">
-    <div class="col-auto">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Game History</h5>
-                <br>
-                <table id="game-history-table" class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="row">Period</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr id="row-stock">
-                            <th scope="row">Starting inventory<br>(before order)</th>
-                        </tr>
-                        <tr id="row-order">
-                            <th scope="row">Order quantity</th>
-                        </tr>
-                        <tr id="row-demand">
-                            <th scope="row">Realized demand</th>
-                        </tr>
-                        <tr id="row-profit">
-                            <th scope="row">Profit</th>
-                        </tr>
-                        <tr id="row-cprofit">
-                            <th scope="row">Cumulative profit</th>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+<br>
 
-    <div class="col-auto">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Quantities Ordered & Demanded</h5>
-                <div id="amounts-ordered-demanded-barchart"></div>
+<!-- historical-info-container -->
+<div class="row no-gutters" id="historical-info-container">
+    <h4 class="p-0">Game History</h4>
+
+    <ul class="ml-2">
+
+        <li>
+            <h6 class="mt-2 card-title">Order & demand quantities by period:</h6>
+
+            <!-- hist-quantities-barchart -->
+            <div class="col-auto">
+                <div class="card border-0" id="hist-quantities-card">
+                    <div class="card-body">
+                        {# <h6 class="card-title text-center">Order & Demand Quantities by Period</h6> #}
+                        <div id="hist-quantities-barchart"></div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        </li>
+
+        <li>
+            <h6 class="mt-2 card-title">Summary metrics by period:</h6>
+
+            <!-- hist-metrics-table -->
+            <div class="d-flex col-12 p-0 m-0">
+                <div class="card border-0">
+                    <div class="card-body">
+                        {# <h6 class="card-title text-center">Summary Metrics by Period</h6> #}
+                        <div class="table-responsive">
+                            <table id="hist-metrics-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="row">Period</th>
+                                        {# <th scope="row" class="flex-shrink-1">Period</th> #}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="row-stock">
+                                        <th scope="row" style="white-space: nowrap;"><strong>Starting inventory<br>(before order)</strong></th>
+                                    </tr>
+                                    <tr id="row-order">
+                                        <th scope="row" style="white-space: nowrap;"><strong>Order quantity</strong></th>
+                                    </tr>
+                                    <tr id="row-demand">
+                                        <th scope="row" style="white-space: nowrap;"><strong>Demand quantity<br>(realized)</strong></th>
+                                    </tr>
+                                    <tr id="row-profit">
+                                        <th scope="row" style="white-space: nowrap;"><strong>Profit</strong></th>
+                                    </tr>
+                                    <tr id="row-cprofit">
+                                        <th scope="row" style="white-space: nowrap;"><strong>Cumulative profit</strong></th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+
+
+    </ul>
 </div>
 
-<!-- amounts-ordered-demanded-barchart -->
-{# <div class="row">
-    <div class="col-auto">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Quantities Ordered & Demanded</h5>
-                <div id="amounts-ordered-demanded-barchart"></div>
-            </div>
-        </div>
-    </div>
-</div> #}
+<br>
 
-<!-- game-history-table -->
-{# <div class="row">
-    <div class="col-auto">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Game History</h5>
-                <br>
-                <table id="game-history-table" class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="row">Period</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr id="row-stock">
-                            <th scope="row">Starting inventory<br>(before order)</th>
-                        </tr>
-                        <tr id="row-order">
-                            <th scope="row">Order quantity</th>
-                        </tr>
-                        <tr id="row-demand">
-                            <th scope="row">Realized demand</th>
-                        </tr>
-                        <tr id="row-profit">
-                            <th scope="row">Profit</th>
-                        </tr>
-                        <tr id="row-cprofit">
-                            <th scope="row">Cumulative profit</th>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div> #}
-
-
-<!-- final-results-table -->
-<div class="row" id="final-results-row">
-    <div class="col-auto">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Game {{ game_number }} Final Results</h5>
-                <br>
-                <table id="final-results-table" class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th scope="row"></th>
-                            <th scope="col">Result</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr id="row-order">
-                            <th scope="row">Total ordered</th>
-                        </tr>
-                        <tr id="row-demand">
-                            <th scope="row">Total demanded</th>
-                        </tr>
-                        <tr id="row-stock">
-                            <th scope="row">Ending inventory</th>
-                        </tr>
-                        <tr id="row-profit">
-                            <th scope="row">Total profit</th>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
-    </div>
-</div>
+<!-- final-results-container (each game has a table of results plus one "overall" table of results) -->
+<div class="row" id="final-results-container"></div>

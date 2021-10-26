@@ -1,5 +1,5 @@
 {{ block title }}
-    Round {{ game_round }} results
+    Results: Game {{ game_number }}, Period {{ game_round }}
 {{ endblock }}
 
 {{ block content }}
@@ -13,8 +13,7 @@
             <li>Demand was <strong>{{ du }}</strong> units.</li>
             <li>You ordered <strong>{{ ou }}</strong> units.</li>
             <li>You will have <strong>{{ su }}</strong> units in inventory next period.</li>
-            {# <li>You earned <strong>{{ profit }}</strong> in profit this round.</li> #}
-            <li>You earned <strong id="roundProfit"></strong> in profit this round.</li>
+            <li>You earned <strong id="formattedProfit"></strong> in profit this round.</li>
         </ul>
     </p>
 
@@ -31,7 +30,7 @@
     {{ include Constants.scripts_template }}
 
     <script>
-        $("#roundProfit").text(formatCurrency(js_vars.profit, { maximumFractionDigits: 0 }));
+        $("#formattedProfit").text(formatCurrency(js_vars.profit, { maximumFractionDigits: 0 }));
     </script>
 {{ endblock }}
 

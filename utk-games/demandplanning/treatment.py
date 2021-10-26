@@ -6,6 +6,7 @@ from itertools import product
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
+import scipy.stats as stats
 from otree.api import Currency
 from otree.currency import _CurrencyEncoder
 from pydantic import BaseConfig, BaseModel, StrBytes, conint, validator
@@ -13,6 +14,7 @@ from pydantic import BaseConfig, BaseModel, StrBytes, conint, validator
 # NOTE: disruption only applies two first minigame - everybody gets a disruption in the second minigame
 VARIABILITY_CHOICES = ["high", "low"]
 DISRUPTION_CHOICES = [True, False]
+NATURAL_MEAN = 500
 
 
 class PydanticModel(BaseModel):
@@ -52,9 +54,13 @@ class DisributionParameters(PydanticModel):
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "DisributionParameters":
         if treatment.variance_choice == "low":
-            mu, sigma = 6.212, 0.067
+            sigma = 0.067
+            # mu, sigma = 6.212, 0.067
         else:
-            mu, sigma = 6.15, 0.35
+            # mu, sigma = 6.15, 0.35
+            sigma = 0.35
+        mu = np.log(NATURAL_MEAN) - 0.5 * sigma ** 2
+
         return DisributionParameters(mu=mu, sigma=sigma)
 
 
@@ -94,6 +100,12 @@ class Treatment(PydanticModel):
             return TREATMENT_GROUPS[index]
         except KeyError:
             traceback.print_exc()
+
+    def get_optimal_order_quantity(self) -> float:
+        rcpu, wcpu, hcpu = self.get_unit_costs().tuple()
+        cf = float((rcpu - wcpu) / (rcpu - wcpu + hcpu))
+        mu, sigma = self.get_distribution_parameters().tuple()
+        return float(NATURAL_MEAN * np.exp(stats.norm.ppf(cf) * sigma))
 
     def get_unit_costs(self) -> UnitCosts:
         return UnitCosts.from_treatment(self)
