@@ -5,33 +5,18 @@
 {{ block content }}
 
     {{ include Constants.style_template }}
-
-    <p> Anne: fill-in text here </p>
-
-    <p>
-        <ul>
-            <li>Demand was <strong>{{ du }}</strong> units.</li>
-            <li>You ordered <strong>{{ ou }}</strong> units.</li>
-            <li>You will have <strong>{{ su }}</strong> units in inventory next period.</li>
-            <li>You earned <strong id="formattedProfit"></strong> in profit this round.</li>
-        </ul>
-    </p>
-
-
-    <br>
-
-    {{ include Constants.visualizations_template }}
-
-
-    <center>
-        {{ next_button }}
-    </center>
-
+    {{ include Constants.sections_template }}
     {{ include Constants.scripts_template }}
 
     <script>
-        $("#formattedProfit").text(formatCurrency(js_vars.profit, { maximumFractionDigits: 0 }));
+        renderResultsListContainer();
+        renderGameHistoryContainer();
     </script>
+
+    <center class="w-100 mb-2">
+        {{ next_button }}
+    </center>
+
 {{ endblock }}
 
 

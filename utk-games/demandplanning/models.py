@@ -131,7 +131,7 @@ class Constants(ConstantsBase):
     # template paths for django include
     style_template = django_include_template("style.html")
     scripts_template = django_include_template("scripts.html")
-    visualizations_template = django_include_template("visualizations.html")
+    sections_template = django_include_template("sections.html")
 
 
 ConstantsBase.__setattr__ = orig_constants_meta_setattr

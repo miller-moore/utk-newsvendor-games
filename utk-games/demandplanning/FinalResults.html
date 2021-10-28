@@ -5,23 +5,20 @@
 {{ block content }}
 
     {{ include Constants.style_template }}
+    {{ include Constants.sections_template }}
+    {{ include Constants.scripts_template }}
 
-    <p> Anne: fill-in text here </p>
     <br><br><br>
-
-    {{ include Constants.visualizations_template }}
 
     <br>
     {{ if not is_done }}
         <h6>Game {{ next_game }} begins next.</h6>
 
-        <center>
+        <center class="w-100 mb-2">
             {{ next_button }}
         </center>
     {{ else }}
         <h6>Thanks for playing!</h6>
     {{ endif }}
 
-    {{ include Constants.scripts_template }}
 {{ endblock }}
-

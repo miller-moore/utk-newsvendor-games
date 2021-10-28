@@ -1,13 +1,38 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.css">
-<style>
 
-  .table td.fit,
-  .table th.fit {
-      white-space: nowrap;
-      width: 1%;
-  }
+<style>
+    /* Note: 1rem = 16px */
+
+    .table-responsive::-webkit-scrollbar {
+        -webkit-appearance: none;
+    }
+
+    .table-responsive::-webkit-scrollbar:vertical {
+        width: 12px;
+    }
+
+    .table-responsive::-webkit-scrollbar:horizontal {
+        height: 12px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, .5);
+        border-radius: 10px;
+        border: 2px solid #ffffff;
+    }
+
+    .table-responsive::-webkit-scrollbar-track {
+        border-radius: 10px;
+        background-color: #ffffff;
+    }
+
+    .table td.fit,
+    .table th.fit {
+        white-space: nowrap;
+        width: 1%;
+    }
     table.table-fit {
         width: auto !important;
         table-layout: auto !important;
@@ -17,35 +42,5 @@
     }
     table.table-fit tbody td, table.table-fit tfoot td {
         width: auto !important;
-    }
-
-    /*
-    th[scope="col"] {
-      text-align: -webkit-center;
-    }
-    td {
-      text-align: -webkit-center;
-    }
-
-    td, th {
-        padding: 5px;
-        border: 1px solid black;
-        display: table-cell;
-        vertical-align: inherit;
-    }
-    */
-
-    #treatment-table-caption {
-        display: table-caption;
-        text-align: -webkit-left;
-        font-size: 0.8rem; /* Note: 1rem = 16px */
-        /* font-weight: bold; */
-        color: black;
-    }
-
-    #treatment-table {
-        border-colapse: collapse;
-        -webkit-border-horizontal-spacing: 2px;
-        -webkit-border-vertical-spacing: 2px;
     }
 </style>
