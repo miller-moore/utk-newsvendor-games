@@ -15,9 +15,13 @@
 
     {{ if not Constants.allow_disruption }}
         <br>
-        <p><strong>THIS IS JUST A TEST (ALLOW_DISRUPTION is False):</strong> the demand distribution will not actually change.
+        <p>
+            <b>THIS IS JUST A TEST.</b>
         </p>
-        <p>Set ALLOW_DISRUPTION = True (file 'demandplanning/models.py') to allow the disruption's affect to change the participant's demand distribution.</p>
+        <p>
+            The demand distribution will NOT actually change because ALLOW_DISRUPTION is False.
+            Set ALLOW_DISRUPTION = True in 'demandplanning/models.py' to allow the disruption to change the distribution.
+        </p>
         <br>
     {{endif}}
 

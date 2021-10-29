@@ -11,8 +11,8 @@
     <br><br><br>
 
     <br>
-    {{ if not is_done }}
-        <h6>Game {{ next_game }} begins next.</h6>
+    {{ if not is_absolute_final_round }}
+        <h6>Game {{ game_number|add(1) }} begins next.</h6>
 
         <center class="w-100 mb-2">
             {{ next_button }}

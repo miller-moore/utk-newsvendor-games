@@ -1,104 +1,72 @@
-import json
 from pathlib import Path
-from typing import List
+from typing import Iterable
+from uuid import uuid4
 
-import numpy as np
-import pandas as pd
-from otree.api import BaseConstants, BaseGroup, BasePlayer, BaseSubsession
-from otree.api import Currency
-from otree.api import Currency as c
-from otree.api import currency_range, models, widgets
+from otree.api import BaseConstants, BaseGroup, BasePlayer, BaseSubsession, Currency, models, widgets
 from otree.constants import BaseConstantsMeta
-from otree.models import subsession
+from otree.templating import filters
+from rich import print
 
-from . import util
+from .constants import ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS, RVS_SIZE
 from .treatment import Treatment, UnitCosts
+from .util import (
+    get_game_number,
+    get_game_rounds,
+    get_includable_template_path,
+    get_round_in_game,
+    get_settings,
+    get_time,
+    initialize_game_history,
+    is_absolute_final_round,
+    is_disruption_this_round,
+    is_game_over,
+    page_name,
+)
 
-GAMES = 2
-ROUNDS = 12
-RVS_SIZE = int(1e5)
-APP_DIR = Path(__file__).resolve().parent
-APP_NAME = APP_DIR.name
-STATIC_DIR = APP_DIR / "static"
-INCLUDES_DIR = APP_DIR / "includes"
-ALLOW_DISRUPTION = False
-
-for dr in [STATIC_DIR, INCLUDES_DIR]:
-    dr.mkdir(parents=True, exist_ok=True)
-del dr
-
-
-def rounds_for_game(game_number: int) -> List[int]:
-    last_round = ROUNDS * game_number + 1
-    first_round = last_round - ROUNDS
-    return list(range(first_round, last_round))
+# https://stackoverflow.com/a/12028864
+# from django import template
+# register = template.Library()
 
 
-def game_of_round(round_number: int) -> int:
-    return ((round_number - 1) - (round_number - 1) % ROUNDS) // ROUNDS + 1
+@filters.register("type")
+def _type(value):
+    return type(value)
 
 
-def round_of_game(round_number: int) -> int:
-    game_number = game_of_round(round_number)
-    return round_number - (game_number - 1) * ROUNDS
+@filters.register("len")
+def _len(value):
+    try:
+        return len(value)
+    except:
+        return 0 if not value else 1
 
 
-def is_end_of_game(round_number: int) -> bool:
-    game_number = game_of_round(round_number)
-    return round_number == game_number * ROUNDS
+@filters.register
+def isiterable(value):
+    return isinstance(value, Iterable)
 
 
-def should_disrupt_next_round(player: "Player") -> bool:
-    if player.round_number == 1:
-        return False
+@filters.register
+def add(value, other=0):
 
-    treatment = player.participant.vars.get("treatment", None)
-    assert treatment, f"no 'treatment' attribute exists on player.participant"
-
-    game_number = game_of_round(player.round_number)
-    game_round = round_of_game(player.round_number)
-
-    conditions = [
-        treatment.disrupt_is_true() and game_number == 1 and (game_round + 1) == int(3 / 4 * ROUNDS) + 1,
-        game_number == 2 and (game_round + 1) == int(1 / 4 * ROUNDS) + 1,
-    ]
-    return any(conditions)
-
-
-def is_disrupt_round(player: "Player") -> bool:
-    if player.round_number == 1:
-        return False
-
-    treatment = player.participant.vars.get("treatment", None)
-    assert treatment, f"no 'treatment' attribute exists on player.participant"
-
-    game_number = game_of_round(player.round_number)
-    game_round = round_of_game(player.round_number)
-
-    # occurrence_round_game_1 = int(3 / 4 * ROUNDS) + 1
-    # occurrence_round_game_2 = int(1 / 4 * ROUNDS) + 1
-
-    occurrence_round_game_1 = occurrence_round_game_2 = int(1 / 2 * ROUNDS) + 1
-
-    conditions = [
-        treatment.disrupt_is_true() and game_number == 1 and game_round == occurrence_round_game_1,
-        game_number == 2 and game_round == occurrence_round_game_2,
-    ]
-    return any(conditions)
+    print("add filter: %s, %s" % (value, other))
+    try:
+        if int(value) == value and int(other) == other:
+            return int(value + other)
+    except:
+        pass
+    try:
+        return float(value) + float(other)
+    except:
+        pass
+    try:
+        return value + other
+    except:
+        pass
+    return ""
 
 
-def django_include_template(html_filename: str) -> str:
-    """Return a string of the path to a template file for django include expressions, e.g., {{ include "my-html-include-template" }}."""
-    assert html_filename.endswith(".html"), f"""html_filename does not endwith {".html"!r}"""
-
-    # strict file path (must exist)
-    filepath = (APP_DIR / html_filename).resolve(strict=True)
-
-    # return string for django include expression: {{ include "include_path" }}
-    include_path = str(Path(APP_DIR.name) / filepath.name)
-    return include_path
-
-
+# Hack to allow settattr on Constants at runtime
 orig_constants_meta_setattr = BaseConstantsMeta.__setattr__
 delattr(BaseConstantsMeta, "__setattr__")
 
@@ -128,64 +96,68 @@ class Constants(ConstantsBase):
     allow_disruption = ALLOW_DISRUPTION
     rvs_size = RVS_SIZE
 
-    # template paths for django include
-    style_template = django_include_template("style.html")
-    scripts_template = django_include_template("scripts.html")
-    sections_template = django_include_template("sections.html")
+    # paths for templates used in include tags, e.g., {{ include "demandplanning/style.html" }} or {{ include Constants.style_template }}
+    style_template = get_includable_template_path("style.html")
+    scripts_template = get_includable_template_path("scripts.html")
+    sections_template = get_includable_template_path("sections.html")
 
 
 ConstantsBase.__setattr__ = orig_constants_meta_setattr
 
 
 class Subsession(BaseSubsession):
-    def creating_session(self: BaseSubsession) -> None:
-        # TODO: apply disruption to participant based on round_number
+    @staticmethod
+    def creating_session(subsession: BaseSubsession):
 
-        print(f"Round number: {self.round_number}")
-        print(f"Last round in game? {is_end_of_game(self.round_number)}")
+        for player in subsession.get_players():
+            treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
+            unit_costs: UnitCosts = treatment.get_unit_costs()
+            demand_rvs = player.participant.vars.get("demand_rvs", treatment.get_demand_rvs(Constants.rvs_size))
+            uuid = player.participant.vars.get("uuid", str(uuid4()))
+            is_planner = player.participant.vars.get("is_planner", None)
+            years_as_planner = player.participant.vars.get("years_as_planner", None)
+            company_name = player.participant.vars.get("company_name", None)
+            does_consent = player.participant.vars.get("does_consent", None)
+            game_number = get_game_number(player.round_number)
+            round_in_game = get_round_in_game(player.round_number)
+            game_rounds = get_game_rounds(player.round_number)
 
-        game_of_round = util.game_of_round(self.round_number, ROUNDS)
-        if game_of_round > GAMES:
-            raise ValueError(f"game number cannot be > {GAMES}: got {game_of_round}")
+            if not "uuid" in player.participant.vars:
+                print(f"[yellow]Round {player.round_number}: creating session for participant {uuid}[/]")
+                player.participant.uuid = uuid
+                player.participant.starttime = get_time()
+                player.participant.is_planner = is_planner
+                player.participant.years_as_planner = years_as_planner
+                player.participant.company_name = company_name
+                player.participant.does_consent = does_consent
+                player.participant.treatment = treatment
+                player.participant.unit_costs = unit_costs
+                player.participant.demand_rvs = demand_rvs
+                player.participant.stock_units = 0
+                player.participant.history = initialize_game_history()
+                player.participant.game_results = []
 
-        if self.round_number == 1:
-            settings = util.get_settings()
-            print("Game settings: %s", str(settings.asdict()))
-
-            # print(f"Initializing participant fields")
-            # for player in self.get_players():
-            #     treatment = Treatment.choose()
-            #     starttime = util.get_time()
-            #     unit_costs = treatment.get_unit_costs()
-            #     demand_rvs = treatment.get_demand_rvs(RVS_SIZE)
-
-            #     player.participant.treatment = treatment
-            #     player.participant.starttime = starttime
-            #     player.participant.stock_units = 0
-            #     player.participant.unit_costs = unit_costs
-            #     player.participant.demand_rvs = demand_rvs
-            #     player.participant.round_results = []
-            #     player.participant.game_results = []
-
-            #     player.starttime = starttime
-            #     player.endtime = None
-            #     player.rcpu = unit_costs.rcpu
-            #     player.wcpu = unit_costs.wcpu
-            #     player.hcpu = unit_costs.hcpu
-            #     player.su = 0
-            #     player.ou = None
-            #     player.du = None
-            #     player.revenue = None
-            #     player.cost = None
-            #     player.profit = None
-
-        # elif is_end_of_game(self.round_number):
-        #     print(f"Resetting participant stock_units to zero for new game")
-        #     for player in self.get_players():
-        #         player.participant.stock_units = 0
-
-        # elif is_disruption_round(self.round_number):
-        #     pass
+            player.uuid = player.participant.uuid
+            player.is_planner = player.participant.is_planner
+            player.years_as_planner = player.participant.years_as_planner
+            player.company_name = player.participant.company_name
+            player.does_consent = player.participant.does_consent
+            player.starttime = get_time()
+            player.endtime = None
+            player.game_number = game_number
+            player.period_number = round_in_game
+            player.su = player.participant.stock_units
+            player.ou = None
+            player.du = None
+            player.ooq = (
+                max(0, round(player.participant.treatment.get_optimal_order_quantity() - player.su)) if treatment else None
+            )
+            player.rcpu = unit_costs.rcpu
+            player.wcpu = unit_costs.wcpu
+            player.hcpu = unit_costs.hcpu
+            player.revenue = None
+            player.cost = None
+            player.profit = None
 
 
 class Group(BaseGroup):
@@ -195,26 +167,41 @@ class Group(BaseGroup):
 class Player(BasePlayer):
 
     # identifiers
-    starttime = models.FloatField()
-    endtime = models.FloatField()
+    uuid = models.StringField()
+    starttime = models.FloatField(min=get_time())
+    endtime = models.FloatField(min=get_time())
+
+    # participant data formfields
+    is_planner = models.BooleanField(widget=widgets.RadioSelectHorizontal(), label="Are you presently employed as a planner?")
+    years_as_planner = models.IntegerField(
+        label="How many years in your career have you held the role of planner (rounded to the nearest year)?"
+    )
+    company_name = models.StringField(
+        label="What is the name of the company your currently work for?",
+    )
+    does_consent = models.BooleanField(
+        widget=widgets.CheckboxInput(),
+        label="By checking this box, you consent to participate in this study. You understand that all data will be kept confidential by the researcher. Your personal information will not be stored in backend databases. You are free to withdraw at any time without giving a reason.",
+    )
+
+    # player data
+    game_number = models.IntegerField(min=1, initial=1)
+    period_number = models.IntegerField(min=1, initial=1)
 
     # stock units, order units, demand units
-    su = models.IntegerField(min=0)
-    ou = models.IntegerField(min=0)
+    su = models.IntegerField(min=0, initial=0)
+    ou = models.IntegerField(min=0)  # formfield 'ou'
     du = models.IntegerField(min=0)
+    ooq = models.IntegerField(min=0)
 
-    # retail cost per unit, wholesale cost per unit, holding cost per unit
+    # retail cost per unit (revenue), wholesale cost per unit (cost), holding cost per unit (cost)
+    rcpu = models.CurrencyField()
     wcpu = models.CurrencyField()
     hcpu = models.CurrencyField()
 
-    # retail cost (revenue) per unit
-    rcpu = models.CurrencyField()
-
     # revenue = rcpu * du
-    revenue = models.CurrencyField()
-
     # cost = wcpu * ou + hcpu * su
-    cost = models.CurrencyField()
-
     # profit = revenue - cost
+    revenue = models.CurrencyField()
+    cost = models.CurrencyField()
     profit = models.CurrencyField()

@@ -92,18 +92,49 @@
     }
 </script>
 
-
 <!-- situational-info-container -->
 <script>
 
+    function d3Resizer() {
+        var aspect = 460/400;
+        var cardWidth = $("#distribution-card").width();
+        var cardHeight = $("#distribution-card").height();
+        if(cardWidth >= 460) {
+            $("#hist-quantities-card").width(cardWidth);
+            $("#hist-quantities-card").height(cardWidth / aspect);
+        } else if (cardHeight >= 400) {
+            $("#hist-quantities-card").height(cardHeight);
+            $("#hist-quantities-card").width(cardHeight * aspect);
+        }
+        var chart = d3.select("#hist-quantities-barchart");
+        if(chart && chart.node()) {
+            var targetWidth = chart.node().getBoundingClientRect().width;
+            chart.attr("width", targetWidth);
+            chart.attr("height", targetWidth / aspect);
+        }
+
+        var chart = d3.select("#distribution-curve");
+        if(chart && chart.node()) {
+            var targetWidth = chart.node().getBoundingClientRect().width;
+            chart.attr("width", targetWidth);
+            chart.attr("height", targetWidth / aspect);
+        }
+    }
+    d3.select(window).on("resize", d3Resizer);
+
     function resizeDistributionCurveSvg() {
         var aspect = 460 / 400;
+
         var width = $('#distribution-curve').width();
-        var height = width / aspect;
+        if (!width || width < 460) {
+            width = 460
+        }
+        var height = int(width / aspect);
+        width = int(width);
 
         $('#distribution-curve-svg').css({
-            'width': `${int(width)}px`,
-            'height': `${int(height)}px`
+            'width': `${width}px`,
+            'height': `${height}px`
         });
     }
 
@@ -115,19 +146,8 @@
         var aspect = width / height;
         var chart = d3.select(chartId);
 
-        function resizer() {
-            var chart = d3.select("#distribution-curve");
-            if(chart && chart.node()) {
-                var targetWidth = chart.node().getBoundingClientRect().width;
-                chart.attr("width", targetWidth);
-                chart.attr("height", targetWidth / aspect);
-            }
-        }
-
-        d3.select(window).on("resize", resizer);
-
         // set the dimensions and margins of the graph
-        var margin = {left: 80, right: 50, top: 50, bottom: 80};
+        var margin = {left: 80, right: 50, top: 50, bottom: 50};
 
         var svg = d3.select("#distribution-curve").append("svg")
             .attr("id", "distribution-curve-svg")
@@ -138,46 +158,51 @@
             .append("g")
                 .attr("transform",`translate(${margin.left},${margin.top})`);
 
-
-        resizeDistributionCurveSvg();
-
-
-        var data = sort(js_vars.demand_rvs);
-
-        // add the x Axis
-        //var xmax = js_vars.variance_choice === "low"? 1000: 1400;
-        //var xAxis = d3.scaleLinear()
-        //    .domain([0, xmax])
-        //    .range([0, width])
-        //var xticks = xAxis.ticks(10)
-
         // add xAxis
-        var xticks = d3.scaleLinear()
-            .domain([0, d3.max(data)])
-            .range([0, width])
-            .ticks(10)
-        var stepSize = xticks[1] - xticks[0]
-        var xmin = d3.min(data) - d3.min(data) % stepSize
-        var xmax = d3.max(data) + d3.max(data) % stepSize
+        var data = sort(js_vars.demand_rvs);
+        var xmin = Math.max(0, d3.min(data) * .9)
+        var xmax = d3.max(data) * .9
+        if (js_vars.variance_choice == "high") {
+            var xAxis = d3.scaleLinear()
+                .domain([0, 1400])
+                .range([0, width])
+            var xticks = xAxis.ticks(30)
+        } else {
+            var xAxis = d3.scaleLinear()
+                .domain([xmin, xmax])
+                .range([0, width])
+            var xticks = xAxis.ticks(10)
+            var stepSize = xticks[1] - xticks[0]
+            var xmin = d3.min(data) - d3.min(data) % stepSize
+            var xmax = d3.max(data) + d3.max(data) % stepSize
+
+            var xAxis = d3.scaleLinear()
+                .domain([xmin, xmax])
+                .range([0, width])
+            var xticks = xAxis.ticks(30)
+        }
+
+
+        //var xminExp = int(Math.log10(xmin));
+        //xmin = Math.max(0, xmin - xmin % Math.pow(xmin, xminExp))
 
         // Compute kernel density estimation
         var kde = kernelDensityEstimator(kernelEpanechnikov(7), xticks)
         var density = kde(data);
-        var keeps = density.filter(v => v[1] > 1e-7).map(v => v[0])
-        var xmin = xmin > 0? d3.min(keeps): xmin
-        var xmax = d3.max(keeps)
-
-        // finish xAxis
-        var xAxis = d3.scaleLinear()
-            .domain([xmin, xmax])
-            .range([0, width])
+        //var keeps = density.filter(v => v[1] > 1e-7)
+        //var xmin = d3.min(keeps.map(v => v[0]))
+        //var xmax = d3.max(keeps.map(v => v[0]))
+        //// finish xAxis
+        //var xAxis = d3.scaleLinear()
+        //    .domain([xmin, xmax])
+        //    .range([0, width])
 
         var xAxisGenerator = d3.axisBottom(xAxis);
 
 
+        // draw xAxis
         svg.append("g")  // @see: d3 axis formatting article, https://ghenshaw-work.medium.com/customizing-axes-in-d3-js-99d58863738b
             .attr("transform", `translate(0, ${height})`)
-            //.call(xAxisGenerator.tickSize(0).tickFormat(d3.format(".2s")))
             .call(xAxisGenerator.ticks(5))
             .selectAll(".tick text")
                 .attr("font-size", "15")
@@ -200,17 +225,21 @@
 
         var yAxisGenerator = d3.axisLeft(yAxis);
 
+        // draw yAxis
         svg.append("g") // @see: d3 axis formatting article, https://ghenshaw-work.medium.com/customizing-axes-in-d3-js-99d58863738b
-            .call(ymax < 1e-2? yAxisGenerator.ticks(5).tickFormat(d3.format(".1e")): yAxisGenerator.ticks(5).tickFormat(d3.format(".2f")))
+            .call(ymax < 1e-2? yAxisGenerator.ticks(5).tickFormat(d3.format(".1e")): yAxisGenerator.ticks(5).tickFormat(d3.format(".3f")))
             .selectAll(".tick text")
                 .attr("font-size", "15")
+
+
+        resizeDistributionCurveSvg();
 
         // Add X axis label:
         var xAxisLabel = "Units";
         svg.append("text")
             .attr("text-anchor", "end")
-            .attr("x", width / 2 + 10)
-            .attr("y", height + 40)
+            .attr("x", width / 2)
+            .attr("y", height + 45)
             .text(xAxisLabel)
             .style("font-size", "20px")
 
@@ -315,7 +344,7 @@
 
         try {
             costsTable.bootstrapTable({
-                pagination: false,
+                //pagination: false,
                 showColumns: true
             });
         } catch(e) {
@@ -334,25 +363,25 @@
 <!-- game-history-container -->
 <script>
 
-    function resizer() {
-        var aspect = 460/400;
-        var cardWidth = $("#distribution-card").width();
-        var cardHeight = $("#distribution-card").height();
-        if(cardWidth >= 460) {
-            $("#hist-quantities-card").width(cardWidth);
-            $("#hist-quantities-card").height(cardWidth / aspect);
-        } else if (cardHeight >= 400) {
-            $("#hist-quantities-card").height(cardHeight);
-            $("#hist-quantities-card").width(cardHeight * aspect);
-        }
-        var chart = d3.select("#hist-quantities-barchart");
-        if(chart && chart.node()) {
-            var targetWidth = chart.node().getBoundingClientRect().width;
-            chart.attr("width", targetWidth);
-            chart.attr("height", targetWidth / aspect);
-        }
-    }
-    d3.select(window).on("resize", resizer);
+    //function resizer() {
+    //    var aspect = 460/400;
+    //    var cardWidth = $("#distribution-card").width();
+    //    var cardHeight = $("#distribution-card").height();
+    //    if(cardWidth >= 460) {
+    //        $("#hist-quantities-card").width(cardWidth);
+    //        $("#hist-quantities-card").height(cardWidth / aspect);
+    //    } else if (cardHeight >= 400) {
+    //        $("#hist-quantities-card").height(cardHeight);
+    //        $("#hist-quantities-card").width(cardHeight * aspect);
+    //    }
+    //    var chart = d3.select("#hist-quantities-barchart");
+    //    if(chart && chart.node()) {
+    //        var targetWidth = chart.node().getBoundingClientRect().width;
+    //        chart.attr("width", targetWidth);
+    //        chart.attr("height", targetWidth / aspect);
+    //    }
+    //}
+    //d3.select(window).on("resize", resizer);
 
     function resizeQuantitiesBarchartSvg() {
         var aspect = 460 / 400;
@@ -549,7 +578,8 @@
         try {
             metricsTable.bootstrapTable({
                 pagination: false,
-                showColumns: true,
+                //showColumns: true,
+                advancedSearch: true,
             });
         } catch(e) {
             console.error(e);
@@ -593,11 +623,11 @@
         // @note: to add extra text to the form label:
         //var label = $('label[for="id_ou"]');
         //var labelText = label.text();
-        //var noteText = `<span>Note: according to commercial forecasting software, the optimal order quantity for this period is <strong>${js_vars.optimal_order_quantity}</strong>.</span>`;
+        //var noteText = `<span>Note: according to commercial forecasting software, the optimal order quantity for this period is <strong>${js_vars.ooq}</strong>.</span>`;
         //label.html(`<span>${noteText}<br><br>${labelText}</span>`);
 
         // @note: to format the number before rendering:
-        $("#optimal-order-quantity").html(formatNumber(js_vars.optimal_order_quantity, { maximumFractionDigits: 0}));
+        $("#optimal-order-quantity").html(formatNumber(js_vars.ooq, { maximumFractionDigits: 0}));
 
     }
 </script>
@@ -731,36 +761,10 @@
 
 <script>
     // hide all sections by default
+    $("#text-container").hide();
     $("#situational-info-container").hide();
     $("#game-history-container").hide();
     $("#decision-form-container").hide();
     $("#results-list-container").hide();
     $("#final-results-container").hide();
-</script>
-
-<script>
-
-    // determine current page
-    var href = window.location.href;
-    var onWelcomePage = href.includes('/Welcome/');
-    var onDisruptionPage = href.includes('/Disruption/');
-    var onDecidePage = href.includes('/Decide/');
-    var onResultsPage = href.includes('/Results/')
-    var onFinalResultsPage = href.includes('/FinalResults/')
-
-    /*
-    if (onDecidePage) {
-        renderSituationalInfoContainer();
-        renderGameHistoryContainer();
-        renderDecisionFormContainer();
-
-    } else if (onResultsPage) {
-        renderGameHistoryContainer();
-        renderResultsListContainer();
-
-    } else if (onFinalResultsPage) {
-        renderGameHistoryContainer();
-        renderFinalResultsContainer();
-    }
-    */
 </script>

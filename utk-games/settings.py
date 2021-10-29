@@ -1,23 +1,26 @@
 from os import environ
 
-# NOTE: participant fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#participant-fields
-# NOTE: participant fields are stored internally as participant.vars, but also participant.xyz is same as participant.vars['xyz']
+# NOTE: participant/session fields: https://otree.readthedocs.io/en/latest/rounds.html?#participant-fields
+# NOTE: attributes can always be stored in participant.vars/session.vars (dictionaries)
+# NOTE: however, they may also be assigned as familiar class properties (e.g. object.myattr) if added first to PARTICIPANT_FIELDS/SESSION_FIELDS
 
 # This allows to set any type of data to player.participant (not constrained to oTree's orm column types)
 PARTICIPANT_FIELDS = [
-    "starttime",
+    "uuid",
+    "is_planner",
+    "years_as_planner",
+    "company_name",
+    "does_consent",
     "treatment",
     "unit_costs",
     "demand_rvs",
     "stock_units",
-    "game_results",
     "history",
-    "endtime",
+    "game_results",
 ]
 
 # NOTE: session fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#session-fields
-# NOTE: session fields are stored internally in session.vars
-SESSION_FIELDS = ["global_var_1", "global_var_2"]
+SESSION_FIELDS = []
 
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
@@ -37,7 +40,7 @@ SESSION_CONFIGS = [
         display_name="Demand Planning Game",
         num_demo_participants=1,
         app_sequence=["demandplanning"],
-    ),
+    )
 ]
 
 

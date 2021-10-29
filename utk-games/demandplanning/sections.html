@@ -11,8 +11,55 @@
     <br>
 </div>
 
+
 <!-- situational-info-container-->
 <div class="row mb-4" id="situational-info-container">
+    <h5 class="card-title">Situational Information:</h5>
+
+    <!-- unit-costs-table -->
+    <div class="col-sm mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Unit costs</h6>
+                <div class="table-responsive">
+                    <table id="unit-costs-table">
+                        <thead></thead>
+                        <tbody>
+                            <tr id="row-wcpu">
+                                <th scope="row"><strong>Wholesale</strong></th>
+                            </tr>
+                            <tr id="row-rcpu">
+                                <th scope="row"><strong>Retail</strong></th>
+                            </tr>
+                            <tr id="row-hcpu">
+                                <th scope="row"><strong>Holding</strong></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- distribution-curve -->
+    <div class="col-sm">
+        <div class="card" id="distribution-card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Market demand probability distribution</h6>
+                <p id="distribution-curve-loading-message" style="font-size:0.8rem;"><br>&nbsp;Loading Demand Distribution...&nbsp;</p>
+                <!-- Add a slider -->
+                <!-- <input type="range" name="mySlider" id=mySlider min="10" max="100" value="50"> -->
+                <div id="distribution-curve">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+</div>
+
+<!-- situational-info-container-->
+{# <div class="row mb-4" id="situational-info-container">
     <div class="card border">
         <div class="card-body">
             <h5 class="card-title">Situational Information</h5>
@@ -22,8 +69,6 @@
                 <!-- unit-costs-table -->
                 <li>Unit costs:
                 </li>
-                {# <li>The following unit costs are used to calculate profit in each period of the game:
-                </li> #}
                 <div class="d-flex col-auto p-0 m-0">
                     <div class="card border-0">
                         <div class="card-body">
@@ -49,12 +94,11 @@
 
                 <!-- distribution-curve -->
                 <li>Market demand probability distribution:</li>
-                {# <li>Market demand in each period is simulated by a random draw from a designated probability density function (pdf). The following graph displays the pdf designated to this period:
-                </li> #}
+                <!-- li>Market demand in each period is simulated by a random draw from a designated probability density function (pdf). The following graph displays the pdf designated to this period:
+                </! -->
                 <div class="col-6">
                     <div class="card" id="distribution-card">
                         <div class="card-body">
-                            {# <h6 class="card-title text-center">Demand Distribution</h6> #}
                             <p id="distribution-curve-loading-message" style="font-size:0.8rem;"><br>&nbsp;Loading Demand Distribution...&nbsp;</p>
                             <!-- Add a slider -->
                             <!-- <input type="range" name="mySlider" id=mySlider min="10" max="100" value="50"> -->
@@ -68,9 +112,9 @@
         </div>
     </div>
     <br>
-</div>
+</div> #}
 
-
+<!-- results-list-container -->
 <div class="row mb-4" id="results-list-container">
     <div class="card border">
         <div class="card-body">
@@ -89,6 +133,7 @@
     <br>
 </div>
 
+
 <!-- final-results-container (each game has a table of results plus one "overall" table of results) -->
 <div class="row mb-4" id="final-results-container">
     <div class="card border">
@@ -102,12 +147,65 @@
 
 <!-- game-history-container -->
 <div class="row mb-4" id="game-history-container">
+    <h5 class="card-title">Game History Information:</h5>
+
+    <!-- hist-quantities-barchart -->
+    <div class="col-auto mb-4">
+        <div class="card" id="hist-quantities-card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Quantities ordered & demanded in prior periods</h6>
+                <div id="hist-quantities-barchart"></div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <!-- hist-metrics-table -->
+    <div class="col-auto">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Summary of key metrics in prior periods</h6>
+                <div class="table-responsive">
+                    <table id="hist-metrics-table">
+                        <thead>
+                            <tr>
+                                <th scope="row">Period</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="row-stock">
+                                <th scope="row" style="white-space: nowrap;"><strong>Starting inventory<br>(before order)</strong></th>
+                            </tr>
+                            <tr id="row-order">
+                                <th scope="row" style="white-space: nowrap;"><strong>Order quantity</strong></th>
+                            </tr>
+                            <tr id="row-demand">
+                                <th scope="row" style="white-space: nowrap;"><strong>Demand quantity<br>(realized)</strong></th>
+                            </tr>
+                            <tr id="row-profit">
+                                <th scope="row" style="white-space: nowrap;"><strong>Profit</strong></th>
+                            </tr>
+                            <tr id="row-cprofit">
+                                <th scope="row" style="white-space: nowrap;"><strong>Cumulative profit</strong></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+</div>
+
+{# <!-- game-history-container -->
+<div class="row mb-4" id="game-history-container">
     <div class="card border">
         <div class="card-body">
             <h5 class="card-title">Game History Information</h5>
 
             <ol type="a">
-
                 <!-- hist-quantities-barchart -->
                 <li>Quantities ordered & demanded in prior periods:
                 </li>
@@ -127,13 +225,11 @@
                 <div class="col-12 p-0 m-0">
                     <div class="card border-0">
                         <div class="card-body">
-                            {# <h6 class="card-title text-center">Summary Metrics by Period</h6> #}
                             <div class="table-responsive">
                                 <table id="hist-metrics-table">
                                     <thead>
                                         <tr>
                                             <th scope="row">Period</th>
-                                            {# <th scope="row" class="flex-shrink-1">Period</th> #}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -165,7 +261,7 @@
     </div>
 
     <br>
-</div>
+</div> #}
 
 
 
@@ -175,7 +271,7 @@
             <h5 class="card-title">Decision</h5>
 
             <p>
-                Note: according to commercial forecasting software, the optimal order quantity for this period is <strong id="optimal-order-quantity">{{ optimal_order_quantity }}</strong>.
+                Note: according to commercial forecasting software, the optimal order quantity for this period is <strong id="optimal-order-quantity">{{ ooq }}</strong>.
                 {{ if page_name == 'Decide' }}
                     {{ formfield 'ou' label="How many units will you order?" }}
                 {{ endif }}

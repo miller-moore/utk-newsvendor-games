@@ -1,77 +1,151 @@
 import json
 import time
+import warnings
 from collections import namedtuple
 from datetime import datetime
 from pathlib import Path
 from types import ModuleType
-from typing import Any, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from otree.api import BasePlayer, Currency, currency_range
+from otree.models import Participant
 from pydantic import BaseConfig, BaseModel
 from scipy import stats
 
+from .constants import APP_DIR, DISRUPTION_ROUND_IN_GAMES, GAMES, ROUNDS
+
+
+def page_name(player: BasePlayer) -> str:
+    participant: Participant = player.participant
+    return participant._current_page_name
+
+
+def initialize_game_history() -> List[Dict[str, Any]]:
+    return [
+        dict(
+            period=i + 1,
+            su_before=0 if i == 0 else None,
+            su_after=None,
+            ou=None,
+            du=None,
+            revenue=None,
+            cost=None,
+            profit=None,
+            cumulative_profit=None,
+        )
+        for i in range(ROUNDS)
+    ]
+
+
+def get_game_number(round_number: int) -> int:
+    return ((round_number - 1) - (round_number - 1) % ROUNDS) // ROUNDS + 1
+
+
+def get_game_rounds(round_number: int) -> List[int]:
+    game_number = get_game_number(round_number)
+    last_round = ROUNDS * game_number + 1
+    first_round = last_round - ROUNDS
+    return list(range(first_round, last_round))
+
+
+def get_round_in_game(round_number: int) -> int:
+    game_number = get_game_number(round_number)
+    return round_number - (game_number - 1) * ROUNDS
+
+
+def is_game_over(round_number: int) -> bool:
+    game_number = get_game_number(round_number)
+    return round_number == game_number * ROUNDS
+
+
+def is_absolute_final_round(round_number: int):
+    return round_number == ROUNDS * GAMES
+
+
+def is_disruption_this_round(player: BasePlayer) -> bool:
+    from .treatment import Treatment
+
+    treatment: Treatment = player.participant.vars.get("treatment", None)
+    if treatment is None:
+        return False
+
+    game_number = get_game_number(player.round_number)
+    game_round = get_round_in_game(player.round_number)
+
+    disruption_round = DISRUPTION_ROUND_IN_GAMES.get(game_number, None)
+    if not disruption_round:
+        warnings.warn(
+            f"""Disruption round is not defined for game_number {game_number}. The following shows disruptions that are currently defined in the global constant DISRUPTION_ROUND_IN_GAMES: {DISRUPTION_ROUND_IN_GAMES!r}"""
+        )
+        return False
+
+    # check round condition for this round
+    is_this_round_disruption = game_round == disruption_round
+
+    # game 1 special case: only the players with True disruption_choice treatment will experience game 1 disruption
+    if game_number == 1:
+        return is_this_round_disruption and treatment.has_disruption()
+    return is_this_round_disruption
+
+
+def is_disruption_next_round(player: BasePlayer) -> bool:
+    from .treatment import Treatment
+
+    treatment: Treatment = player.participant.vars.get("treatment", None)
+    if treatment is None:
+        return False
+
+    game_number = get_game_number(player.round_number)
+    game_round = get_round_in_game(player.round_number)
+
+    disruption_round = DISRUPTION_ROUND_IN_GAMES.get(game_number, None)
+    if not disruption_round:
+        warnings.warn(
+            f"""Disruption round is not defined for game_number {game_number}. The following shows disruptions that are currently defined in the global constant DISRUPTION_ROUND_IN_GAMES: {DISRUPTION_ROUND_IN_GAMES!r}"""
+        )
+        return False
+
+    # check round condition for next round
+    is_next_round_disruption = (game_round + 1) == (disruption_round + 1)
+
+    # game 1 special case: only the players with True disruption_choice treatment will experience game 1 disruption
+    if game_number == 1:
+        return is_next_round_disruption and treatment.has_disruption()
+    return is_next_round_disruption
+
+
+def get_includable_template_path(template_filepath: str) -> str:
+    """Parse template_filepath to an "includable" template path, e.g., {{ include "demandplanning/style.html" }} or {{ include Constants.style_template }}."""
+    p = Path(template_filepath)
+    assert (
+        ".html" in p.suffixes
+    ), f"""expected template_filepath extension to include {".html"!r} - got {template_filepath!r} (extension {p.suffix!r})."""
+
+    # strict file path (must exist)
+    filepath = (APP_DIR / template_filepath).resolve(strict=True)
+
+    # return string for django include expression: {{ include "include_path" }}
+    include_path = str(Path(APP_DIR.name) / filepath.name)
+    return include_path
+
 
 def compute_profit(player: Any) -> float:
-    """Compute & return the planner's profit at the end of each game (single playthrough).
+    pass
 
-    Parameters
-    ----------
-    player: BasePlayer
-        The player
 
-    ## Important attributes
-    retail_cost : float
-        Rc - get from low/high variance options
-    wholesale_cost : float
-        Wc - get from low/high variance options
-    holding_cost : float
-        Hc - get from low/high variance options
-    excess_quantity : float
-        Eq - get from player cache
-    order_quantity : float
-        Oq - get from player's input each round
-    demand_quantity : float
-        Dq - draw dynamically from distribution
+def frontend_format_currency(currency: Currency, as_integer: bool = False) -> str:
+    import re
 
-    # Pseudo-code:
-    if sq + oq > dq:
-        # we still have an excess
-        rev = Dq * Rc
-        sq = sq + oq - dq
-        costs = oq * Wc + sq * Hc
-        return rev - costs
+    symbol = re.sub(r"([^0-9.]+)(.*)", "\\1", str(currency))
+    if as_integer:
+        decimals = 0
     else:
-        rev = ( sq + oq ) * Rc
-        costs = oq * Wc
-        return rev - costs
-
-    Returns
-    -------
-    float
-        Profit amount
-    """
-
-    from .models import Costs
-
-    # get from player treatment group & map to values defined in above dictionaries
-    Rc, Wc, Hc = Costs.tuple()
-
-    # NOTE: get excess_stock from participant's cache (round_i - 1)
-    Eq_1 = player.cache.get("excess_stock")
-    # Oq: get from page input
-    Oq = None
-    # Dq: draw from the lognorm
-    Dq = None
-
-    # update the player's excess_stock for next round
-    player.cache["excess_stock"] = Eq_1 + Oq - Dq
-
-    if Eq_1 + Oq > Dq:
-        return Dq * Rc - Oq * Wc - player.cache["excess_stock"] * Hc
-    return (Eq_1 + Oq) * Rc - Oq * Wc
+        decimals = len(str(currency).split(".")[1])
+    c_str = f"{symbol}{float(str(currency).replace(symbol,'')):,.{decimals}f}"
+    return c_str
 
 
 def get_demand_data_csv_path(as_asset_url: bool, participantid: str) -> str:
@@ -136,14 +210,6 @@ def get_settings() -> ModuleType:
 
 def json_dump_settings(**kwargs) -> str:
     return json.dumps(get_settings().asdict(), **kwargs)
-
-
-def apply_distribution_disruption(player: BasePlayer):
-    # player distribution is generated at beginning of each playthrough & cached to the player
-    # it is regenerated between the two playthroughs
-    # 1st playthrough: if disruption is True in the player's treatment group, apply the disruption in round int(1/4 * playthrough_rounds) (6th when 24 rounds)
-    # 2nd playthrough: all participants have a disruption in round int(3/4 * playthrough_rounds) (18th when 24 rounds)
-    pass
 
 
 def lognormalize_normal_samples(normal_rvs: np.ndarray) -> np.ndarray:

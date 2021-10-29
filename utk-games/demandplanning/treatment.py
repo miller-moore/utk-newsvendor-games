@@ -7,9 +7,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import scipy.stats as stats
-from otree.api import Currency
+from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
-from pydantic import BaseConfig, BaseModel, StrBytes, conint, validator
+from pydantic import BaseModel, StrBytes, conint, validator
 
 # NOTE: disruption only applies two first minigame - everybody gets a disruption in the second minigame
 VARIABILITY_CHOICES = ["high", "low"]
@@ -80,10 +80,7 @@ class Treatment(PydanticModel):
             raise ValueError(f"""disruption_choice must be one of {DISRUPTION_CHOICES!r} - got {v!r} """)
         return v
 
-    def variance_is_low(self) -> bool:
-        return self.variance_choice == "low"
-
-    def disrupt_is_true(self) -> bool:
+    def has_disruption(self) -> bool:
         return self.disruption_choice
 
     @classmethod
