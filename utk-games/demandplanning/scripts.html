@@ -4,7 +4,7 @@
 <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
 <script src="https://d3js.org/d3.v6.js"></script>
 
-<!-- miscellaneous javascript functions -->
+{# miscellaneous javascript functions #}
 <script>
     function sort(array, reverse = false) {
         var acopy = Array.from(array);
@@ -24,14 +24,38 @@
         return baseUrl;
     }
 
-    function show() {
-        // @notice: use only in 'onclick' HTMLElement attribute:  <button onclick="show()">Click me!</button>
-        this.style.display = "block";
+    function show(el) {
+        el = $(!el? this: el);
+        var origVisibility = el.attr("__orig-visibility-value")
+        var origDisplay = el.attr("__orig-display-value")
+
+        if(origVisibility) {
+            el.css("visibility", origVisibility)
+        } else {
+            el.css("visibility", "visible")
+        }
+        if(origDisplay) {
+            el.css("display", origDisplay)
+        } else {
+            el.css("display", "block")
+        }
+
+        el.attr("__orig-display-value", null)
+        el.attr("__orig-visibility-value", null)
     }
 
-    function hide() {
-        // @notice: use only in 'onclick' HTMLElement attribute:  <button onclick="hide()">Click me!</button>
-        this.style.display = "none";
+    function hide(el, opts = { keepInDom: false }) {
+        /*  @notice: when hiding elements, if you set "display: none;", it hides the entire element from the DOM, while "visibility: hidden;" hides the inner contents of the element, but the element stays in its original position and size. @see https://attacomsian.com/blog/javascript-hide-show-dom-elements
+        */
+        el = $(!el? this: el);
+        el.attr("__orig-display-value", el.css("display"))
+        el.attr("__orig-visibility-value", el.css("visibility"))
+
+        el.css("visibility", "hidden");
+        if (opts && opts.keepInDom) {
+            return
+        }
+        el.css("display", "none");
     }
 
     function showJsVarsDOM() {
@@ -80,7 +104,7 @@
     // '#ff56c6'
     // '#aa3382'
 
-    function demandDistributionColor() {
+    function distributionColor() {
         return '#aa3382'
     }
 
@@ -92,49 +116,86 @@
     }
 </script>
 
-<!-- situational-info-container -->
+
+{# hide all sections by default #}
+<script>
+    hide($("#text-container"));
+    hide($("#situational-info-container"));
+    hide($("#game-history-container"));
+    hide($("#decision-form-container"));
+    hide($("#results-list-container"));
+    hide($("#final-results-container"));
+</script>
+
+
+{# situational-info-container #}
 <script>
 
-    function d3Resizer() {
-        var aspect = 460/400;
-        var cardWidth = $("#distribution-card").width();
-        var cardHeight = $("#distribution-card").height();
-        if(cardWidth >= 460) {
-            $("#hist-quantities-card").width(cardWidth);
-            $("#hist-quantities-card").height(cardWidth / aspect);
-        } else if (cardHeight >= 400) {
-            $("#hist-quantities-card").height(cardHeight);
-            $("#hist-quantities-card").width(cardHeight * aspect);
+    function chartDims() {
+        // set the dimensions and margins of the graph
+        var width = 460, height= 360
+        return {
+            width: width,
+            height: height,
+            aspect: width / height,
+            left: 80,
+            right: 50,
+            top: 50,
+            bottom: 50
         }
-        var chart = d3.select("#hist-quantities-barchart");
-        if(chart && chart.node()) {
-            var targetWidth = chart.node().getBoundingClientRect().width;
-            chart.attr("width", targetWidth);
-            chart.attr("height", targetWidth / aspect);
-        }
+    }
 
-        var chart = d3.select("#distribution-curve");
-        if(chart && chart.node()) {
-            var targetWidth = chart.node().getBoundingClientRect().width;
-            chart.attr("width", targetWidth);
-            chart.attr("height", targetWidth / aspect);
-        }
+    function d3Resizer() {
+        //var dsizes = distchartSizing();
+        //var chart = d3.select("#distribution-curve");
+        //if(chart && chart.node()) {
+        //    var targetWidth = chart.node().getBoundingClientRect().width;
+        //    chart.attr("width", targetWidth);
+        //    chart.attr("height", targetWidth / dsizes.aspect);
+        //}
+        //var dcard = $("#distribution-card")
+        //var dcW = dcard.width();
+        //var dcH = dcard.height();
+        //if(dcW >= 460) {
+        //    $("#hist-quantities-card").width(dcW);
+        //    $("#hist-quantities-card").height(dcW / aspect);
+        //} else if (cardHeight >= 400) {
+        //    $("#hist-quantities-card").height(cardHeight);
+        //    $("#hist-quantities-card").width(cardHeight * aspect);
+        //}
+        //var chart = d3.select("#hist-quantities-barchart");
+        //if(chart && chart.node()) {
+        //    var targetWidth = chart.node().getBoundingClientRect().width;
+        //    chart.attr("width", targetWidth);
+        //    chart.attr("height", targetWidth / bchSizes.aspect);
+        //}
     }
     d3.select(window).on("resize", d3Resizer);
 
     function resizeDistributionCurveSvg() {
-        var aspect = 460 / 400;
 
-        var width = $('#distribution-curve').width();
-        if (!width || width < 460) {
-            width = 460
-        }
-        var height = int(width / aspect);
-        width = int(width);
+        //var width = $('#distribution-curve').width();
+        //if (!width || width < 460) {
+        //    width = 460
+        //}
+        //var height = int(width / aspect);
+        //width = int(width);
+        //$('#distribution-curve-svg').css({
+        //    'width': `${width}px`,
+        //    'height': `${height}px`
+        //});
 
+        var dims = chartDims();
+        //var chart = $('#distribution-curve')
+        //var height = chart.height() < dims.height? dims.height: chart.height()
+        //var width = height * dims.aspect;
+        //$('#distribution-curve-svg').css({
+        //    'width': `${int(width)}px`,
+        //    'height': `${int(height)}px`
+        //});
         $('#distribution-curve-svg').css({
-            'width': `${width}px`,
-            'height': `${height}px`
+            'width': `${int(dims.width)}px`,
+            'height': `${int(dims.height)}px`
         });
     }
 
@@ -259,7 +320,7 @@
             .append("path")
             .attr("class", "mypath")
             .datum(density)
-            .style("fill", demandDistributionColor())
+            .style("fill", distributionColor())
             //.style("fill", "#69b3a2")
             .attr("opacity", ".8")
             .attr("stroke", "#000")
@@ -354,43 +415,26 @@
     }
 
     function renderSituationalInfoContainer() {
-        $("#situational-info-container").show();
+        show($("#situational-info-container"));
         updateUnitCostsTable();
         plotDistributionCurve();
     }
 </script>
 
+
+
+
 <!-- game-history-container -->
 <script>
 
-    //function resizer() {
-    //    var aspect = 460/400;
-    //    var cardWidth = $("#distribution-card").width();
-    //    var cardHeight = $("#distribution-card").height();
-    //    if(cardWidth >= 460) {
-    //        $("#hist-quantities-card").width(cardWidth);
-    //        $("#hist-quantities-card").height(cardWidth / aspect);
-    //    } else if (cardHeight >= 400) {
-    //        $("#hist-quantities-card").height(cardHeight);
-    //        $("#hist-quantities-card").width(cardHeight * aspect);
-    //    }
-    //    var chart = d3.select("#hist-quantities-barchart");
-    //    if(chart && chart.node()) {
-    //        var targetWidth = chart.node().getBoundingClientRect().width;
-    //        chart.attr("width", targetWidth);
-    //        chart.attr("height", targetWidth / aspect);
-    //    }
-    //}
-    //d3.select(window).on("resize", resizer);
-
     function resizeQuantitiesBarchartSvg() {
-        var aspect = 460 / 400;
+        var sizing = chartDims();
 
         var width = $('#hist-quantities-barchart').width();
-        if (!width || width < 460) {
-            width = 460
+        if (!width || width < sizing.width) {
+            width = sizing.width
         }
-        var height = int(width / aspect);
+        var height = int(width / sizing.aspect);
         width = int(width);
 
         $('#hist-quantities-svg').css({
@@ -400,12 +444,12 @@
     }
 
     function plotQuantitiesBarchart() {
+
         $("#hist-quantities-barchart").empty();
 
         var chartId = "#hist-quantities-barchart";
-        var width = 460, height = 400;
-        var aspect = int(width / height);
         var chart = d3.select("#hist-quantities-barchart");
+        var { height, width, aspect } = chartDims();
 
         // set the dimensions and margins of the graph
         //var margin = {top: 50, right: 100, bottom: 50, left: 100};
@@ -441,13 +485,15 @@
         var xAxis = d3.scaleBand()
             .domain(groups)
             .range([0, width])
-            .padding([0.2]);
+            //.padding([0.2]);
+            .paddingInner(.5)
+            .paddingOuter(.02)
 
         var xAxisGenerator = d3.axisBottom(xAxis);
 
         svg.append("g")
             .attr("transform", `translate(0, ${height})`)
-            .call(xAxisGenerator.tickSize(0))
+            .call(xAxisGenerator) //.tickSize(0))
             .selectAll(".tick text")
                 .attr("font-size", "15")
 
@@ -472,24 +518,21 @@
             .range([0, xAxis.bandwidth()])
             .padding([0.05]);
 
-        var xAxisLabel = "Period";
         svg.append("text")
             .attr("text-anchor", "end")
             .attr("x", width / 2 + 10)
             .attr("y", height + 40)
-            .text(xAxisLabel)
             .style("font-size", "20px")
+            .text("Period")
 
         // Y axis label:
-        var yAxisLabel = "Quantity";
         svg.append("text")
             .attr("text-anchor", "end")
             .attr("transform", "rotate(-90)")
             .attr("y", -65)
             .attr("x", -height / 2 + 40)
-            .text(yAxisLabel)
             .style("font-size", "20px")
-
+            .text("Quantity")
 
         // color palette = one color per subgroup
         var color = d3.scaleOrdinal()
@@ -607,7 +650,7 @@
     }
 
     function renderGameHistoryContainer() {
-        $("#game-history-container").show();
+        show($("#game-history-container"))
 
         plotQuantitiesBarchart();
         updateMetricsTable();
@@ -615,10 +658,12 @@
     }
 </script>
 
+
+
 <!-- decision-form-container -->
 <script>
     function renderDecisionFormContainer() {
-        $("#decision-form-container").show();
+        show($("#decision-form-container"));
 
         // @note: to add extra text to the form label:
         //var label = $('label[for="id_ou"]');
@@ -632,10 +677,12 @@
     }
 </script>
 
+
+
 <!-- results-list-container -->
 <script>
     function renderResultsListContainer() {
-        $("#results-list-container").show();
+        show($("#results-list-container"));
 
         $("#results-du").html(formatNumber(js_vars.du, { maximumFractionDigits: 0 }));
         $("#results-ou").html(formatNumber(js_vars.ou, { maximumFractionDigits: 0 }));
@@ -643,6 +690,8 @@
         $("#results-profit").html(formatCurrency(js_vars.profit, { maximumFractionDigits: 0 }));
     }
 </script>
+
+
 
 <!-- final-results-container -->
 <script>
@@ -753,18 +802,8 @@
     }
 
     function renderFinalResultsContainer() {
-        $("#final-results-container").show();
+        show($("#final-results-container"));
 
         updateFinalResultsTables();
     }
-</script>
-
-<script>
-    // hide all sections by default
-    $("#text-container").hide();
-    $("#situational-info-container").hide();
-    $("#game-history-container").hide();
-    $("#decision-form-container").hide();
-    $("#results-list-container").hide();
-    $("#final-results-container").hide();
 </script>

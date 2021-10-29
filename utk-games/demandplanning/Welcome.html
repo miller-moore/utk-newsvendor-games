@@ -7,27 +7,15 @@
     {{ include Constants.sections_template }}
     {{ include Constants.scripts_template }}
 
-    {# <h4 class="page-header"></h4> #}
-
-    {{ formfield 'is_planner' }}
-    {{ formfield 'years_as_planner' }}
-    {{ formfield 'company_name' }}
-    {{ formfield 'does_consent' }}
-
-    <script>
-     // HERE: add callback to consent checkbox to display the uuid on the page after checked:
-
-    /*    <p>Your unique participant id is <b>{{ uuid }}</b>.
-            {#
-                If you had a previous session terminate for some reason before completing the survey and want to recover where you left off, please submit your participant id to the server <a href="/recover-session" onclick="try_server_recovery()">here</a> and submit a recovery request by your (or previous session's?) participant id recover the previous session from the browser's cache (two unlikely events), then you may wish to request session recovery from the server's backend database by submitting your participant id in the request for server recovery. You may also start a survey from scratch (incomplete surveys and their data are ignored).
-            #}
-            <br>
-        </p>
-    */
-    </script>
+    <div class="col-12">
+        {{ formfield 'is_planner' }}
+        {{ formfield 'years_as_planner' }}
+        {{ formfield 'company_name' }}
+        {{ formfield 'does_consent' }}
+    </div>
 
 
-    <center class="w-100 mb-2">
+    <center class="w-100 m-4">
         {{ next_button }}
     </center>
 
@@ -40,8 +28,8 @@
             var target = event.target;
             var checkbox = $('#id_does_consent')[0];
             if (checkbox.checked) {
+                //btnNext.prepend(`<p>If you had a previous session terminate for some reason before completing the survey and want to recover where you left off, please fill out and submit the form at <a href="/recover-session" onclick="try_server_recovery()">here</a> to request a recovery attempt.<p>`);
                 alert(`Your unique participant id is: ${js_vars.uuid}`);
-                //setTimeout(function() { target.dispatchEvent(event.originalEvent); }, 2000);
                 this.removeEventListener("click", wrapClick);
                 origClick.bind(this)();
             }

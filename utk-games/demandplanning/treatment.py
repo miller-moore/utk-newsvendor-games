@@ -101,7 +101,7 @@ class Treatment(PydanticModel):
     def get_optimal_order_quantity(self) -> float:
         rcpu, wcpu, hcpu = self.get_unit_costs().tuple()
         cf = float((rcpu - wcpu) / (rcpu - wcpu + hcpu))
-        mu, sigma = self.get_distribution_parameters().tuple()
+        _, sigma = self.get_distribution_parameters().tuple()
         return float(NATURAL_MEAN * np.exp(stats.norm.ppf(cf) * sigma))
 
     def get_unit_costs(self) -> UnitCosts:

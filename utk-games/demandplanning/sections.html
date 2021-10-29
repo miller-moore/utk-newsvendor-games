@@ -1,7 +1,10 @@
 <!-- Inclusion template 'demandplanning/visualizations.html' -->
 
+<br>
+<br>
+
 <!-- text-container-->
-<div class="row mb-4" id="text-container">
+<div class="row border mb-4" id="text-container">
     <div class="card border">
         <div class="card-body">
             <p class="text-muted">* Anne: maybe add text here. *</p>
@@ -11,13 +14,15 @@
     <br>
 </div>
 
+{# <div class="d-none d-xl-block">hide on screens smaller than xl</div> #}
 
 <!-- situational-info-container-->
-<div class="row mb-4" id="situational-info-container">
-    <h5 class="card-title">Situational Information:</h5>
+<div class="row border mb-4" id="situational-info-container">
+    <h4 class="mt-2">Situational Information:</h4>
+    {# <h5 class="card-title">Situational Information:</h5> #}
 
     <!-- unit-costs-table -->
-    <div class="col-sm mb-4">
+    <div class="col-6 my-2">
         <div class="card">
             <div class="card-body">
                 <h6 class="card-title text-center">Unit costs</h6>
@@ -42,7 +47,7 @@
     </div>
 
     <!-- distribution-curve -->
-    <div class="col-sm">
+    <div class="col-6 my-2">
         <div class="card" id="distribution-card">
             <div class="card-body">
                 <h6 class="card-title text-center">Market demand probability distribution</h6>
@@ -58,64 +63,8 @@
     <br>
 </div>
 
-<!-- situational-info-container-->
-{# <div class="row mb-4" id="situational-info-container">
-    <div class="card border">
-        <div class="card-body">
-            <h5 class="card-title">Situational Information</h5>
-
-            <ol type="a">
-
-                <!-- unit-costs-table -->
-                <li>Unit costs:
-                </li>
-                <div class="d-flex col-auto p-0 m-0">
-                    <div class="card border-0">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="unit-costs-table">
-                                    <thead></thead>
-                                    <tbody>
-                                        <tr id="row-wcpu">
-                                            <th scope="row"><strong>Wholesale</strong></th>
-                                        </tr>
-                                        <tr id="row-rcpu">
-                                            <th scope="row"><strong>Retail</strong></th>
-                                        </tr>
-                                        <tr id="row-hcpu">
-                                            <th scope="row"><strong>Holding</strong></th>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- distribution-curve -->
-                <li>Market demand probability distribution:</li>
-                <!-- li>Market demand in each period is simulated by a random draw from a designated probability density function (pdf). The following graph displays the pdf designated to this period:
-                </! -->
-                <div class="col-6">
-                    <div class="card" id="distribution-card">
-                        <div class="card-body">
-                            <p id="distribution-curve-loading-message" style="font-size:0.8rem;"><br>&nbsp;Loading Demand Distribution...&nbsp;</p>
-                            <!-- Add a slider -->
-                            <!-- <input type="range" name="mySlider" id=mySlider min="10" max="100" value="50"> -->
-                            <div id="distribution-curve">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </ol>
-        </div>
-    </div>
-    <br>
-</div> #}
-
 <!-- results-list-container -->
-<div class="row mb-4" id="results-list-container">
+<div class="row border mb-4" id="results-list-container">
     <div class="card border">
         <div class="card-body">
             <h5 class="card-title">Results</h5>
@@ -135,7 +84,7 @@
 
 
 <!-- final-results-container (each game has a table of results plus one "overall" table of results) -->
-<div class="row mb-4" id="final-results-container">
+<div class="row border mb-4" id="final-results-container">
     <div class="card border">
         <div class="card-body" id="final-results-card">
             <h5 class="card-title">Final Results</h5>
@@ -146,8 +95,8 @@
 
 
 <!-- game-history-container -->
-<div class="row mb-4" id="game-history-container">
-    <h5 class="card-title">Game History Information:</h5>
+<div class="row border mb-4" id="game-history-container">
+    <h4 class="mt-2">Game History Information:</h4>
 
     <!-- hist-quantities-barchart -->
     <div class="col-auto mb-4">
@@ -165,7 +114,7 @@
     <div class="col-auto">
         <div class="card">
             <div class="card-body">
-                <h6 class="card-title text-center">Summary of key metrics in prior periods</h6>
+                <h6 class="card-title text-center">Summary of key metrics of prior periods</h6>
                 <div class="table-responsive">
                     <table id="hist-metrics-table">
                         <thead>
@@ -200,7 +149,7 @@
 </div>
 
 {# <!-- game-history-container -->
-<div class="row mb-4" id="game-history-container">
+<div class="row border mb-4" id="game-history-container">
     <div class="card border">
         <div class="card-body">
             <h5 class="card-title">Game History Information</h5>
@@ -265,7 +214,7 @@
 
 
 
-<div class="row mb-4" id="decision-form-container">
+<div class="row border mb-4" id="decision-form-container">
     <div class="card border">
         <div class="card-body">
             <h5 class="card-title">Decision</h5>

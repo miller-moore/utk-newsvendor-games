@@ -9,22 +9,22 @@ import numpy as np
 from otree.api import Currency
 from otree.api import Page as OTreePage
 from otree.lookup import PageLookup, _get_session_lookups
+from otree.models import Participant
 from rich import print
 
 from .formvalidation import error_message_decorator
-from .models import Constants, Player
+from .models import Constants, Player, hydrate_player, initialize_game_history
 from .treatment import Treatment, UnitCosts
 from .util import (
     get_game_number,
     get_game_rounds,
+    get_page_name,
     get_round_in_game,
     get_time,
-    initialize_game_history,
     is_absolute_final_round,
     is_disruption_next_round,
     is_disruption_this_round,
     is_game_over,
-    page_name,
 )
 
 
@@ -73,7 +73,7 @@ class Page(OTreePage):
             games=Constants.num_games,
             rounds=Constants.rounds_per_game,
             allow_disruption=Constants.allow_disruption,
-            page_name=page_name(player),
+            page_name=get_page_name(player),
             round_number=player.round_number,
             game_number=game_number,
             game_round=game_round,
@@ -115,6 +115,10 @@ class Page(OTreePage):
         _vars.update(demand_rvs=player.participant.vars.get("demand_rvs", None))
         return _vars
 
+    @staticmethod
+    def before_next_page(player: Player, **kwargs):
+        hydrate_player(player)
+
 
 class Welcome(Page):
     form_model = "player"
@@ -140,7 +144,7 @@ class Welcome(Page):
         round_in_game = get_round_in_game(player.round_number)
         game_rounds = get_game_rounds(player.round_number)
         print(
-            f"[green]{page_name(player)} Page:  Round number: {player.round_number}, Game number: {game_number}, Game's last round: {game_rounds[-1]}, Round in game: {round_in_game}[/]"
+            f"[green]{get_page_name(player)} Page:  Round number: {player.round_number}, Game number: {game_number}, Game's last round: {game_rounds[-1]}, Round in game: {round_in_game}[/]"
         )
         player.is_planner = player.participant.is_planner
         player.years_as_planner = player.participant.years_as_planner
@@ -168,15 +172,15 @@ class Decide(Page):
     def vars_for_template(player: Player):
         _vars = Page.vars_for_template(player).copy()
         idx = get_round_in_game(player.round_number) - 1
-        hist = player.participant.history[idx]
-        if hist.get("su_before") is None:
-            hist.update(su_before=player.participant.stock_units)
-        player.participant.history[idx] = hist
+        if player.participant.history[idx].get("su_before") is None:
+            player.participant.history[idx].update(su_before=player.participant.stock_units)
         _vars.update(history=player.participant.history)
         return _vars
 
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
+
+        print(player.round_number, player.profit)
 
         player.is_planner = player.participant.is_planner
         player.years_as_planner = player.participant.years_as_planner
@@ -217,9 +221,9 @@ class Decide(Page):
         player.participant.stock_units = su_new
 
         # cumulative profit
-        first_round_in_game = get_game_rounds(player.round_number)
+        first_round_in_game = get_game_rounds(player.round_number)[0]
         cumulative_profit = (
-            sum(p.profit for p in player.in_rounds(first_round_in_game[0], player.round_number - 1)) + player.profit
+            sum(p.profit for p in player.in_rounds(first_round_in_game, player.round_number - 1)) + player.profit
         )
 
         # history

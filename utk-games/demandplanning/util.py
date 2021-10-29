@@ -18,28 +18,6 @@ from scipy import stats
 from .constants import APP_DIR, DISRUPTION_ROUND_IN_GAMES, GAMES, ROUNDS
 
 
-def page_name(player: BasePlayer) -> str:
-    participant: Participant = player.participant
-    return participant._current_page_name
-
-
-def initialize_game_history() -> List[Dict[str, Any]]:
-    return [
-        dict(
-            period=i + 1,
-            su_before=0 if i == 0 else None,
-            su_after=None,
-            ou=None,
-            du=None,
-            revenue=None,
-            cost=None,
-            profit=None,
-            cumulative_profit=None,
-        )
-        for i in range(ROUNDS)
-    ]
-
-
 def get_game_number(round_number: int) -> int:
     return ((round_number - 1) - (round_number - 1) % ROUNDS) // ROUNDS + 1
 
@@ -54,6 +32,11 @@ def get_game_rounds(round_number: int) -> List[int]:
 def get_round_in_game(round_number: int) -> int:
     game_number = get_game_number(round_number)
     return round_number - (game_number - 1) * ROUNDS
+
+
+def get_page_name(player: BasePlayer) -> str:
+    participant: Participant = player.participant
+    return participant._current_page_name
 
 
 def is_game_over(round_number: int) -> bool:

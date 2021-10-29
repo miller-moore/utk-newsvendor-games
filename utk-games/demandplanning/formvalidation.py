@@ -7,6 +7,8 @@ from typing import Any, Callable, Dict, List, Optional, Type, Union
 
 import numpy as np
 from otree.api import BasePlayer
+from otree.models import Participant
+from rich import print
 
 # Store registered formfield validator handlers
 FORM_FIELD_VALIDATORS: Dict[str, Callable] = {}
@@ -39,6 +41,8 @@ def error_message_decorator(error_message_handler) -> Callable:
     """Decorator designed to wrap a custom Page error_message handler to print page form values to console before running
     the handler.
     """
+    from .util import get_page_name
+
     name = getattr(error_message_handler, "__name__", None)
     if not name == "default_error_message":
         assert (
@@ -50,7 +54,7 @@ def error_message_decorator(error_message_handler) -> Callable:
         """Example ``error_message`` from https://otree.readthedocs.io/en/latest/misc/tips_and_tricks.html#avoid-duplicated-validation-methods:"""
         # print the page's form values to console.
         if values:
-            print(f"Page has form values: ", values)
+            print(f"[blue]Round {player.round_number}: {get_page_name(player)} Page has form values: ", values)
         return error_message_handler(player, values)
 
     return error_message_wrapper

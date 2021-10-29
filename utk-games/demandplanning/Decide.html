@@ -9,16 +9,15 @@
     {{ include Constants.scripts_template }}
 
     <script>
-        if (js_vars.game_round > 1)
-            renderGameHistoryContainer();
+        //if (js_vars.game_round > 1)
+        renderGameHistoryContainer();
         renderDecisionFormContainer();
         renderSituationalInfoContainer();
     </script>
 
-    <center class="w-100 mb-2">
+    <center class="w-100 m-4">
         {{ next_button }}
     </center>
-
 
 {{ endblock }}
 
