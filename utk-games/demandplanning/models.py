@@ -2,18 +2,23 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List
 from uuid import uuid4
 
-from otree.api import (BaseConstants, BaseGroup, BasePlayer, BaseSubsession,
-                       Currency, models, widgets)
+from otree.api import BaseConstants, BaseGroup, BasePlayer, BaseSubsession, Currency, models, widgets
 from otree.constants import BaseConstantsMeta
 from otree.templating import filters
 from rich import print
 
-from .constants import (ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS,
-                        RVS_SIZE)
+from .constants import ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS, RVS_SIZE
 from .treatment import Treatment, UnitCosts
-from .util import (get_game_number, get_game_rounds,
-                   get_includable_template_path, get_round_in_game,
-                   get_settings, get_time)
+from .util import (
+    get_game_number,
+    get_game_rounds,
+    get_includable_template_path,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_round_in_game,
+    get_settings,
+    get_time,
+)
 
 # https://stackoverflow.com/a/12028864
 # from django import template
@@ -95,63 +100,46 @@ class Constants(ConstantsBase):
 ConstantsBase.__setattr__ = orig_constants_meta_setattr
 
 
-def hydrate_player(player: "Player") -> None:
-    treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
-    unit_costs: UnitCosts = treatment.get_unit_costs()
-    demand_rvs = player.participant.vars.get("demand_rvs", treatment.get_demand_rvs(Constants.rvs_size))
-    uuid = player.participant.vars.get("uuid", str(uuid4()))
-    is_planner = player.participant.vars.get("is_planner", None)
-    years_as_planner = player.participant.vars.get("years_as_planner", None)
-    company_name = player.participant.vars.get("company_name", None)
-    does_consent = player.participant.vars.get("does_consent", None)
-    game_number = get_game_number(player.round_number)
-    round_in_game = get_round_in_game(player.round_number)
-    game_rounds = get_game_rounds(player.round_number)
+def hydrate_participant(player: "Player", **kwargs) -> None:
 
     if not "uuid" in player.participant.vars:
-        print(f"[yellow]Round {player.round_number}: creating session for participant {uuid}[/]")
+        uuid = player.participant.vars.get("uuid", str(uuid4()))
+        print(f"[yellow]hydrate_participant: Round {player.round_number}: creating session for participant {uuid}[/]")
+
+        treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
+        unit_costs: UnitCosts = treatment.get_unit_costs()
+        demand_rvs = player.participant.vars.get("demand_rvs", treatment.get_demand_rvs(Constants.rvs_size))
+        is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
+        years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
+        company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
+        does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
+        game_number = get_game_number(player.round_number)
+        round_in_game = get_round_in_game(player.round_number)
+        game_rounds = get_game_rounds(player.round_number)
+
         player.participant.uuid = uuid
         player.participant.starttime = get_time()
         player.participant.is_planner = is_planner
         player.participant.years_as_planner = years_as_planner
         player.participant.company_name = company_name
         player.participant.does_consent = does_consent
-        player.participant.treatment = treatment
         player.participant.unit_costs = unit_costs
-        player.participant.demand_rvs = demand_rvs
         player.participant.stock_units = 0
+        player.participant.treatment = treatment
+        player.participant.demand_rvs = demand_rvs
         player.participant.history = initialize_game_history()
         player.participant.game_results = []
-
-    player.uuid = player.participant.uuid
-    player.is_planner = player.participant.is_planner
-    player.years_as_planner = player.participant.years_as_planner
-    player.company_name = player.participant.company_name
-    player.does_consent = player.participant.does_consent
-    player.starttime = get_time()
-    player.endtime = None
-    player.game_number = game_number
-    player.period_number = round_in_game
-    player.su = player.participant.stock_units
-    player.ou = None
-    player.du = None
-    player.ooq = max(0, round(player.participant.treatment.get_optimal_order_quantity() - player.su))
-    player.rcpu = unit_costs.rcpu
-    player.wcpu = unit_costs.wcpu
-    player.hcpu = unit_costs.hcpu
-    player.revenue = 0
-    player.cost = 0
-    player.profit = 0
 
 
 def initialize_game_history() -> List[Dict[str, Any]]:
     return [
         dict(
             period=i + 1,
-            su_before=0 if i == 0 else None,
-            su_after=None,
             ou=None,
             du=None,
+            su_before=0 if i == 0 else None,
+            su_after=None,
+            ooq=None,
             revenue=None,
             cost=None,
             profit=None,
@@ -165,7 +153,7 @@ class Subsession(BaseSubsession):
     @staticmethod
     def creating_session(subsession: BaseSubsession):
         for player in subsession.get_players():
-            hydrate_player(player)
+            hydrate_participant(player)
 
 
 class Group(BaseGroup):

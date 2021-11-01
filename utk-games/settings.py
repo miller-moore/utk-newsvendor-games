@@ -7,14 +7,15 @@ from os import environ
 # This allows to set any type of data to player.participant (not constrained to oTree's orm column types)
 PARTICIPANT_FIELDS = [
     "uuid",
+    "starttime",
     "is_planner",
     "years_as_planner",
     "company_name",
     "does_consent",
-    "treatment",
     "unit_costs",
-    "demand_rvs",
     "stock_units",
+    "treatment",
+    "demand_rvs",
     "history",
     "game_results",
 ]

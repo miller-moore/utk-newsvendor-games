@@ -123,7 +123,7 @@
     hide($("#situational-info-container"));
     hide($("#game-history-container"));
     hide($("#decision-form-container"));
-    hide($("#results-list-container"));
+    hide($("#results-container"));
     hide($("#final-results-container"));
 </script>
 
@@ -576,29 +576,29 @@
         var metricsTableCProfitRow = $("#hist-metrics-table #row-cprofit");
         for (var i=0; i < js_vars.history.length; i++) {
             var h = js_vars.history[i];
-            var p = h.period;
+            var period = h.period;
             var su = formatNumber(h.su_before? h.su_before: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
             var ou = formatNumber(h.ou? h.ou: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
             var du = formatNumber(h.du? h.du: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
             var profit = formatCurrency(h.profit? h.profit: 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
             var cumulative_profit = formatCurrency(h.cumulative_profit? h.cumulative_profit: 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
 
-            var r = i + 1;
-
+            // @notice: these conditionals allow each period column to be built in the table even if the game isn't done yet
             if (js_vars.page_name == 'Results') {
-                if (r > js_vars.game_round) {
-                    su = '';
+                if (i + 1 > js_vars.period_number) {
+                    su = i + 1 > js_vars.period_number + 1? '': formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0});
                     ou = '';
                     du = '';
                     profit = '';
                     cumulative_profit = '';
                 }
             } else if (js_vars.page_name == 'Decide') {
-                if (r > js_vars.game_round) {
-                    su = '';
-                }
-                if (r >= js_vars.game_round) {
-                    //su = '';
+                if (i + 1 >= js_vars.period_number) {
+                    if (i > 0 && i + 1 === js_vars.period_number) {
+                        su = formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0})
+                    } else if (i > 0) {
+                        su = ''
+                    }
                     ou = '';
                     du = '';
                     profit = '';
@@ -606,16 +606,13 @@
                 }
             }
 
-            var colWidth = Math.floor(100/(js_vars.rounds + 1));
-            //var colWidth = 100
-            //metricsTheadTr.append(`<th scope="col" data-halign="center" data-width="${colWidth}" data-width-unit="%">${p}</th>`);
 
-            metricsTheadTr.append(`<th class="period-label" scope="col" data-halign="center" data-align="center" >${p}</th>`); // class=""
-            metricsTableStockRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${su}</td>`); // class=""
-            metricsTableOrderRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${ou}</td>`); // class=""
-            metricsTableDemandRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${du}</td>`); // class=""
-            metricsTableProfitRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${profit}</td>`); // class=""
-            metricsTableCProfitRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${cumulative_profit}</td>`); // class=""
+            metricsTheadTr.append(`<th class="period-label" scope="col" data-halign="center" data-align="center" >${period}</th>`);
+            metricsTableStockRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${su}</td>`);
+            metricsTableOrderRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${ou}</td>`);
+            metricsTableDemandRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${du}</td>`);
+            metricsTableProfitRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${profit}</td>`);
+            metricsTableCProfitRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${cumulative_profit}</td>`);
         }
 
         try {
@@ -672,17 +669,17 @@
         //label.html(`<span>${noteText}<br><br>${labelText}</span>`);
 
         // @note: to format the number before rendering:
-        $("#optimal-order-quantity").html(formatNumber(js_vars.ooq, { maximumFractionDigits: 0}));
+        $("#optimal-order-quantity").html(formatNumber(js_vars.ooq, { maximumFractionDigits: 0})); // HERE: js_vars.ooq is None after round 2?
 
     }
 </script>
 
 
 
-<!-- results-list-container -->
+<!-- results-container -->
 <script>
-    function renderResultsListContainer() {
-        show($("#results-list-container"));
+    function renderResultsContainer() {
+        show($("#results-container"));
 
         $("#results-du").html(formatNumber(js_vars.du, { maximumFractionDigits: 0 }));
         $("#results-ou").html(formatNumber(js_vars.ou, { maximumFractionDigits: 0 }));

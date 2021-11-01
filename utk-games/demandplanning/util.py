@@ -39,6 +39,15 @@ def get_page_name(player: BasePlayer) -> str:
     return participant._current_page_name
 
 
+def get_optimal_order_quantity(player: BasePlayer) -> int:
+    from .models import Player
+
+    assert isinstance(player, Player), f"""this function is only valid for player type {Player!r}"""
+    if player.participant.vars.get("treatment", None) is None:
+        return 0
+    return max(0, round(player.participant.treatment.get_optimal_order_quantity() - player.participant.stock_units))
+
+
 def is_game_over(round_number: int) -> bool:
     game_number = get_game_number(round_number)
     return round_number == game_number * ROUNDS
@@ -280,7 +289,7 @@ def normalize_lognormal_samples(lognormal_rvs: np.ndarray) -> np.ndarray:
 
 
 def get_time(iso: bool = False) -> float:
-    t = datetime.utcnow()
+    t = datetime.now()
     if not iso:
         return t.timestamp()
     return t.isoformat()

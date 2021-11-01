@@ -1,7 +1,7 @@
 from pathlib import Path
 
 GAMES = 2
-ROUNDS = 8
+ROUNDS = 5
 ALLOW_DISRUPTION = False
 DISRUPTION_ROUND_IN_GAMES = {1: int(3 / 4 * ROUNDS), 2: int(1 / 4 * ROUNDS)}
 

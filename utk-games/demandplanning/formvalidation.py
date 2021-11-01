@@ -54,7 +54,10 @@ def error_message_decorator(error_message_handler) -> Callable:
         """Example ``error_message`` from https://otree.readthedocs.io/en/latest/misc/tips_and_tricks.html#avoid-duplicated-validation-methods:"""
         # print the page's form values to console.
         if values:
-            print(f"[blue]Round {player.round_number}: {get_page_name(player)} Page has form values: ", values)
+            print(
+                f"[blue]error_message_decorator: Round {player.round_number}: {get_page_name(player)} Page has form values: %s"
+                % str(values)
+            )
         return error_message_handler(player, values)
 
     return error_message_wrapper

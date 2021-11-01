@@ -14,12 +14,10 @@
     <br>
 </div>
 
-{# <div class="d-none d-xl-block">hide on screens smaller than xl</div> #}
 
 <!-- situational-info-container-->
 <div class="row border mb-4" id="situational-info-container">
     <h4 class="mt-2">Situational Information:</h4>
-    {# <h5 class="card-title">Situational Information:</h5> #}
 
     <!-- unit-costs-table -->
     <div class="col-6 my-2">
@@ -63,22 +61,21 @@
     <br>
 </div>
 
-<!-- results-list-container -->
-<div class="row border mb-4" id="results-list-container">
-    <div class="card border">
-        <div class="card-body">
-            <h5 class="card-title">Results</h5>
-            <p>
-                <ul>
-                    <li>Demand was <strong id="results-du">{{ du }}</strong> units.</li>
-                    <li>You ordered <strong id="results-ou">{{ ou }}</strong> units.</li>
-                    <li>You will have <strong id="results-su">{{ su }}</strong> units in inventory next period.</li>
-                    <li>You earned <strong id="results-profit">{{ profit }}</strong> in profit this round.</li>
-                </ul>
-            </p>
+<!-- results-container -->
+<div class="row border mb-4" id="results-container">
+    <h4 class="mt-2">Results:</h4>
 
+        <div class="card border-0">
+            <div class="card-body">
+                <ul>
+                    <li>Demand was <strong id="results-du"></strong> units.</li>
+                    <li>You ordered <strong id="results-ou"></strong> units.</li>
+                    <li>You will have <strong id="results-su"></strong> units in inventory next period.</li>
+                    <li>You earned <strong id="results-profit"></strong> in profit this round.</li>
+                </ul>
+            </div>
         </div>
-    </div>
+
     <br>
 </div>
 
@@ -147,88 +144,4 @@
 
     <br>
 </div>
-
-{# <!-- game-history-container -->
-<div class="row border mb-4" id="game-history-container">
-    <div class="card border">
-        <div class="card-body">
-            <h5 class="card-title">Game History Information</h5>
-
-            <ol type="a">
-                <!-- hist-quantities-barchart -->
-                <li>Quantities ordered & demanded in prior periods:
-                </li>
-                <div class="col-auto">
-                    <div class="card" id="hist-quantities-card">
-                        <div class="card-body">
-                            <div id="hist-quantities-barchart"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <br>
-
-                <!-- hist-metrics-table -->
-                <li>Summary of key metrics in prior periods:
-                </li>
-                <div class="col-12 p-0 m-0">
-                    <div class="card border-0">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table id="hist-metrics-table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="row">Period</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr id="row-stock">
-                                            <th scope="row" style="white-space: nowrap;"><strong>Starting inventory<br>(before order)</strong></th>
-                                        </tr>
-                                        <tr id="row-order">
-                                            <th scope="row" style="white-space: nowrap;"><strong>Order quantity</strong></th>
-                                        </tr>
-                                        <tr id="row-demand">
-                                            <th scope="row" style="white-space: nowrap;"><strong>Demand quantity<br>(realized)</strong></th>
-                                        </tr>
-                                        <tr id="row-profit">
-                                            <th scope="row" style="white-space: nowrap;"><strong>Profit</strong></th>
-                                        </tr>
-                                        <tr id="row-cprofit">
-                                            <th scope="row" style="white-space: nowrap;"><strong>Cumulative profit</strong></th>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </ol>
-
-        </div>
-    </div>
-
-    <br>
-</div> #}
-
-
-
-<div class="row border mb-4" id="decision-form-container">
-    <div class="card border">
-        <div class="card-body">
-            <h5 class="card-title">Decision</h5>
-
-            <p>
-                Note: according to commercial forecasting software, the optimal order quantity for this period is <strong id="optimal-order-quantity">{{ ooq }}</strong>.
-                {{ if page_name == 'Decide' }}
-                    {{ formfield 'ou' label="How many units will you order?" }}
-                {{ endif }}
-            </p>
-
-        </div>
-    </div>
-    <br>
-</div>
-
 
