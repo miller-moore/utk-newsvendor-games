@@ -8,13 +8,10 @@
     {{ include Constants.sections_template }}
     {{ include Constants.scripts_template }}
 
-    <br><br><br>
-
     <script>
         renderFinalResultsContainer();
     </script>
 
-    <br>
     {{ if not is_absolute_final_round }}
         <h6>Game {{ game_number|add(1) }} begins next.</h6>
 

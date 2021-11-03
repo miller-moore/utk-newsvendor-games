@@ -29,7 +29,7 @@
             var checkbox = $('#id_does_consent')[0];
             if (checkbox.checked) {
                 //btnNext.prepend(`<p>If you had a previous session terminate for some reason before completing the survey and want to recover where you left off, please fill out and submit the form at <a href="/recover-session" onclick="try_server_recovery()">here</a> to request a recovery attempt.<p>`);
-                alert(`Your unique participant id is: ${js_vars.uuid}`);
+                // alert(`Your unique participant id is: ${js_vars.uuid}`);
                 this.removeEventListener("click", wrapClick);
                 origClick.bind(this)();
             }

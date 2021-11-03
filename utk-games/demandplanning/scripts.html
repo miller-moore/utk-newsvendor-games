@@ -225,23 +225,33 @@
         var xmax = d3.max(data) * .9
         if (js_vars.variance_choice == "high") {
             var xAxis = d3.scaleLinear()
-                .domain([0, 1400])
+                .domain([0, xmax])
                 .range([0, width])
             var xticks = xAxis.ticks(30)
+
+            var xAxis = d3.scaleLinear()
+                .domain([0, 1800])
+                .range([0, width])
         } else {
             var xAxis = d3.scaleLinear()
                 .domain([xmin, xmax])
                 .range([0, width])
             var xticks = xAxis.ticks(10)
-            var stepSize = xticks[1] - xticks[0]
-            var xmin = d3.min(data) - d3.min(data) % stepSize
-            var xmax = d3.max(data) + d3.max(data) % stepSize
 
+            var stepSize = xticks[1] - xticks[0]
+            //var xmin = d3.min(data) - d3.min(data) % stepSize
+            //var xmax = d3.max(data) + d3.max(data) % stepSize
             var xAxis = d3.scaleLinear()
-                .domain([xmin, xmax])
+                .domain([0, 1400])
                 .range([0, width])
-            var xticks = xAxis.ticks(30)
+
+            var xticks = xAxis.ticks(10)
         }
+
+        // NOTE: use static x-domain?
+        //var xAxis = d3.scaleLinear()
+        //    .domain([0, 1800])
+        //    .range([0, width])
 
 
         //var xminExp = int(Math.log10(xmin));

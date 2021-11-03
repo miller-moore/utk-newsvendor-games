@@ -14,18 +14,11 @@ from rich import print
 from .formvalidation import error_message_decorator
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
-from .util import (
-    get_game_number,
-    get_game_rounds,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_round_in_game,
-    get_time,
-    is_absolute_final_round,
-    is_disruption_next_round,
-    is_disruption_this_round,
-    is_game_over,
-)
+from .util import (get_game_number, get_game_rounds,
+                   get_optimal_order_quantity, get_page_name,
+                   get_round_in_game, get_time, is_absolute_final_round,
+                   is_disruption_next_round, is_disruption_this_round,
+                   is_game_over)
 
 
 @error_message_decorator
@@ -49,7 +42,9 @@ def error_message(player: Player, formfields: Any):
 
 def vars_for_template(player: Player) -> dict:
 
-    from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
+    from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                REAL_WORLD_CURRENCY_CODE,
+                                REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
@@ -123,6 +118,7 @@ class HydratePlayer(Page):
         player.uuid = player.participant.uuid
         player.starttime = get_time()
         player.endtime = None
+        player.treatment = player.participant.treatment.json()
         player.is_planner = player.participant.is_planner
         player.years_as_planner = player.participant.years_as_planner
         player.company_name = player.participant.company_name
@@ -140,7 +136,7 @@ class HydratePlayer(Page):
         player.cost = 0
         player.profit = 0
 
-        extras = dict(su=player.su, ooq=player.ooq, is_planner=player.is_planner)
+        extras = dict(su=player.su, ooq=player.ooq, is_planner=player.field_maybe_none("is_planner"))
         print(
             f"[green]hydrate_player: Round {player.round_number}: {get_page_name(player)} Page, Game {player.game_number} (ends on round {get_game_rounds(player.round_number)[-1]}), Period number: {player.period_number}, player extras: {extras}"
         )
@@ -181,6 +177,8 @@ class Disruption(Page):
     def before_next_page(player: Player, **kwargs):
         if Constants.allow_disruption:
             player.participant.demand_rvs = player.participant.treatment.get_demand_rvs(Constants.rvs_size, disrupt=True)
+            # TODO: update participant's mu & sigma to transformed values even tho demand_rvs is the thing that matters in practice
+            # player.participant.treatment.get_distribution_parameters()
 
 
 class Decide(Page):

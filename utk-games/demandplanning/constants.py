@@ -1,9 +1,15 @@
 from pathlib import Path
 
 GAMES = 2
-ROUNDS = 5
-ALLOW_DISRUPTION = False
+ROUNDS = 4
+
+# NOTE: disruption stuff
+# NOTE: a disruption only applies to the first game - everybody gets a disruption in the second game
+ALLOW_DISRUPTION = True
 DISRUPTION_ROUND_IN_GAMES = {1: int(3 / 4 * ROUNDS), 2: int(1 / 4 * ROUNDS)}
+VARIABILITY_CHOICES = ["high", "low"]
+DISRUPTION_CHOICES = [True, False]
+NATURAL_MEAN = 500
 
 RVS_SIZE = int(1e5)
 APP_DIR = Path(__file__).resolve().parent

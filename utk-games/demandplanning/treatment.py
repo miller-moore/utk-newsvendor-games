@@ -11,10 +11,7 @@ from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
 from pydantic import BaseModel, StrBytes, conint, validator
 
-# NOTE: disruption only applies two first minigame - everybody gets a disruption in the second minigame
-VARIABILITY_CHOICES = ["high", "low"]
-DISRUPTION_CHOICES = [True, False]
-NATURAL_MEAN = 500
+from .constants import DISRUPTION_CHOICES, NATURAL_MEAN, VARIABILITY_CHOICES
 
 
 class PydanticModel(BaseModel):
@@ -119,18 +116,25 @@ class Treatment(PydanticModel):
 
         mu, sigma = self.get_distribution_parameters().tuple()
         if disrupt:
-            if self.variance_choice == "low":
-                # increase sigma
-                sigma *= 2
-            else:
-                # decrease sigma
-                sigma /= 2
+            ## transform mu & sigma
+            sigma *= 2
+            mu *= 1
+
+            ## if transform depends on other things... e.g., variance_choice
+            # if self.variance_choice == "low":
+            #     sigma *= 2
+            #     mu *= 1
+            # else:
+            #     sigma /= 2
+            #     mu *= 1
         return np.random.lognormal(mu, sigma, size).tolist()
 
 
 TREATMENT_GROUPS = {
     idx + 1: Treatment.from_args(*args) for idx, args in enumerate(product(VARIABILITY_CHOICES, DISRUPTION_CHOICES))
 }
+
+# TREATMENT_GROUPS = {i: Treatment.from_args(*("high", True)) for i in range(1, 5)}
 
 
 def dump_all_treatment_groups(**kwargs) -> str:
