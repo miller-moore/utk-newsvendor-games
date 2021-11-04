@@ -20,7 +20,10 @@ fi
 
 # activate virtualenv
 source ${VIRTUALENV_DIR}/bin/activate
-pip install -U pip wheel setuptools
 
-# update python requirements
+# ensure dev dependencies are installed
+# TODO: convert all this to a poetry managed project with a pyproject.toml file
+pip install -r ${PROJECT_ROOT}/requirements-dev.txt
+
+# ensure main dependencies are installed
 pip install -r ${PROJECT_ROOT}/requirements.txt
