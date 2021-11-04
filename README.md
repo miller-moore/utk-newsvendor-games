@@ -1,5 +1,5 @@
 # utk-newsvendor-games
-Codebase of newsvendor games for research in supply chain planner biases.
+Codebase of "gamified survey web applications" facilitating various objectives of academic research in supply chain management at the University of Tennessee, Knoxville.
 
 ### Setup workspace and virtual environment (if not already done):
 ```bash
