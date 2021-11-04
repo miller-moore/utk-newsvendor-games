@@ -11,7 +11,7 @@ pip -U install pip wheel setuptools
 pip install -r requirements.txt
 ```
 
-### To run otree devserver (if workspace and virtual environment are setup per above instructions):
+### To run otree (if steps above have been completed):
 ```bash
 # go to the git repository (i.e., the workspace)
 cd utk-newsvendor-games
