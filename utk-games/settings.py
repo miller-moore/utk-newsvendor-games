@@ -38,9 +38,9 @@ SESSION_CONFIG_DEFAULTS = dict(
 SESSION_CONFIGS = [
     dict(
         name="demandplanning",
-        display_name="Demand Planning Game",
+        display_name="Demand Planning Games - UTK SCM Research",
         num_demo_participants=1,
-        app_sequence=["demandplanning"],
+        app_sequence=["disruption"],
     )
 ]
 
