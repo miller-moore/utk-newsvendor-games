@@ -37,11 +37,17 @@ SESSION_CONFIG_DEFAULTS = dict(
 
 SESSION_CONFIGS = [
     dict(
-        name="demandplanning",
-        display_name="UTK SCM Demand Planning Games",
+        name="disruption",
+        display_name="Disruption Game",
         num_demo_participants=1,
-        app_sequence=["shorthorizon", "disruption"],
-    )
+        app_sequence=["disruption"],
+    ),
+    dict(
+        name="shorthorizon",
+        display_name="Short Horizon Game",
+        num_demo_participants=1,
+        app_sequence=["shorthorizon"],
+    ),
 ]
 
 
