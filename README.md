@@ -1,5 +1,5 @@
 # utk-newsvendor-games
-Codebase of newsvendor games for research in supply chain planner biases.
+Codebase of "gamified survey web applications" facilitating various objectives of academic research in supply chain management at the University of Tennessee, Knoxville.
 
 ### Setup workspace and virtual environment (if not already done):
 ```bash
@@ -11,7 +11,7 @@ pip -U install pip wheel setuptools
 pip install -r requirements.txt
 ```
 
-### To run otree devserver (if workspace and virtual environment are setup per above instructions):
+### To run otree (if steps above have been completed):
 ```bash
 # go to the git repository (i.e., the workspace)
 cd utk-newsvendor-games
@@ -24,9 +24,8 @@ source venv/bin/activate
 pip install -r requirements.txt
 # go to the app directory
 cd utk-games
-# run otree
-otree devserver
-# then, open http://localhost:8000/ in a web browser
+# run otree ...
+# if running otree devserver, should be able to open http://localhost:8000/ in a web browser but only if you're running `otree devserver` on your local machine. This is not likely to work on remote machines unless a port is forwarded from your local machine to the remote machine through ssh, which is a topic beyond the scope of this project.
 ```
 
 ### Useful links:
