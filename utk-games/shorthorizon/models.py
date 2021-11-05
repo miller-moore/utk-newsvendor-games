@@ -2,23 +2,13 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List
 from uuid import uuid4
 
-from otree.api import BaseConstants, BaseGroup, BasePlayer, BaseSubsession, Currency, models, widgets
-from otree.constants import BaseConstantsMeta
+from otree.api import BaseGroup, BasePlayer, BaseSubsession, models, widgets
 from otree.templating import filters
 from rich import print
 
-from .constants import ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS, RVS_SIZE
+from .constants import Constants
 from .treatment import Treatment, UnitCosts
-from .util import (
-    get_game_number,
-    get_game_rounds,
-    get_includable_template_path,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_round_in_game,
-    get_settings,
-    get_time,
-)
+from .util import get_game_number, get_game_rounds, get_round_in_game, get_time
 
 # https://stackoverflow.com/a/12028864
 # from django import template
@@ -61,43 +51,43 @@ def add(value, other=0):
     return ""
 
 
-# Hack to allow settattr on Constants at runtime
-orig_constants_meta_setattr = BaseConstantsMeta.__setattr__
-delattr(BaseConstantsMeta, "__setattr__")
+# # Hack to allow settattr on Constants at runtime
+# orig_constants_meta_setattr = BaseConstantsMeta.__setattr__
+# delattr(BaseConstantsMeta, "__setattr__")
 
 
-class ConstantsBase(BaseConstants, metaclass=BaseConstantsMeta):
-    pass
+# class ConstantsBase(BaseConstants, metaclass=BaseConstantsMeta):
+#     pass
 
 
-class Constants(ConstantsBase):
-    # otree constants
-    name_in_url = APP_NAME
-    num_rounds = GAMES * ROUNDS
-    players_per_group = None
-    endowment = Currency(0)
-    instructions_template = None
+# class Constants(ConstantsBase):
+#     # otree constants
+#     name_in_url = APP_NAME
+#     num_rounds = GAMES * ROUNDS
+#     players_per_group = None
+#     endowment = Currency(0)
+#     instructions_template = None
 
-    # custom constants
-    num_games = GAMES
-    rounds_per_game = ROUNDS
-    app_name = APP_DIR.name
-    authors = [
-        "Anne Dohmen, University of Tennessee - Knoxville, Department of Supply Chain Management",
-        "Miller Moore, University of Tennessee - Knoxville, Department of Business Analytics & Statistics",
-    ]
-    static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
+#     # custom constants
+#     num_games = GAMES
+#     rounds_per_game = ROUNDS
+#     app_name = APP_DIR.name
+#     authors = [
+#         "Anne Dohmen, University of Tennessee - Knoxville, Department of Supply Chain Management",
+#         "Miller Moore, University of Tennessee - Knoxville, Department of Business Analytics & Statistics",
+#     ]
+#     static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
 
-    allow_disruption = ALLOW_DISRUPTION
-    rvs_size = RVS_SIZE
+#     allow_disruption = ALLOW_DISRUPTION
+#     rvs_size = RVS_SIZE
 
-    # paths for templates used in include tags, e.g., {{ include "disruption/style.html" }} or {{ include Constants.style_template }}
-    style_template = get_includable_template_path("style.html")
-    scripts_template = get_includable_template_path("scripts.html")
-    sections_template = get_includable_template_path("sections.html")
+#     # paths for templates used in include tags, e.g., {{ include "shorthorizon/style.html" }} or {{ include Constants.style_template }}
+#     style_template = get_includable_template_path("style.html")
+#     scripts_template = get_includable_template_path("scripts.html")
+#     sections_template = get_includable_template_path("sections.html")
 
 
-ConstantsBase.__setattr__ = orig_constants_meta_setattr
+# ConstantsBase.__setattr__ = orig_constants_meta_setattr
 
 
 def hydrate_participant(player: "Player", **kwargs) -> None:
@@ -145,7 +135,7 @@ def initialize_game_history() -> List[Dict[str, Any]]:
             profit=None,
             cumulative_profit=None,
         )
-        for i in range(ROUNDS)
+        for i in range(Constants.rounds_per_game)
     ]
 
 

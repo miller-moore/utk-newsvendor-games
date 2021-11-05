@@ -15,23 +15,23 @@ from otree.models import Participant
 from pydantic import BaseConfig, BaseModel
 from scipy import stats
 
-from .constants import APP_DIR, DISRUPTION_ROUND_IN_GAMES, GAMES, ROUNDS
+from .constants import DISRUPTION_ROUND_IN_GAMES, Constants
 
 
 def get_game_number(round_number: int) -> int:
-    return ((round_number - 1) - (round_number - 1) % ROUNDS) // ROUNDS + 1
+    return ((round_number - 1) - (round_number - 1) % Constants.rounds_per_game) // Constants.rounds_per_game + 1
 
 
 def get_game_rounds(round_number: int) -> List[int]:
     game_number = get_game_number(round_number)
-    last_round = ROUNDS * game_number + 1
-    first_round = last_round - ROUNDS
+    last_round = Constants.rounds_per_game * game_number + 1
+    first_round = last_round - Constants.rounds_per_game
     return list(range(first_round, last_round))
 
 
 def get_round_in_game(round_number: int) -> int:
     game_number = get_game_number(round_number)
-    return round_number - (game_number - 1) * ROUNDS
+    return round_number - (game_number - 1) * Constants.rounds_per_game
 
 
 def get_page_name(player: BasePlayer) -> str:
@@ -50,11 +50,11 @@ def get_optimal_order_quantity(player: BasePlayer) -> int:
 
 def is_game_over(round_number: int) -> bool:
     game_number = get_game_number(round_number)
-    return round_number == game_number * ROUNDS
+    return round_number == game_number * Constants.rounds_per_game
 
 
 def is_absolute_final_round(round_number: int):
-    return round_number == ROUNDS * GAMES
+    return round_number == Constants.rounds_per_game * Constants.num_games
 
 
 def is_disruption_this_round(player: BasePlayer) -> bool:
@@ -107,21 +107,6 @@ def is_disruption_next_round(player: BasePlayer) -> bool:
     if game_number == 1:
         return is_next_round_disruption and treatment.has_disruption()
     return is_next_round_disruption
-
-
-def get_includable_template_path(template_filepath: str) -> str:
-    """Parse template_filepath to an "includable" template path, e.g., {{ include "disruption/style.html" }} or {{ include Constants.style_template }}."""
-    p = Path(template_filepath)
-    assert (
-        ".html" in p.suffixes
-    ), f"""expected template_filepath extension to include {".html"!r} - got {template_filepath!r} (extension {p.suffix!r})."""
-
-    # strict file path (must exist)
-    filepath = (APP_DIR / template_filepath).resolve(strict=True)
-
-    # return string for django include expression: {{ include "include_path" }}
-    include_path = str(Path(APP_DIR.name) / filepath.name)
-    return include_path
 
 
 def compute_profit(player: Any) -> float:

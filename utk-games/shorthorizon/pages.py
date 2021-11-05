@@ -11,14 +11,22 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 from rich import print
 
+from .constants import Constants
 from .formvalidation import error_message_decorator
-from .models import Constants, Player, initialize_game_history
+from .models import Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
-from .util import (get_game_number, get_game_rounds,
-                   get_optimal_order_quantity, get_page_name,
-                   get_round_in_game, get_time, is_absolute_final_round,
-                   is_disruption_next_round, is_disruption_this_round,
-                   is_game_over)
+from .util import (
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_round_in_game,
+    get_time,
+    is_absolute_final_round,
+    is_disruption_next_round,
+    is_disruption_this_round,
+    is_game_over,
+)
 
 
 @error_message_decorator
@@ -42,9 +50,7 @@ def error_message(player: Player, formfields: Any):
 
 def vars_for_template(player: Player) -> dict:
 
-    from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                REAL_WORLD_CURRENCY_CODE,
-                                REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+    from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
@@ -262,6 +268,55 @@ class FinalResults(Page):
         return is_game_over(player.round_number)
 
 
+class NextApp(Page):
+    timeout_seconds = 0
+
+    # @staticmethod
+    # def is_displayed(player: Player):
+    #     print(
+    #         f"""[orange]is_displayed: Round: {player.round_number}: {get_page_name(player)} Page, is_absolute_final_round? {is_absolute_final_round(player.round_number)}[/]"""
+    #     )
+    #     return is_absolute_final_round(player.round_number)
+
+    @staticmethod
+    def app_after_this_page(player: Player, upcoming_apps: List[str]) -> Optional[str]:
+        """See https://otree.readthedocs.io/en/self/pages.html?highlight=app_after_this_page#app-after-this-page
+
+        Implemented to determine which app to skip to next based on conditions of this app ('shorthorizon')
+        and any other arbitrary logic as desired.
+
+        Parameters
+        ----------
+        player : Player
+        upcoming_apps : [list[str]]
+            List of upcoming app names or an empty list.
+
+        Returns
+        ----------
+        [Optional[str]]
+            The name of the next app in app_sequence (or None).
+        """
+
+        def printer(next_app):
+            print(
+                f"""[purple]app_after_this_page: Round: {player.round_number!r}: {get_page_name(player)!r} Page, is_absolute_final_round? {is_absolute_final_round(player.round_number)!r}, upcoming_apps: {upcoming_apps!r}, next app: {next_app!r}"""
+            )
+
+        next_app = None
+        if upcoming_apps:
+            if upcoming_apps[0] == "disruption":
+                # skip over 'disruption' app
+                upcoming_apps.pop()
+                try:
+                    next_app = upcoming_apps.pop()
+                except:
+                    pass
+            else:
+                next_app = upcoming_apps[0]
+        printer(next_app)
+        return next_app
+
+
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [HydratePlayer, Welcome, Disruption, Decide, Results, FinalResults]
+page_sequence = [HydratePlayer, Welcome, Disruption, Decide, Results, FinalResults, NextApp]
