@@ -1,0 +1,22 @@
+{{ block title }}
+    Results: Game {{ game_number }}, Period {{ game_round }}
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include Constants.style_template }}
+    {{ include Constants.sections_template }}
+    {{ include Constants.scripts_template }}
+
+    <script>
+        renderResultsContainer();
+        renderGameHistoryContainer();
+    </script>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+{{ endblock }}
+
+

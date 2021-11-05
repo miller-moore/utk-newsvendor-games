@@ -1,0 +1,43 @@
+{{ block title }}
+    Demand Planning Game: Welcome
+{{ endblock }}
+
+{{ block content }}
+    {{ include Constants.style_template }}
+    {{ include Constants.sections_template }}
+    {{ include Constants.scripts_template }}
+
+    <div class="col-12">
+        {{ formfield 'is_planner' }}
+        {{ formfield 'years_as_planner' }}
+        {{ formfield 'company_name' }}
+        {{ formfield 'does_consent' }}
+    </div>
+
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+
+    <script>
+        var btnNext = $('[class*="otree-btn-next"]');
+        var origClick = btnNext.click
+        function wrapClick(event) {
+            console.log(`btnNext clicked`);
+            var target = event.target;
+            var checkbox = $('#id_does_consent')[0];
+            if (checkbox.checked) {
+                //btnNext.prepend(`<p>If you had a previous session terminate for some reason before completing the survey and want to recover where you left off, please fill out and submit the form at <a href="/recover-session" onclick="try_server_recovery()">here</a> to request a recovery attempt.<p>`);
+                // alert(`Your unique participant id is: ${js_vars.uuid}`);
+                this.removeEventListener("click", wrapClick);
+                origClick.bind(this)();
+            }
+            return false;
+        }
+        btnNext.click(wrapClick);
+
+    </script>
+
+{{ endblock }}
+

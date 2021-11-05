@@ -1,0 +1,16 @@
+
+  <!-- @see django templating docs (otree deviates only in rare cases): https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#escape
+
+  <table class="table">
+      <!-- @see https://otree.readthedocs.io/en/latest/forms.html#widgets -->
+      {{ for field in form }}
+          <tr>
+              <th>{{ field.label }}</th>
+              {{ if field|type != "str" and field|isiterable }}
+                  {{ for choice in field }}
+                      <td>{{ choice }}</td>
+                  {{ endfor }}
+              {{ endif }}
+          </tr>
+      {{ endfor }}
+  </table>
