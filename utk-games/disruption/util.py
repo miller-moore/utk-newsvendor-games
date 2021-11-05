@@ -110,7 +110,7 @@ def is_disruption_next_round(player: BasePlayer) -> bool:
 
 
 def get_includable_template_path(template_filepath: str) -> str:
-    """Parse template_filepath to an "includable" template path, e.g., {{ include "demandplanning/style.html" }} or {{ include Constants.style_template }}."""
+    """Parse template_filepath to an "includable" template path, e.g., {{ include "disruption/style.html" }} or {{ include Constants.style_template }}."""
     p = Path(template_filepath)
     assert (
         ".html" in p.suffixes

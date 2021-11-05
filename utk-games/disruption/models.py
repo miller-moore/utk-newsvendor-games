@@ -2,18 +2,23 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List
 from uuid import uuid4
 
-from otree.api import (BaseConstants, BaseGroup, BasePlayer, BaseSubsession,
-                       Currency, models, widgets)
+from otree.api import BaseConstants, BaseGroup, BasePlayer, BaseSubsession, Currency, models, widgets
 from otree.constants import BaseConstantsMeta
 from otree.templating import filters
 from rich import print
 
-from .constants import (ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS,
-                        RVS_SIZE)
+from .constants import ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS, RVS_SIZE
 from .treatment import Treatment, UnitCosts
-from .util import (get_game_number, get_game_rounds,
-                   get_includable_template_path, get_optimal_order_quantity,
-                   get_page_name, get_round_in_game, get_settings, get_time)
+from .util import (
+    get_game_number,
+    get_game_rounds,
+    get_includable_template_path,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_round_in_game,
+    get_settings,
+    get_time,
+)
 
 # https://stackoverflow.com/a/12028864
 # from django import template
@@ -86,7 +91,7 @@ class Constants(ConstantsBase):
     allow_disruption = ALLOW_DISRUPTION
     rvs_size = RVS_SIZE
 
-    # paths for templates used in include tags, e.g., {{ include "demandplanning/style.html" }} or {{ include Constants.style_template }}
+    # paths for templates used in include tags, e.g., {{ include "disruption/style.html" }} or {{ include Constants.style_template }}
     style_template = get_includable_template_path("style.html")
     scripts_template = get_includable_template_path("scripts.html")
     sections_template = get_includable_template_path("sections.html")
