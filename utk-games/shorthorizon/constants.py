@@ -4,15 +4,7 @@ from otree.api import BaseConstants, Currency
 from otree.constants import BaseConstantsMeta
 
 GAMES = 1
-ROUNDS = 1
-
-# NOTE: disruption stuff
-# NOTE: a disruption only applies to the first game - everybody gets a disruption in the second game
-ALLOW_DISRUPTION = True
-DISRUPTION_ROUND_IN_GAMES = {1: int(3 / 4 * ROUNDS), 2: int(1 / 4 * ROUNDS)}
-VARIABILITY_CHOICES = ["high", "low"]
-DISRUPTION_CHOICES = [True, False]
-NATURAL_MEAN = 500
+ROUNDS = 12
 
 RVS_SIZE = int(1e5)
 APP_DIR = Path(__file__).resolve().parent
@@ -72,7 +64,6 @@ class Constants(ConstantsBase):
     ]
     static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
 
-    allow_disruption = ALLOW_DISRUPTION
     rvs_size = RVS_SIZE
 
     # paths for templates used in include tags, e.g., {{ include "disruption/style.html" }} or {{ include Constants.style_template }}

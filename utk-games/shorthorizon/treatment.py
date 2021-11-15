@@ -9,39 +9,23 @@ import numpy as np
 import scipy.stats as stats
 from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
-from pydantic import BaseModel, StrBytes, conint, validator
+from pydantic import Field, StrBytes, conint, validator
 
-from .constants import DISRUPTION_CHOICES, NATURAL_MEAN, VARIABILITY_CHOICES
-
-
-class PydanticModel(BaseModel):
-    def tuple(self: BaseModel) -> Tuple[Any]:
-        """Return a tuple of the pydantic model's attribute values."""
-        return tuple(self.dict().values())
-
-    @classmethod
-    def from_args(cls, *args, **kwargs) -> "PydanticModel":
-        arg_fields = [field_name for field_name in cls.__fields__ if field_name not in kwargs]
-        kwargs.update(dict(zip(arg_fields, args)))
-        return cls(**kwargs)
+from .pydanticmodel import PydanticModel
 
 
 class UnitCosts(PydanticModel):
-    rcpu: Currency  # retail cost / unit (revenue)
-    wcpu: Currency  # wholesale cost / unit (order cost)
-    hcpu: Currency  # holding cost / unit (stock cost)
+    rcpu: Currency = Field(default=Currency(24))  # retail cost / unit (revenue)
+    wcpu: Currency = Field(default=Currency(5.5))  # wholesale cost / unit (order cost)
+    hcpu: Currency = Field(default=Currency(5))  # holding cost / unit (stock cost)
 
     class Config:
         json_encoders = dict(Currency=_CurrencyEncoder)
         arbitrary_types_allowed = True
 
     @classmethod
-    def from_treatment(cls, treatment: "Treatment") -> "UnitCosts":
-        if treatment.variance_choice == "low":
-            rcpu, wcpu, hcpu = [3.00, 1.00, 0.05]
-        else:
-            rcpu, wcpu, hcpu = [25.00, 14.00, 6.00]
-        return UnitCosts(rcpu=rcpu, wcpu=wcpu, hcpu=hcpu)
+    def from_treatment(cls, treatment_idx: int) -> "UnitCosts":
+        return UnitCosts()
 
 
 class DisributionParameters(PydanticModel):
@@ -49,7 +33,7 @@ class DisributionParameters(PydanticModel):
     sigma: float
 
     @classmethod
-    def from_treatment(cls, treatment: "Treatment") -> "DisributionParameters":
+    def from_treatment(cls, treatment_idx: int) -> "DisributionParameters":
         if treatment.variance_choice == "low":
             sigma = 0.067
             # mu, sigma = 6.212, 0.067
