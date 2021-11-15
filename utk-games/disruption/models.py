@@ -108,7 +108,7 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
 
         treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
         unit_costs: UnitCosts = treatment.get_unit_costs()
-        demand_rvs = player.participant.vars.get("demand_rvs", treatment.get_demand_rvs(Constants.rvs_size))
+        demand_rvs = treatment._demand_rvs or treatment.get_demand_rvs(Constants.rvs_size)
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
         years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
         company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
@@ -126,7 +126,7 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         player.participant.unit_costs = unit_costs
         player.participant.stock_units = 0
         player.participant.treatment = treatment
-        player.participant.demand_rvs = demand_rvs
+        # player.participant.demand_rvs = demand_rvs
         player.participant.history = initialize_game_history()
         player.participant.game_results = []
 
@@ -212,6 +212,32 @@ class Player(BasePlayer):
 
 def custom_export(players: Iterable[Player]):
     """See https://otree.readthedocs.io/en/self/admin.html#custom-data-exports"""
-    yield ["session", "participant_code", "round_number", "id_in_group", "payoff"]
+    player_fields = [
+        "starttime",
+        "endtime",
+        "treatment",
+        "is_planner",
+        "years_as_planner",
+        "company_name",
+        "does_consent",
+        "game_number",
+        "period_number",
+        "su",
+        "ou",
+        "du",
+        "ooq",
+        "rcpu",
+        "wcpu",
+        "hcpu",
+        "revenue",
+        "cost",
+        "profit",
+    ]
+    yield ["participant_code", *player_fields]
+
+    records = []
     for p in players:
-        yield [p.session.code, p.participant.code, p.round_number, p.id_in_group, p.payoff]
+        records.append([p.participant_id, p.participant.code, *[getattr(p, name) for name in player_fields]])
+    records = sorted(records)
+    for r in records:
+        yield r

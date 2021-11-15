@@ -1,3 +1,5 @@
+scripts/run_prodserver
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
