@@ -33,5 +33,11 @@
   "files.associations": {
     "*.html": "jinja-html"
   },
-  "workbench.editor.enablePreview": false,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true,
+    "**/.hg/store/**": true,
+    "**/venv/*/**": true
+  }
 }

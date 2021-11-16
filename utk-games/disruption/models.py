@@ -4,7 +4,6 @@ from uuid import uuid4
 
 from otree.api import BaseGroup, BasePlayer, BaseSubsession, models, widgets
 from otree.templating import filters
-from rich import print
 
 from .constants import Constants
 from .treatment import Treatment, UnitCosts
@@ -94,8 +93,6 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
 
     if not "uuid" in player.participant.vars:
         uuid = player.participant.vars.get("uuid", str(uuid4()))
-        print(f"[yellow]hydrate_participant: Round {player.round_number}: creating session for participant {uuid}[/]")
-
         treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
         unit_costs: UnitCosts = treatment.get_unit_costs()
         demand_rvs = treatment._demand_rvs or treatment.get_demand_rvs(Constants.rvs_size)
@@ -223,11 +220,11 @@ def custom_export(players: Iterable[Player]):
         "cost",
         "profit",
     ]
-    yield ["participant_code", *player_fields]
+    yield ["id", "participant_code", *player_fields]
 
     records = []
     for p in players:
-        records.append([p.participant_id, p.participant.code, *[getattr(p, name) for name in player_fields]])
+        records.append([p.id, p.participant.code, *[getattr(p, name) for name in player_fields]])
     records = sorted(records)
     for r in records:
         yield r
