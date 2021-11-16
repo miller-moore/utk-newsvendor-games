@@ -2,18 +2,22 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List
 from uuid import uuid4
 
-from otree.api import (BaseConstants, BaseGroup, BasePlayer, BaseSubsession,
-                       Currency, models, widgets)
+from otree.api import BaseConstants, BaseGroup, BasePlayer, BaseSubsession, Currency, models, widgets
 from otree.constants import BaseConstantsMeta
 from otree.templating import filters
-from rich import print
 
-from .constants import (ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS,
-                        RVS_SIZE)
+from .constants import ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS, RVS_SIZE
 from .treatment import Treatment, UnitCosts
-from .util import (get_game_number, get_game_rounds,
-                   get_includable_template_path, get_optimal_order_quantity,
-                   get_page_name, get_round_in_game, get_settings, get_time)
+from .util import (
+    get_game_number,
+    get_game_rounds,
+    get_includable_template_path,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_round_in_game,
+    get_settings,
+    get_time,
+)
 
 # https://stackoverflow.com/a/12028864
 # from django import template
@@ -99,8 +103,6 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
 
     if not "uuid" in player.participant.vars:
         uuid = player.participant.vars.get("uuid", str(uuid4()))
-        print(f"[yellow]hydrate_participant: Round {player.round_number}: creating session for participant {uuid}[/]")
-
         treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
         unit_costs: UnitCosts = treatment.get_unit_costs()
         demand_rvs = treatment._demand_rvs or treatment.get_demand_rvs(Constants.rvs_size)
