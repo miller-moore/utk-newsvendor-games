@@ -109,10 +109,6 @@ def is_disruption_next_round(player: BasePlayer) -> bool:
     return is_next_round_disruption
 
 
-def compute_profit(player: Any) -> float:
-    pass
-
-
 def frontend_format_currency(currency: Currency, as_integer: bool = False) -> str:
     import re
 

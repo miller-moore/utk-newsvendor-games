@@ -163,21 +163,6 @@ class Welcome(Page):
     def is_displayed(player: Player):
         return player.round_number == 1
 
-    # @staticmethod
-    # def error_message(player: Player, values: Any):
-    #     error_messages = dict()
-    #     if isinstance(values, dict):
-    #         for k, v in values.items():
-    #             if k == "is_planner" and v is False:
-    #                 error_messages.update({k: f"""Must be True to proceed."""})
-    #             if k == "years_as_planner" and v is False:
-    #                 error_messages.update({k: f"""Enter a number (>= 0)."""})
-    #             if k == "company_name" and v is False:
-    #                 error_messages.update({k: f"""Enter a name."""})
-    #             if k == "does_consent" and v is False:
-    #                 error_messages.update({k: f"""Must consent to proceed."""})
-    #     return error_messages or None
-
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
         player.participant.is_planner = player.is_planner

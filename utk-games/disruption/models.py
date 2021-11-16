@@ -103,10 +103,10 @@ class Subsession(BaseSubsession):
         for player in subsession.get_players():
             hydrate_participant(player)
 
-    def vars_for_admin_report(self):
-        """See https://otree.readthedocs.io/en/self/admin.html#customizing-the-admin-interface-admin-reports"""
-        payoffs = sorted([p.payoff for p in self.get_players()])
-        return dict(payoffs=payoffs)
+    # def vars_for_admin_report(self):
+    #     """See https://otree.readthedocs.io/en/self/admin.html#customizing-the-admin-interface-admin-reports"""
+    #     payoffs = sorted([p.payoff for p in self.get_players()])
+    #     return dict(payoffs=payoffs)
 
 
 class Group(BaseGroup):
