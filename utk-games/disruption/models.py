@@ -2,23 +2,18 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List
 from uuid import uuid4
 
-from otree.api import BaseConstants, BaseGroup, BasePlayer, BaseSubsession, Currency, models, widgets
+from otree.api import (BaseConstants, BaseGroup, BasePlayer, BaseSubsession,
+                       Currency, models, widgets)
 from otree.constants import BaseConstantsMeta
 from otree.templating import filters
 from rich import print
 
-from .constants import ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS, RVS_SIZE
+from .constants import (ALLOW_DISRUPTION, APP_DIR, APP_NAME, GAMES, ROUNDS,
+                        RVS_SIZE)
 from .treatment import Treatment, UnitCosts
-from .util import (
-    get_game_number,
-    get_game_rounds,
-    get_includable_template_path,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_round_in_game,
-    get_settings,
-    get_time,
-)
+from .util import (get_game_number, get_game_rounds,
+                   get_includable_template_path, get_optimal_order_quantity,
+                   get_page_name, get_round_in_game, get_settings, get_time)
 
 # https://stackoverflow.com/a/12028864
 # from django import template
@@ -233,11 +228,11 @@ def custom_export(players: Iterable[Player]):
         "cost",
         "profit",
     ]
-    yield ["participant_code", *player_fields]
+    yield ["id", "participant_code", *player_fields]
 
     records = []
     for p in players:
-        records.append([p.participant_id, p.participant.code, *[getattr(p, name) for name in player_fields]])
+        records.append([p.id, p.participant.code, *[getattr(p, name) for name in player_fields]])
     records = sorted(records)
     for r in records:
         yield r
