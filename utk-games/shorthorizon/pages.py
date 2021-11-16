@@ -10,21 +10,14 @@ from otree.api import Currency, Page
 from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
-from .formvalidation import default_error_message, register_form_field_validator
+from .formvalidation import (default_error_message,
+                             register_form_field_validator)
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
-from .util import (
-    get_game_number,
-    get_game_rounds,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_round_in_game,
-    get_time,
-    is_absolute_final_round,
-    is_game_over,
-)
-
-Page.error_message = staticmethod(default_error_message)
+from .util import (get_app_name, get_game_number, get_game_rounds,
+                   get_optimal_order_quantity, get_page_name,
+                   get_round_in_game, get_time, is_absolute_final_round,
+                   is_game_over)
 
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
@@ -56,71 +49,79 @@ def validate_does_consent(does_consent: bool) -> Optional[str]:
         return f"""Must consent to proceed."""
     return
 
+class ShortHorizonPage(Page):
 
-def vars_for_template(player: Player) -> dict:
+    error_message = staticmethod(default_error_message)
 
-    from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
+    @staticmethod
+    def vars_for_template(player: Player) -> dict:
 
-    treatment: Treatment = player.participant.vars.get("treatment", None)
+        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                    REAL_WORLD_CURRENCY_CODE,
+                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
-    _vars = dict(
-        language_code=LANGUAGE_CODE,
-        real_world_currency_code=REAL_WORLD_CURRENCY_CODE,
-        real_world_currency_decimal_places=REAL_WORLD_CURRENCY_DECIMAL_PLACES,
-        games=Constants.num_games,
-        rounds=Constants.rounds_per_game,
-        page_name=get_page_name(player),
-        round_number=player.round_number,
-        game_number=player.game_number,  # game_number,
-        game_round=player.period_number,  # game_round,
-        period_number=player.period_number,  # game_round,
-        session_code=player.session.code,
-        participant_code=player.participant.code,
-        is_game_over=is_game_over(player.round_number),
-        is_absolute_final_round=is_absolute_final_round(player.round_number),
-        uuid=player.field_maybe_none("uuid"),
-        starttime=player.field_maybe_none("starttime"),
-        endtime=player.field_maybe_none("endtime"),
-        is_planner=player.field_maybe_none("is_planner"),
-        years_as_planner=player.field_maybe_none("years_as_planner"),
-        company_name=player.field_maybe_none("company_name"),
-        does_consent=player.field_maybe_none("does_consent"),
-        su=player.field_maybe_none("su"),
-        ou=player.field_maybe_none("ou"),
-        du=player.field_maybe_none("du"),
-        ooq=player.field_maybe_none("ooq"),
-        rcpu=player.field_maybe_none("rcpu"),
-        wcpu=player.field_maybe_none("wcpu"),
-        scpu=player.field_maybe_none("scpu"),
-        revenue=player.field_maybe_none("revenue"),
-        cost=player.field_maybe_none("cost"),
-        profit=player.field_maybe_none("profit"),
-        history=player.participant.vars.get("history", None),
-        game_results=player.participant.vars.get("game_results", None),
-        payoff_round=player.participant.vars.get("payoff_round", None),
-        payoff=player.participant.vars.get("payoff", None),
-    )
+        treatment: Treatment = player.participant.vars.get("treatment", None)
 
-    # make Currency (Decimal) objects json serializable
-    for ckey in ["rcpu", "wcpu", "scpu", "revenue", "cost", "profit"]:
-        val = _vars.get(ckey)
-        _vars.update({ckey: float(val) if val else None})
+        _vars = dict(
+            language_code=LANGUAGE_CODE,
+            real_world_currency_code=REAL_WORLD_CURRENCY_CODE,
+            real_world_currency_decimal_places=REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+            games=Constants.num_games,
+            rounds=Constants.rounds_per_game,
+            page_name=get_page_name(player),
+            app_name=get_app_name(player),
+            round_number=player.round_number,
+            game_number=player.game_number,  # game_number,
+            game_round=player.period_number,  # game_round,
+            period_number=player.period_number,  # game_round,
+            session_code=player.session.code,
+            participant_code=player.participant.code,
+            is_game_over=is_game_over(player.round_number),
+            is_absolute_final_round=is_absolute_final_round(player.round_number),
+            uuid=player.field_maybe_none("uuid"),
+            starttime=player.field_maybe_none("starttime"),
+            endtime=player.field_maybe_none("endtime"),
+            is_planner=player.field_maybe_none("is_planner"),
+            years_as_planner=player.field_maybe_none("years_as_planner"),
+            company_name=player.field_maybe_none("company_name"),
+            does_consent=player.field_maybe_none("does_consent"),
+            su=player.field_maybe_none("su"),
+            ou=player.field_maybe_none("ou"),
+            du=player.field_maybe_none("du"),
+            ooq=player.field_maybe_none("ooq"),
+            rcpu=player.field_maybe_none("rcpu"),
+            wcpu=player.field_maybe_none("wcpu"),
+            scpu=player.field_maybe_none("scpu"),
+            revenue=player.field_maybe_none("revenue"),
+            cost=player.field_maybe_none("cost"),
+            profit=player.field_maybe_none("profit"),
+            history=player.participant.vars.get("history", None),
+            game_results=player.participant.vars.get("game_results", None),
+            payoff_round=player.participant.vars.get("payoff_round", None),
+            payoff=player.participant.vars.get("payoff", None),
+        )
 
-    return _vars
+        # make Currency (Decimal) objects json serializable
+        for ckey in ["rcpu", "wcpu", "scpu", "revenue", "cost", "profit"]:
+            val = _vars.get(ckey)
+            _vars.update({ckey: float(val) if val else None})
+
+        return _vars
+
+    @staticmethod
+    def js_vars(player: Player) -> dict:
+        _vars = ShortHorizonPage.vars_for_template(player).copy()
+        treatment = player.participant.treatment
+        _vars.update(demand_rvs=treatment.get_demand_rvs())
+        return _vars
 
 
-def js_vars(player: Player) -> dict:
-    _vars = Page.vars_for_template(player).copy()
-    treatment = player.participant.treatment
-    _vars.update(demand_rvs=treatment.get_demand_rvs())
-    return _vars
+# Page.error_message = staticmethod(default_error_messagef)
+# Page.vars_for_template = staticmethod(vars_for_template)
+# Page.js_vars = staticmethod(js_vars)
 
 
-Page.vars_for_template = staticmethod(vars_for_template)
-Page.js_vars = staticmethod(js_vars)
-
-
-class HydratePlayer(Page):
+class HydratePlayer2(ShortHorizonPage):
 
     timeout_seconds = 0
 
@@ -155,7 +156,7 @@ class HydratePlayer(Page):
         )
 
 
-class Welcome(Page):
+class Welcome2(ShortHorizonPage):
     form_model = "player"
     form_fields = ["is_planner", "years_as_planner", "company_name", "does_consent"]
 
@@ -171,7 +172,7 @@ class Welcome(Page):
         player.participant.does_consent = player.does_consent
 
 
-class Decide(Page):
+class Decide2(ShortHorizonPage):
 
     form_model = "player"
     form_fields = ["ou"]
@@ -225,10 +226,11 @@ class Decide(Page):
 
         if player.round_number == player.participant.payoff_round:
             player.payoff = Currency(min(1750, max(750, player.profit * 0.05)))
-            player.participant.payoff = player.payoff
+        else:
+            player.payoff = Currency(0)
 
 
-class Results(Page):
+class Results2(ShortHorizonPage):
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
         player.endtime = get_time()
@@ -238,7 +240,7 @@ class Results(Page):
             player.participant.history = initialize_game_history()
 
 
-class FinalResults(Page):
+class FinalResults2(ShortHorizonPage):
     @staticmethod
     def is_displayed(player: Player):
         return is_game_over(player.round_number)
@@ -246,4 +248,4 @@ class FinalResults(Page):
 
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [HydratePlayer, Welcome, Decide, Results, FinalResults]
+page_sequence = [HydratePlayer2, Welcome2, Decide2, Results2, FinalResults2]

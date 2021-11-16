@@ -15,6 +15,7 @@ from .formvalidation import default_error_message, register_form_field_validator
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
 from .util import (
+    get_app_name,
     get_game_number,
     get_game_rounds,
     get_optimal_order_quantity,
@@ -74,6 +75,7 @@ def vars_for_template(player: Player) -> dict:
         rounds=Constants.rounds_per_game,
         allow_disruption=Constants.allow_disruption,
         page_name=get_page_name(player),
+        app_name=get_app_name(player),
         round_number=player.round_number,
         game_number=player.game_number,  # game_number,
         game_round=player.period_number,  # game_round,
@@ -138,7 +140,7 @@ class HydratePlayer(Page):
         player.uuid = player.participant.uuid
         player.starttime = get_time()
         player.endtime = None
-        player.treatment = player.participant.treatment.json()
+        player.treatment = player.participant.treatment.idx
         player.is_planner = player.participant.is_planner
         player.years_as_planner = player.participant.years_as_planner
         player.company_name = player.participant.company_name
@@ -255,7 +257,8 @@ class Decide(Page):
 
         if player.round_number == player.participant.payoff_round:
             player.payoff = Currency(min(1750, max(750, player.profit * 0.05)))
-            player.participant.payoff = player.payoff
+        else:
+            player.payoff = Currency(0)
 
 
 class Results(Page):

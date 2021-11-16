@@ -4,8 +4,7 @@ import traceback
 from enum import Enum
 from functools import lru_cache
 from itertools import product
-from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
-                    Tuple, Union)
+from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as stats
@@ -13,9 +12,9 @@ from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
 from pydantic import BaseModel, Field, StrBytes, typing, validator
 from pydantic.main import Extra
+from pydantic.types import conint
 
-from .constants import (DISRUPTION_CHOICES, NATURAL_MEAN, VARIABILITY_CHOICES,
-                        Constants)
+from .constants import NATURAL_MEAN, Constants
 
 IntStr = Union[int, str]
 AbstractSetIntStr = AbstractSet[IntStr]
@@ -120,9 +119,11 @@ class DisributionParameters(PydanticModel):
         return DisributionParameters(mu=mu, sigma=sigma)
 
 
+TREATMENT_GROUPS = list(product(["high", "low"], [True, False]))
+
+
 class Treatment(PydanticModel):
-    variance_choice: str
-    disruption_choice: bool
+    idx: conint(strict=True, ge=1, le=len(TREATMENT_GROUPS))
     _mu: float = None
     _sigma: float = None
     _payoff_round: int = None
@@ -132,35 +133,21 @@ class Treatment(PydanticModel):
     class Config:
         extra = Extra.allow
 
-    @validator("variance_choice")
-    def check_variance_choice(cls, v: Any) -> Any:
-        if not v in VARIABILITY_CHOICES:
-            raise ValueError(f"""variance_choice must be one of {VARIABILITY_CHOICES!r} - got {v!r} """)
-        return v
+    @property
+    def variance_choice(self) -> bool:
+        return TREATMENT_GROUPS[self.idx - 1][0]
 
-    @validator("disruption_choice")
-    def check_disruption_choice(cls, v: Any) -> Any:
-        if not v in DISRUPTION_CHOICES:
-            raise ValueError(f"""disruption_choice must be one of {DISRUPTION_CHOICES!r} - got {v!r} """)
-        return v
-
-    def has_disruption(self) -> bool:
-        return self.disruption_choice
+    @property
+    def disruption_choice(self) -> bool:
+        return TREATMENT_GROUPS[self.idx - 1][1]
 
     @classmethod
     def choose(cls) -> "Treatment":
-        return TREATMENT_GROUPS[random.choice(list(TREATMENT_GROUPS))]
+        return Treatment(idx=random.choice(range(len(TREATMENT_GROUPS))) + 1)
 
     @classmethod
     def from_json(cls, json: StrBytes) -> "Treatment":
         return Treatment.parse_raw(json)
-
-    @classmethod
-    def from_group_index(cls, index: int) -> "Treatment":
-        try:
-            return TREATMENT_GROUPS[index]
-        except KeyError:
-            traceback.print_exc()
 
     def get_optimal_order_quantity(self) -> float:
         rcpu, wcpu, hcpu = self.get_unit_costs().tuple()
@@ -183,6 +170,7 @@ class Treatment(PydanticModel):
 
     def get_demand_rvs(self, size: int = Constants.rvs_size, disrupt: bool = False) -> List[float]:
         """Return samples from the applicable treatment distribution"""
+
         assert type(size) is int and size > 0, f"""expected size to be a positive integer - got {size}"""
 
         if len(self._demand_rvs) == size and not disrupt:
@@ -200,10 +188,3 @@ class Treatment(PydanticModel):
 @lru_cache(maxsize=5)
 def generate_demand_rvs(mu: float, sigma: float, size: int = int(1e4)) -> List[float]:
     return np.random.lognormal(mu, sigma, size).tolist()
-
-
-TREATMENT_GROUPS = {
-    idx + 1: Treatment.from_args(*args) for idx, args in enumerate(product(VARIABILITY_CHOICES, DISRUPTION_CHOICES))
-}
-
-# TREATMENT_GROUPS = {i: Treatment.from_args(*("high", True)) for i in range(1, 5)}

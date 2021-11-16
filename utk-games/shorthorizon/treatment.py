@@ -4,8 +4,7 @@ import traceback
 from enum import Enum
 from functools import lru_cache
 from itertools import product
-from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
-                    Tuple, Union)
+from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as stats
@@ -85,7 +84,7 @@ class PydanticModel(BaseModel):
         )
 
 
-DISTRIBUTIONS = [
+TREATMENT_GROUPS = [
     dict(natural_mean=100, natural_sigma=50),
     dict(natural_mean=100, natural_sigma=100),
     dict(natural_mean=500, natural_sigma=150),
@@ -117,7 +116,7 @@ class DisributionParameters(PydanticModel):
 
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "UnitCosts":
-        natural_mean, natural_sigma = DISTRIBUTIONS[treatment.idx - 1].values()
+        natural_mean, natural_sigma = TREATMENT_GROUPS[treatment.idx - 1].values()
 
         # method of moments: https://en.wikipedia.org/wiki/Log-normal_distribution
         mu = np.log(natural_mean ** 2 / np.sqrt(natural_sigma ** 2 + natural_mean ** 2))
@@ -136,7 +135,7 @@ class DisributionParameters(PydanticModel):
 
 
 class Treatment(PydanticModel):
-    idx: conint(strict=True, ge=1, le=len(DISTRIBUTIONS))
+    idx: conint(strict=True, ge=1, le=len(TREATMENT_GROUPS))
     _mu: float = None
     _sigma: float = None
     _payoff_round: int = None
@@ -148,7 +147,7 @@ class Treatment(PydanticModel):
 
     @classmethod
     def choose(cls) -> "Treatment":
-        return Treatment(idx=random.choice(range(1, len(DISTRIBUTIONS) + 1)))
+        return Treatment(idx=random.choice(range(len(TREATMENT_GROUPS))) + 1)
 
     @classmethod
     def from_json(cls, json: StrBytes) -> "Treatment":

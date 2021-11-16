@@ -23,7 +23,7 @@ source ${VIRTUALENV_DIR}/bin/activate
 
 # ensure dev dependencies are installed
 # TODO: convert all this to a poetry managed project with a pyproject.toml file
-pip install -r ${PROJECT_ROOT}/requirements-dev.txt
+pip install -r -U ${PROJECT_ROOT}/requirements-dev.txt
 
 # ensure main dependencies are installed
-pip install -r ${PROJECT_ROOT}/requirements.txt
+pip install -r -U ${PROJECT_ROOT}/requirements.txt
