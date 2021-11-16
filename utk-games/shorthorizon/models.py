@@ -58,7 +58,7 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         uuid = player.participant.vars.get("uuid", str(uuid4()))
         treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
         unit_costs: UnitCosts = treatment.get_unit_costs()
-        demand_rvs = treatment._demand_rvs or treatment.get_demand_rvs(Constants.rvs_size)
+        _ = treatment.get_demand_rvs(Constants.rvs_size)  # initialize treatment._demand_rvs
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
         years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
         company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
@@ -76,11 +76,9 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         player.participant.unit_costs = unit_costs
         player.participant.stock_units = 0
         player.participant.treatment = treatment
-        # player.participant.demand_rvs = demand_rvs
         player.participant.history = initialize_game_history()
         player.participant.game_results = []
-        player.participant.payout_round = random.choice(range(1, Constants.num_rounds + 1))
-        player.participant.payout = Currency(0)
+        player.participant.payoff_round = player.field_maybe_none("payoff_round") or treatment.get_payoff_round()
 
 
 def initialize_game_history() -> List[Dict[str, Any]]:
@@ -106,10 +104,10 @@ class Subsession(BaseSubsession):
         for player in subsession.get_players():
             hydrate_participant(player)
 
-    def vars_for_admin_report(self):
-        """See https://otree.readthedocs.io/en/self/admin.html#customizing-the-admin-interface-admin-reports"""
-        payoffs = sorted([p.payoff for p in self.get_players()])
-        return dict(payoffs=payoffs)
+    # def vars_for_admin_report(self):
+    #     """See https://otree.readthedocs.io/en/self/admin.html#customizing-the-admin-interface-admin-reports"""
+    #     payoffs = sorted([p.payoff for p in self.get_players()])
+    #     return dict(payoffs=payoffs)
 
 
 class Group(BaseGroup):
@@ -160,8 +158,7 @@ class Player(BasePlayer):
     cost = models.CurrencyField(initial=0)
     profit = models.CurrencyField(initial=0)
 
-    payout_round = models.IntegerField()
-    payout = models.CurrencyField(initial=0)
+    payoff_round = models.IntegerField()
 
 
 def custom_export(players: Iterable[Player]):
@@ -186,20 +183,14 @@ def custom_export(players: Iterable[Player]):
         "revenue",
         "cost",
         "profit",
+        "payoff_round",
+        "payoff",
     ]
-    yield ["id", "participant_code", *player_fields, "payout_round", "payout"]
+    yield ["id", "participant_code", *player_fields]
 
     records = []
     for p in players:
-        records.append(
-            [
-                p.id,
-                p.participant.code,
-                *[getattr(p, name) for name in player_fields],
-                p.participant.payout_round,
-                p.participant.payout,
-            ]
-        )
+        records.append([p.id, p.participant.code, *[getattr(p, name) for name in player_fields]])
     records = sorted(records)
     for r in records:
         yield r

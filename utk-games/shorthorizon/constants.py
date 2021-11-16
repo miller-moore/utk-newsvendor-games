@@ -5,7 +5,7 @@ from otree.constants import BaseConstantsMeta
 
 GAMES = 1
 ROUNDS = 12
-RVS_SIZE = int(1e5)
+RVS_SIZE = int(1e4)
 APP_DIR = Path(__file__).resolve().parent
 APP_NAME = APP_DIR.name
 STATIC_DIR = APP_DIR / "static"

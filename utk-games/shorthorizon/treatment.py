@@ -2,9 +2,9 @@ import json
 import random
 import traceback
 from enum import Enum
+from functools import lru_cache
 from itertools import product
-from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
-                    Tuple, Union)
+from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as stats
@@ -12,7 +12,9 @@ from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
 from pydantic import BaseModel, Field, StrBytes, typing, validator
 from pydantic.main import Extra
-from pydantic.types import conint
+from pydantic.types import confloat, conint
+
+from .constants import Constants
 
 IntStr = Union[int, str]
 AbstractSetIntStr = AbstractSet[IntStr]
@@ -133,9 +135,11 @@ class DisributionParameters(PydanticModel):
 
 
 class Treatment(PydanticModel):
-    idx: int = conint(strict=True, ge=0, le=len(DISTRIBUTIONS) - 1)
+    idx: conint(strict=True, ge=0, le=len(DISTRIBUTIONS) - 1)
     _mu: float = None
     _sigma: float = None
+    _payoff_round: int = None
+    _history: List[Dict[str, Any]] = []
     _demand_rvs: List[float] = []
 
     class Config:
@@ -160,7 +164,7 @@ class Treatment(PydanticModel):
         natural_mean = np.exp(mu + (1 / 2) * sigma ** 2)
         natural_sigma = np.sqrt((np.exp(sigma ** 2) - 1) * np.exp(2 * mu + sigma ** 2))
         return float(natural_mean * np.exp(stats.norm.ppf(cf) * sigma))
-        # return float(natural_mean + stats.norm.ppf(cf) * natural_sigma)  # TODO: might be negative... ask Anne
+        # return float(natural_mean + stats.norm.ppf(cf) * natural_sigma)  # TODO: this permits negative values... ask Anne
 
     def get_unit_costs(self) -> UnitCosts:
         return UnitCosts.from_treatment(self)
@@ -170,11 +174,13 @@ class Treatment(PydanticModel):
             self._mu, self._sigma = DisributionParameters.from_treatment(self).tuple()
         return DisributionParameters(mu=self._mu, sigma=self._sigma)
 
-    def get_demand_rvs(self, size: Optional[int] = None, disrupt: bool = False) -> List[float]:
-        """Return samples from the applicable treatment distribution"""
+    def get_payoff_round(self):
+        if self._payoff_round is None:
+            self._payoff_round = random.choice(range(1, Constants.num_rounds + 1))
+        return self._payoff_round
 
-        if size is None:
-            size = int(1e4)
+    def get_demand_rvs(self, size: int = Constants.rvs_size, disrupt: bool = False) -> List[float]:
+        """Return samples from the applicable treatment distribution"""
         assert type(size) is int and size > 0, f"""expected size to be a positive integer - got {size}"""
 
         if len(self._demand_rvs) == size and not disrupt:
@@ -183,7 +189,12 @@ class Treatment(PydanticModel):
         mu, sigma = self.get_distribution_parameters().tuple()
         if disrupt:
             ## transform mu & sigma
-            self._sigma *= 2
             self._mu *= 1
-        self._demand_rvs = np.random.lognormal(self._mu, self._sigma, size).tolist()
+            self._sigma *= 2
+        self._demand_rvs = generate_demand_rvs(self._mu, self._sigma, size)
         return self._demand_rvs
+
+
+@lru_cache(maxsize=5)
+def generate_demand_rvs(mu: float, sigma: float, size: int = int(1e4)) -> List[float]:
+    return np.random.lognormal(mu, sigma, size).tolist()
