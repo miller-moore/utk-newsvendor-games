@@ -122,7 +122,7 @@ class Player(BasePlayer):
     endtime = models.FloatField(min=get_time())
 
     # participant data
-    treatment = models.IntegerField()
+    treatment = models.IntegerField(min=1)
     # participant Welcome formfields
     is_planner = models.BooleanField(widget=widgets.RadioSelectHorizontal(), label="Are you presently employed as a planner?")
     years_as_planner = models.IntegerField(

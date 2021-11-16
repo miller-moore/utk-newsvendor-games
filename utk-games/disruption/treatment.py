@@ -2,8 +2,10 @@ import json
 import random
 import traceback
 from enum import Enum
+from functools import lru_cache
 from itertools import product
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
@@ -12,7 +14,8 @@ from otree.currency import _CurrencyEncoder
 from pydantic import BaseModel, Field, StrBytes, typing, validator
 from pydantic.main import Extra
 
-from .constants import DISRUPTION_CHOICES, NATURAL_MEAN, VARIABILITY_CHOICES
+from .constants import (DISRUPTION_CHOICES, NATURAL_MEAN, VARIABILITY_CHOICES,
+                        Constants)
 
 IntStr = Union[int, str]
 AbstractSetIntStr = AbstractSet[IntStr]
@@ -120,6 +123,10 @@ class DisributionParameters(PydanticModel):
 class Treatment(PydanticModel):
     variance_choice: str
     disruption_choice: bool
+    _mu: float = None
+    _sigma: float = None
+    _payoff_round: int = None
+    _history: List[Dict[str, Any]] = []
     _demand_rvs: List[float] = []
 
     class Config:
@@ -165,13 +172,17 @@ class Treatment(PydanticModel):
         return UnitCosts.from_treatment(self)
 
     def get_distribution_parameters(self) -> DisributionParameters:
-        return DisributionParameters.from_treatment(self)
+        if self._mu is None or self._sigma is None:
+            self._mu, self._sigma = DisributionParameters.from_treatment(self).tuple()
+        return DisributionParameters(mu=self._mu, sigma=self._sigma)
 
-    def get_demand_rvs(self, size: Optional[int] = None, disrupt: bool = False) -> List[float]:
+    def get_payoff_round(self):
+        if self._payoff_round is None:
+            self._payoff_round = random.choice(range(1, Constants.num_rounds + 1))
+        return self._payoff_round
+
+    def get_demand_rvs(self, size: int = Constants.rvs_size, disrupt: bool = False) -> List[float]:
         """Return samples from the applicable treatment distribution"""
-
-        if size is None:
-            size = int(1e4)
         assert type(size) is int and size > 0, f"""expected size to be a positive integer - got {size}"""
 
         if len(self._demand_rvs) == size and not disrupt:
@@ -180,18 +191,15 @@ class Treatment(PydanticModel):
         mu, sigma = self.get_distribution_parameters().tuple()
         if disrupt:
             ## transform mu & sigma
-            sigma *= 2
-            mu *= 1
-
-            ## if transform depends on other things... e.g., variance_choice
-            # if self.variance_choice == "low":
-            #     sigma *= 2
-            #     mu *= 1
-            # else:
-            #     sigma /= 2
-            #     mu *= 1
-        self._demand_rvs = np.random.lognormal(mu, sigma, size).tolist()
+            self._mu *= 1
+            self._sigma *= 2
+        self._demand_rvs = generate_demand_rvs(self._mu, self._sigma, size)
         return self._demand_rvs
+
+
+@lru_cache(maxsize=5)
+def generate_demand_rvs(mu: float, sigma: float, size: int = int(1e4)) -> List[float]:
+    return np.random.lognormal(mu, sigma, size).tolist()
 
 
 TREATMENT_GROUPS = {
@@ -199,7 +207,3 @@ TREATMENT_GROUPS = {
 }
 
 # TREATMENT_GROUPS = {i: Treatment.from_args(*("high", True)) for i in range(1, 5)}
-
-
-def dump_all_treatment_groups(**kwargs) -> str:
-    return json.dumps({k: Treatment.from_args(*args).json() for k, args in TREATMENT_GROUPS.items()}, **kwargs)

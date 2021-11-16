@@ -50,52 +50,13 @@ def add(value, other=0):
     return ""
 
 
-# # Hack to allow settattr on Constants at runtime
-# orig_constants_meta_setattr = BaseConstantsMeta.__setattr__
-# delattr(BaseConstantsMeta, "__setattr__")
-
-
-# class ConstantsBase(BaseConstants, metaclass=BaseConstantsMeta):
-#     pass
-
-
-# class Constants(ConstantsBase):
-#     # otree constants
-#     name_in_url = APP_NAME
-#     num_rounds = GAMES * ROUNDS
-#     players_per_group = None
-#     endowment = Currency(0)
-#     instructions_template = None
-
-#     # custom constants
-#     num_games = GAMES
-#     rounds_per_game = ROUNDS
-#     app_name = APP_DIR.name
-#     authors = [
-#         "Anne Dohmen, University of Tennessee - Knoxville, Department of Supply Chain Management",
-#         "Miller Moore, University of Tennessee - Knoxville, Department of Business Analytics & Statistics",
-#     ]
-#     static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
-
-#     allow_disruption = ALLOW_DISRUPTION
-#     rvs_size = RVS_SIZE
-
-#     # paths for templates used in include tags, e.g., {{ include "shorthorizon/style.html" }} or {{ include Constants.style_template }}
-#     style_template = get_includable_template_path("style.html")
-#     scripts_template = get_includable_template_path("scripts.html")
-#     sections_template = get_includable_template_path("sections.html")
-
-
-# ConstantsBase.__setattr__ = orig_constants_meta_setattr
-
-
 def hydrate_participant(player: "Player", **kwargs) -> None:
 
     if not "uuid" in player.participant.vars:
         uuid = player.participant.vars.get("uuid", str(uuid4()))
         treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
         unit_costs: UnitCosts = treatment.get_unit_costs()
-        demand_rvs = treatment._demand_rvs or treatment.get_demand_rvs(Constants.rvs_size)
+        _ = treatment.get_demand_rvs(Constants.rvs_size)  # initialize treatment._demand_rvs
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
         years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
         company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
@@ -113,9 +74,9 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         player.participant.unit_costs = unit_costs
         player.participant.stock_units = 0
         player.participant.treatment = treatment
-        # player.participant.demand_rvs = demand_rvs
         player.participant.history = initialize_game_history()
         player.participant.game_results = []
+        player.participant.payoff_round = player.field_maybe_none("payoff_round") or treatment.get_payoff_round()
 
 
 def initialize_game_history() -> List[Dict[str, Any]]:
@@ -160,7 +121,7 @@ class Player(BasePlayer):
     endtime = models.FloatField(min=get_time())
 
     # participant data
-    treatment = models.LongStringField()
+    treatment = models.IntegerField(min=1)
     # participant Welcome formfields
     is_planner = models.BooleanField(widget=widgets.RadioSelectHorizontal(), label="Are you presently employed as a planner?")
     years_as_planner = models.IntegerField(
@@ -196,6 +157,8 @@ class Player(BasePlayer):
     cost = models.CurrencyField(initial=0)
     profit = models.CurrencyField(initial=0)
 
+    payoff_round = models.IntegerField()
+
 
 def custom_export(players: Iterable[Player]):
     """See https://otree.readthedocs.io/en/self/admin.html#custom-data-exports"""
@@ -219,6 +182,8 @@ def custom_export(players: Iterable[Player]):
         "revenue",
         "cost",
         "profit",
+        "payoff_round",
+        "payoff",
     ]
     yield ["id", "participant_code", *player_fields]
 

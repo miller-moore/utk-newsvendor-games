@@ -11,21 +11,15 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 from rich import print
 
-from .formvalidation import default_error_message, register_form_field_validator
+from .formvalidation import (default_error_message,
+                             register_form_field_validator)
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
-from .util import (
-    get_game_number,
-    get_game_rounds,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_round_in_game,
-    get_time,
-    is_absolute_final_round,
-    is_disruption_next_round,
-    is_disruption_this_round,
-    is_game_over,
-)
+from .util import (get_game_number, get_game_rounds,
+                   get_optimal_order_quantity, get_page_name,
+                   get_round_in_game, get_time, is_absolute_final_round,
+                   is_disruption_next_round, is_disruption_this_round,
+                   is_game_over)
 
 Page.error_message = staticmethod(default_error_message)
 
@@ -62,7 +56,9 @@ def validate_does_consent(does_consent: bool) -> Optional[str]:
 
 def vars_for_template(player: Player) -> dict:
 
-    from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
+    from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                REAL_WORLD_CURRENCY_CODE,
+                                REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
@@ -118,7 +114,7 @@ def vars_for_template(player: Player) -> dict:
 def js_vars(player: Player) -> dict:
     _vars = Page.vars_for_template(player).copy()
     treatment = player.participant.treatment
-    _vars.update(demand_rvs=treatment._demand_rvs or treatment.get_demand_rvs(Constants.rvs_size))
+    _vars.update(demand_rvs=treatment.get_demand_rvs())
     return _vars
 
 
@@ -153,6 +149,7 @@ class HydratePlayer(Page):
         player.revenue = 0
         player.cost = 0
         player.profit = 0
+        player.payoff_round = player.participant.payoff_round
 
         extras = dict(su=player.su, ooq=player.ooq, is_planner=player.field_maybe_none("is_planner"))
         print(
@@ -167,16 +164,6 @@ class Welcome(Page):
     @staticmethod
     def is_displayed(player: Player):
         return player.round_number == 1
-
-    # @staticmethod
-    # def get_form_fields(player: Player) -> List[str]:
-    #     """Generate formfields dynamically for the Page template whether or not defined as a field in the Player model.
-    #     if player.f3:
-    #         return ["f1", "f2", "f3"]
-    #     else:
-    #         return ["f1", "f2"]
-    #     """
-    #     return Welcome.form_fields
 
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
@@ -194,10 +181,7 @@ class Disruption(Page):
     @staticmethod
     def before_next_page(player: Player, **kwargs):
         if Constants.allow_disruption:
-            # player.participant.demand_rvs = player.participant.treatment.get_demand_rvs(Constants.rvs_size, disrupt=True)
             player.participant.treatment.get_demand_rvs(Constants.rvs_size, disrupt=True)
-            # TODO: update participant's mu & sigma to transformed values even tho demand_rvs is the thing that matters in practice
-            # player.participant.treatment.get_distribution_parameters()
 
 
 class Decide(Page):

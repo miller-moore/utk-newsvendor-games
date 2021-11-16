@@ -10,14 +10,19 @@ from otree.api import Currency, Page
 from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
-from .formvalidation import (default_error_message,
-                             register_form_field_validator)
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
-from .util import (get_game_number, get_game_rounds,
-                   get_optimal_order_quantity, get_page_name,
-                   get_round_in_game, get_time, is_absolute_final_round,
-                   is_game_over)
+from .util import (
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_round_in_game,
+    get_time,
+    is_absolute_final_round,
+    is_game_over,
+)
 
 Page.error_message = staticmethod(default_error_message)
 
@@ -54,9 +59,7 @@ def validate_does_consent(does_consent: bool) -> Optional[str]:
 
 def vars_for_template(player: Player) -> dict:
 
-    from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                REAL_WORLD_CURRENCY_CODE,
-                                REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+    from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
