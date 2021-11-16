@@ -6,7 +6,7 @@ pushd $PROJECT_ROOT/utk-games >/dev/null
 
 
 killprodserver() {
-  ps ww -o pid,ppid,user,command 2>&1 | grep 'otree prodserver' | grep -v grep | awk '{ print $1 }' | xargs kill
+  ps xww -o pid,ppid,user,command 2>&1 | grep 'otree prodserver' | grep -v grep | awk '{ print $1 }' | xargs kill
 }
 
 killprodserver >/dev/null 2>&1
