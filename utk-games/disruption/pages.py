@@ -11,7 +11,7 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 from rich import print
 
-from .formvalidation import error_message_decorator
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
 from .util import (
@@ -27,24 +27,37 @@ from .util import (
     is_game_over,
 )
 
+Page.error_message = staticmethod(default_error_message)
 
-@error_message_decorator
-def error_message(player: Player, formfields: Any):
-    from .formvalidation import FORM_FIELD_VALIDATORS
 
-    if not type(formfields) is dict:
-        return
+@register_form_field_validator(form_field="is_planner", expect_type=bool)
+def validate_is_planner(is_planner: bool) -> Optional[str]:
+    if is_planner is False:
+        return f"""Must be True to proceed."""
+    return
 
-    error_messages = dict()
-    for field in formfields:
-        if field in FORM_FIELD_VALIDATORS:
-            validate = FORM_FIELD_VALIDATORS[field]
-            values = formfields[field]
-            try:
-                validate(values)
-            except Exception as e:
-                error_messages[field] = str(e)
-    return error_messages
+
+@register_form_field_validator(form_field="years_as_planner", expect_type=int)
+def validate_years_as_planner(years_as_planner: int) -> Optional[str]:
+    if years_as_planner < 0:
+        return f"""Number must be >= 0."""
+    return
+
+
+@register_form_field_validator(form_field="company_name", expect_type=str)
+def validate_company_name(company_name: str) -> Optional[str]:
+    import re
+
+    if not re.findall(r"[a-zA-Z]", str(company_name)):
+        return f"""Enter a name."""
+    return
+
+
+@register_form_field_validator(form_field="does_consent", expect_type=bool)
+def validate_does_consent(does_consent: bool) -> Optional[str]:
+    if does_consent is False:
+        return f"""Must consent to proceed."""
+    return
 
 
 def vars_for_template(player: Player) -> dict:
@@ -109,7 +122,6 @@ def js_vars(player: Player) -> dict:
     return _vars
 
 
-Page.error_message = staticmethod(error_message)
 Page.vars_for_template = staticmethod(vars_for_template)
 Page.js_vars = staticmethod(js_vars)
 
