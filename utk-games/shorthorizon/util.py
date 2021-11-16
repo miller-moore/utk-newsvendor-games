@@ -15,7 +15,7 @@ from otree.models import Participant
 from pydantic import BaseConfig, BaseModel
 from scipy import stats
 
-from .constants import DISRUPTION_ROUND_IN_GAMES, Constants
+from .constants import Constants
 
 
 def get_game_number(round_number: int) -> int:
@@ -55,62 +55,6 @@ def is_game_over(round_number: int) -> bool:
 
 def is_absolute_final_round(round_number: int):
     return round_number == Constants.rounds_per_game * Constants.num_games
-
-
-def is_disruption_this_round(player: BasePlayer) -> bool:
-    from .treatment import Treatment
-
-    treatment: Treatment = player.participant.vars.get("treatment", None)
-    if treatment is None:
-        return False
-
-    game_number = get_game_number(player.round_number)
-    game_round = get_round_in_game(player.round_number)
-
-    disruption_round = DISRUPTION_ROUND_IN_GAMES.get(game_number, None)
-    if not disruption_round:
-        warnings.warn(
-            f"""Disruption round is not defined for game_number {game_number}. The following shows disruptions that are currently defined in the global constant DISRUPTION_ROUND_IN_GAMES: {DISRUPTION_ROUND_IN_GAMES!r}"""
-        )
-        return False
-
-    # check round condition for this round
-    is_this_round_disruption = game_round == disruption_round
-
-    # game 1 special case: only the players with True disruption_choice treatment will experience game 1 disruption
-    if game_number == 1:
-        return is_this_round_disruption and treatment.has_disruption()
-    return is_this_round_disruption
-
-
-def is_disruption_next_round(player: BasePlayer) -> bool:
-    from .treatment import Treatment
-
-    treatment: Treatment = player.participant.vars.get("treatment", None)
-    if treatment is None:
-        return False
-
-    game_number = get_game_number(player.round_number)
-    game_round = get_round_in_game(player.round_number)
-
-    disruption_round = DISRUPTION_ROUND_IN_GAMES.get(game_number, None)
-    if not disruption_round:
-        warnings.warn(
-            f"""Disruption round is not defined for game_number {game_number}. The following shows disruptions that are currently defined in the global constant DISRUPTION_ROUND_IN_GAMES: {DISRUPTION_ROUND_IN_GAMES!r}"""
-        )
-        return False
-
-    # check round condition for next round
-    is_next_round_disruption = (game_round + 1) == (disruption_round + 1)
-
-    # game 1 special case: only the players with True disruption_choice treatment will experience game 1 disruption
-    if game_number == 1:
-        return is_next_round_disruption and treatment.has_disruption()
-    return is_next_round_disruption
-
-
-def compute_profit(player: Any) -> float:
-    pass
 
 
 def frontend_format_currency(currency: Currency, as_integer: bool = False) -> str:

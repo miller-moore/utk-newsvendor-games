@@ -5,7 +5,6 @@ from otree.constants import BaseConstantsMeta
 
 GAMES = 1
 ROUNDS = 12
-
 RVS_SIZE = int(1e5)
 APP_DIR = Path(__file__).resolve().parent
 APP_NAME = APP_DIR.name
@@ -58,12 +57,7 @@ class Constants(ConstantsBase):
     num_games = GAMES
     rounds_per_game = ROUNDS
     app_name = APP_DIR.name
-    authors = [
-        "Anne Dohmen, University of Tennessee - Knoxville, Department of Supply Chain Management",
-        "Miller Moore, University of Tennessee - Knoxville, Department of Business Analytics & Statistics",
-    ]
     static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
-
     rvs_size = RVS_SIZE
 
     # paths for templates used in include tags, e.g., {{ include "disruption/style.html" }} or {{ include Constants.style_template }}

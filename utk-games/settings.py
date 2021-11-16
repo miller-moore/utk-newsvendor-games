@@ -18,6 +18,8 @@ PARTICIPANT_FIELDS = [
     # "demand_rvs",
     "history",
     "game_results",
+    "payout_round",
+    "payout"
 ]
 
 # NOTE: session fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#session-fields

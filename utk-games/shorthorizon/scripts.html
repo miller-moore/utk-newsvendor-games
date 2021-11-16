@@ -404,14 +404,14 @@
         var costsTable = $("#unit-costs-table")
         var costsWholesaleRow = $("#row-wcpu");
         var costsRetailRow = $("#row-rcpu");
-        var costsHoldingRow = $("#row-hcpu");
+        var costsHoldingRow = $("#row-scpu");
         var wcpu = formatCurrency(js_vars.wcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
         var rcpu = formatCurrency(js_vars.rcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
-        var hcpu = formatCurrency(js_vars.hcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
+        var scpu = formatCurrency(js_vars.scpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
 
         costsWholesaleRow.append(`<td id="row-wcpu">${wcpu} / unit / period</td>`);
         costsRetailRow.append(`<td id="row-rcpu">${rcpu} / unit / period</td>`);
-        costsHoldingRow.append(`<td id="row-hcpu">${hcpu} / unit / period</td>`);
+        costsHoldingRow.append(`<td id="row-scpu">${scpu} / unit / period</td>`);
 
         try {
             costsTable.bootstrapTable({
@@ -587,7 +587,7 @@
         for (var i=0; i < js_vars.history.length; i++) {
             var h = js_vars.history[i];
             var period = h.period;
-            var su = formatNumber(h.su_before? h.su_before: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            var su = formatNumber(h.su? h.su: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
             var ou = formatNumber(h.ou? h.ou: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
             var du = formatNumber(h.du? h.du: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
             var profit = formatCurrency(h.profit? h.profit: 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
@@ -596,7 +596,8 @@
             // @notice: these conditionals allow each period column to be built in the table even if the game isn't done yet
             if (js_vars.page_name == 'Results') {
                 if (i + 1 > js_vars.period_number) {
-                    su = i + 1 > js_vars.period_number + 1? '': formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                    //su = i + 1 > js_vars.period_number + 1? '': formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                    su = '';
                     ou = '';
                     du = '';
                     profit = '';
@@ -604,11 +605,12 @@
                 }
             } else if (js_vars.page_name == 'Decide') {
                 if (i + 1 >= js_vars.period_number) {
-                    if (i > 0 && i + 1 === js_vars.period_number) {
-                        su = formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0})
-                    } else if (i > 0) {
-                        su = ''
-                    }
+                    //if (i > 0 && i + 1 === js_vars.period_number) {
+                    //    su = formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0})
+                    //} else if (i > 0) {
+                    //    su = ''
+                    //}
+                    su = '';
                     ou = '';
                     du = '';
                     profit = '';

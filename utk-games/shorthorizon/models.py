@@ -1,10 +1,11 @@
+import random
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 from uuid import uuid4
 
 from otree.api import BaseGroup, BasePlayer, BaseSubsession, models, widgets
+from otree.currency import Currency
 from otree.templating import filters
-from rich import print
 
 from .constants import Constants
 from .treatment import Treatment, UnitCosts
@@ -51,54 +52,13 @@ def add(value, other=0):
     return ""
 
 
-# # Hack to allow settattr on Constants at runtime
-# orig_constants_meta_setattr = BaseConstantsMeta.__setattr__
-# delattr(BaseConstantsMeta, "__setattr__")
-
-
-# class ConstantsBase(BaseConstants, metaclass=BaseConstantsMeta):
-#     pass
-
-
-# class Constants(ConstantsBase):
-#     # otree constants
-#     name_in_url = APP_NAME
-#     num_rounds = GAMES * ROUNDS
-#     players_per_group = None
-#     endowment = Currency(0)
-#     instructions_template = None
-
-#     # custom constants
-#     num_games = GAMES
-#     rounds_per_game = ROUNDS
-#     app_name = APP_DIR.name
-#     authors = [
-#         "Anne Dohmen, University of Tennessee - Knoxville, Department of Supply Chain Management",
-#         "Miller Moore, University of Tennessee - Knoxville, Department of Business Analytics & Statistics",
-#     ]
-#     static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
-
-#     allow_disruption = ALLOW_DISRUPTION
-#     rvs_size = RVS_SIZE
-
-#     # paths for templates used in include tags, e.g., {{ include "shorthorizon/style.html" }} or {{ include Constants.style_template }}
-#     style_template = get_includable_template_path("style.html")
-#     scripts_template = get_includable_template_path("scripts.html")
-#     sections_template = get_includable_template_path("sections.html")
-
-
-# ConstantsBase.__setattr__ = orig_constants_meta_setattr
-
-
 def hydrate_participant(player: "Player", **kwargs) -> None:
 
     if not "uuid" in player.participant.vars:
         uuid = player.participant.vars.get("uuid", str(uuid4()))
-        print(f"[yellow]hydrate_participant: Round {player.round_number}: creating session for participant {uuid}[/]")
-
         treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
         unit_costs: UnitCosts = treatment.get_unit_costs()
-        demand_rvs = player.participant.vars.get("demand_rvs", treatment.get_demand_rvs(Constants.rvs_size))
+        demand_rvs = treatment._demand_rvs or treatment.get_demand_rvs(Constants.rvs_size)
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
         years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
         company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
@@ -116,9 +76,11 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         player.participant.unit_costs = unit_costs
         player.participant.stock_units = 0
         player.participant.treatment = treatment
-        player.participant.demand_rvs = demand_rvs
+        # player.participant.demand_rvs = demand_rvs
         player.participant.history = initialize_game_history()
         player.participant.game_results = []
+        player.participant.payout_round = random.choice(range(1, Constants.num_rounds + 1))
+        player.participant.payout = Currency(0)
 
 
 def initialize_game_history() -> List[Dict[str, Any]]:
@@ -127,8 +89,7 @@ def initialize_game_history() -> List[Dict[str, Any]]:
             period=i + 1,
             ou=None,
             du=None,
-            su_before=0 if i == 0 else None,
-            su_after=None,
+            su=None,
             ooq=None,
             revenue=None,
             cost=None,
@@ -163,7 +124,7 @@ class Player(BasePlayer):
     endtime = models.FloatField(min=get_time())
 
     # participant data
-    treatment = models.LongStringField()
+    treatment = models.IntegerField()
     # participant Welcome formfields
     is_planner = models.BooleanField(widget=widgets.RadioSelectHorizontal(), label="Are you presently employed as a planner?")
     years_as_planner = models.IntegerField(
@@ -187,10 +148,10 @@ class Player(BasePlayer):
     du = models.IntegerField(min=0)
     ooq = models.IntegerField(min=0)
 
-    # retail cost per unit (revenue), wholesale cost per unit (cost), holding cost per unit (cost)
+    # retail cost per unit (revenue), wholesale cost per unit (cost), salvage cost per unit (cost)
     rcpu = models.CurrencyField()
     wcpu = models.CurrencyField()
-    hcpu = models.CurrencyField()
+    scpu = models.CurrencyField()
 
     # revenue = rcpu * du
     # cost = wcpu * ou + hcpu * su
@@ -199,9 +160,46 @@ class Player(BasePlayer):
     cost = models.CurrencyField(initial=0)
     profit = models.CurrencyField(initial=0)
 
+    payout_round = models.IntegerField()
+    payout = models.CurrencyField(initial=0)
+
 
 def custom_export(players: Iterable[Player]):
     """See https://otree.readthedocs.io/en/self/admin.html#custom-data-exports"""
-    yield ["session", "participant_code", "round_number", "id_in_group", "payoff"]
+    player_fields = [
+        "starttime",
+        "endtime",
+        "treatment",
+        "is_planner",
+        "years_as_planner",
+        "company_name",
+        "does_consent",
+        "game_number",
+        "period_number",
+        "su",
+        "ou",
+        "du",
+        "ooq",
+        "rcpu",
+        "wcpu",
+        "scpu",
+        "revenue",
+        "cost",
+        "profit",
+    ]
+    yield ["id", "participant_code", *player_fields, "payout_round", "payout"]
+
+    records = []
     for p in players:
-        yield [p.session.code, p.participant.code, p.round_number, p.id_in_group, p.payoff]
+        records.append(
+            [
+                p.id,
+                p.participant.code,
+                *[getattr(p, name) for name in player_fields],
+                p.participant.payout_round,
+                p.participant.payout,
+            ]
+        )
+    records = sorted(records)
+    for r in records:
+        yield r
