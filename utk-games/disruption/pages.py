@@ -14,11 +14,18 @@ from rich import print
 from .formvalidation import error_message_decorator
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
-from .util import (get_game_number, get_game_rounds,
-                   get_optimal_order_quantity, get_page_name,
-                   get_round_in_game, get_time, is_absolute_final_round,
-                   is_disruption_next_round, is_disruption_this_round,
-                   is_game_over)
+from .util import (
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_round_in_game,
+    get_time,
+    is_absolute_final_round,
+    is_disruption_next_round,
+    is_disruption_this_round,
+    is_game_over,
+)
 
 
 @error_message_decorator
@@ -42,9 +49,7 @@ def error_message(player: Player, formfields: Any):
 
 def vars_for_template(player: Player) -> dict:
 
-    from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                REAL_WORLD_CURRENCY_CODE,
-                                REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+    from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
@@ -99,7 +104,8 @@ def vars_for_template(player: Player) -> dict:
 
 def js_vars(player: Player) -> dict:
     _vars = Page.vars_for_template(player).copy()
-    _vars.update(demand_rvs=player.participant.vars.get("demand_rvs", None))
+    treatment = player.participant.treatment
+    _vars.update(demand_rvs=treatment._demand_rvs or treatment.get_demand_rvs(Constants.rvs_size))
     return _vars
 
 
@@ -176,7 +182,8 @@ class Disruption(Page):
     @staticmethod
     def before_next_page(player: Player, **kwargs):
         if Constants.allow_disruption:
-            player.participant.demand_rvs = player.participant.treatment.get_demand_rvs(Constants.rvs_size, disrupt=True)
+            # player.participant.demand_rvs = player.participant.treatment.get_demand_rvs(Constants.rvs_size, disrupt=True)
+            player.participant.treatment.get_demand_rvs(Constants.rvs_size, disrupt=True)
             # TODO: update participant's mu & sigma to transformed values even tho demand_rvs is the thing that matters in practice
             # player.participant.treatment.get_distribution_parameters()
 
@@ -197,7 +204,7 @@ class Decide(Page):
 
         # unit quantities
         su = round(player.participant.stock_units)
-        du = round(random.choice(player.participant.demand_rvs))
+        du = round(random.choice(player.participant.treatment._demand_rvs))
         ou = round(player.ou)
 
         # compute revenue, cost, profit
