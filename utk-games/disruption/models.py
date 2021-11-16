@@ -103,10 +103,10 @@ class Subsession(BaseSubsession):
         for player in subsession.get_players():
             hydrate_participant(player)
 
-    def vars_for_admin_report(self):
-        """See https://otree.readthedocs.io/en/self/admin.html#customizing-the-admin-interface-admin-reports"""
-        payoffs = sorted([p.payoff for p in self.get_players()])
-        return dict(payoffs=payoffs)
+    # def vars_for_admin_report(self):
+    #     """See https://otree.readthedocs.io/en/self/admin.html#customizing-the-admin-interface-admin-reports"""
+    #     payoffs = sorted([p.payoff for p in self.get_players()])
+    #     return dict(payoffs=payoffs)
 
 
 class Group(BaseGroup):
@@ -149,6 +149,7 @@ class Player(BasePlayer):
     rcpu = models.CurrencyField()
     wcpu = models.CurrencyField()
     hcpu = models.CurrencyField()
+    # scpu = models.CurrencyField()
 
     # revenue = rcpu * du
     # cost = wcpu * ou + hcpu * su
@@ -160,36 +161,36 @@ class Player(BasePlayer):
     payoff_round = models.IntegerField()
 
 
-def custom_export(players: Iterable[Player]):
-    """See https://otree.readthedocs.io/en/self/admin.html#custom-data-exports"""
-    player_fields = [
-        "starttime",
-        "endtime",
-        "treatment",
-        "is_planner",
-        "years_as_planner",
-        "company_name",
-        "does_consent",
-        "game_number",
-        "period_number",
-        "su",
-        "ou",
-        "du",
-        "ooq",
-        "rcpu",
-        "wcpu",
-        "hcpu",
-        "revenue",
-        "cost",
-        "profit",
-        "payoff_round",
-        "payoff",
-    ]
-    yield ["id", "participant_code", *player_fields]
+# def custom_export(players: Iterable[Player]):
+#     """See https://otree.readthedocs.io/en/self/admin.html#custom-data-exports"""
+#     player_fields = [
+#         "starttime",
+#         "endtime",
+#         "treatment",
+#         "is_planner",
+#         "years_as_planner",
+#         "company_name",
+#         "does_consent",
+#         "game_number",
+#         "period_number",
+#         "su",
+#         "ou",
+#         "du",
+#         "ooq",
+#         "rcpu",
+#         "wcpu",
+#         "hcpu",
+#         "revenue",
+#         "cost",
+#         "profit",
+#         "payoff_round",
+#         "payoff",
+#     ]
+#     yield ["id", "participant_code", *player_fields]
 
-    records = []
-    for p in players:
-        records.append([p.id, p.participant.code, *[getattr(p, name) for name in player_fields]])
-    records = sorted(records)
-    for r in records:
-        yield r
+#     records = []
+#     for p in players:
+#         records.append([p.id, p.participant.code, *[getattr(p, name) for name in player_fields]])
+#     records = sorted(records)
+#     for r in records:
+#         yield r

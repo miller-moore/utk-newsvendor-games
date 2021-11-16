@@ -39,6 +39,11 @@ def get_page_name(player: BasePlayer) -> str:
     return participant._current_page_name
 
 
+def get_app_name(player: BasePlayer) -> str:
+    participant: Participant = player.participant
+    return participant._current_app_name
+
+
 def get_optimal_order_quantity(player: BasePlayer) -> int:
     from .models import Player
 
@@ -107,10 +112,6 @@ def is_disruption_next_round(player: BasePlayer) -> bool:
     if game_number == 1:
         return is_next_round_disruption and treatment.has_disruption()
     return is_next_round_disruption
-
-
-def compute_profit(player: Any) -> float:
-    pass
 
 
 def frontend_format_currency(currency: Currency, as_integer: bool = False) -> str:

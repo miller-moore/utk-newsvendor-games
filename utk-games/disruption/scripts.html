@@ -594,7 +594,7 @@
             var cumulative_profit = formatCurrency(h.cumulative_profit? h.cumulative_profit: 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
 
             // @notice: these conditionals allow each period column to be built in the table even if the game isn't done yet
-            if (js_vars.page_name == 'Results') {
+            if (js_vars.page_name.startsWith('Results')) {
                 if (i + 1 > js_vars.period_number) {
                     su = i + 1 > js_vars.period_number + 1? '': formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0});
                     ou = '';
@@ -602,7 +602,7 @@
                     profit = '';
                     cumulative_profit = '';
                 }
-            } else if (js_vars.page_name == 'Decide') {
+            } else if (js_vars.page_name.startsWith('Decide')) {
                 if (i + 1 >= js_vars.period_number) {
                     if (i > 0 && i + 1 === js_vars.period_number) {
                         su = formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0})

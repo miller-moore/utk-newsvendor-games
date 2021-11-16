@@ -39,6 +39,11 @@ def get_page_name(player: BasePlayer) -> str:
     return participant._current_page_name
 
 
+def get_app_name(player: BasePlayer) -> str:
+    participant: Participant = player.participant
+    return participant._current_app_name
+
+
 def get_optimal_order_quantity(player: BasePlayer) -> int:
     from .models import Player
 

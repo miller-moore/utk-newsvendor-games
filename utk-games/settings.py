@@ -35,6 +35,10 @@ SESSION_CONFIG_DEFAULTS = dict(
     participation_fee=0.00,
 )
 
+
+# NOTE: When oTree starts, data models are loaded from the apps defined in SESSION_CONFIGS and models are shared w/ other subsessions thereafter.
+# NOTE: The model loaded last (by the last subsession in the list) overrides models loaded from app subsessions earlier in the session config.
+# NOTE: Hence, Group & Player should use the same model during a session because
 SESSION_CONFIGS = [
     dict(
         name="disruption",
@@ -68,8 +72,9 @@ USE_POINTS = False
 
 # for security, best to set admin password in an environment variable
 ADMIN_USERNAME = environ.get("OTREE_ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = environ.get("OTREE_ADMIN_PASSWORD")
-AUTH_LEVEL = environ.get("OTREE_AUTH_LEVEL", "DEMO")
+if environ.get("OTREE_ADMIN_PASSWORD"):
+    ADMIN_PASSWORD = environ.get("OTREE_ADMIN_PASSWORD")
+    AUTH_LEVEL = environ.get("OTREE_AUTH_LEVEL", "DEMO")
 
 
 DEMO_PAGE_INTRO_HTML = """ """
