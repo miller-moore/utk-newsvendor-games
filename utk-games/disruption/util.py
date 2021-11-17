@@ -106,7 +106,7 @@ def is_disruption_next_round(player: BasePlayer) -> bool:
         return False
 
     # check round condition for next round
-    is_next_round_disruption = (game_round + 1) == (disruption_round + 1)
+    is_next_round_disruption = (game_round + 1) == disruption_round
 
     # game 1 special case: only the players with True disruption_choice treatment will experience game 1 disruption
     if game_number == 1:

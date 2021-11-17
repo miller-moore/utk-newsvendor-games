@@ -49,6 +49,7 @@ def validate_does_consent(does_consent: bool) -> Optional[str]:
         return f"""Must consent to proceed."""
     return
 
+
 class ShortHorizonPage(Page):
 
     error_message = staticmethod(default_error_message)
@@ -99,6 +100,7 @@ class ShortHorizonPage(Page):
             game_results=player.participant.vars.get("game_results", None),
             payoff_round=player.participant.vars.get("payoff_round", None),
             payoff=player.participant.vars.get("payoff", None),
+            treatment=treatment.idx,
         )
 
         # make Currency (Decimal) objects json serializable

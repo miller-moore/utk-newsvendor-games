@@ -120,6 +120,7 @@ class DisributionParameters(PydanticModel):
 
 
 TREATMENT_GROUPS = list(product(["high", "low"], [True, False]))
+# TREATMENT_GROUPS = list(product(["high", "high"], [True, True]))
 
 
 class Treatment(PydanticModel):
@@ -127,7 +128,6 @@ class Treatment(PydanticModel):
     _mu: float = None
     _sigma: float = None
     _payoff_round: int = None
-    _history: List[Dict[str, Any]] = []
     _demand_rvs: List[float] = []
 
     class Config:
@@ -183,6 +183,13 @@ class Treatment(PydanticModel):
             self._sigma *= 2
         self._demand_rvs = generate_demand_rvs(self._mu, self._sigma, size)
         return self._demand_rvs
+
+    def reset(self):
+        size = len(self._demand_rvs) if self._demand_rvs else Constants.rvs_size
+        self._mu = None
+        self._sigma = None
+        self._demand_rvs = []
+        _ = self.get_demand_rvs(size=size)
 
 
 @lru_cache(maxsize=5)

@@ -4,7 +4,8 @@ import traceback
 from enum import Enum
 from functools import lru_cache
 from itertools import product
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
@@ -139,7 +140,6 @@ class Treatment(PydanticModel):
     _mu: float = None
     _sigma: float = None
     _payoff_round: int = None
-    _history: List[Dict[str, Any]] = []
     _demand_rvs: List[float] = []
 
     class Config:
@@ -193,6 +193,13 @@ class Treatment(PydanticModel):
             self._sigma *= 2
         self._demand_rvs = generate_demand_rvs(self._mu, self._sigma, size)
         return self._demand_rvs
+
+    def reset(self):
+        size = len(self._demand_rvs) if self._demand_rvs else Constants.rvs_size
+        self._mu = None
+        self._sigma = None
+        self._demand_rvs = []
+        _ = self.get_demand_rvs(size=size)
 
 
 @lru_cache(maxsize=5)

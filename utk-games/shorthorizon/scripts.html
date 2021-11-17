@@ -221,8 +221,10 @@
 
         // add xAxis
         var data = sort(js_vars.demand_rvs);
-        var xmin = Math.max(0, d3.min(data) * .9)
-        var xmax = d3.max(data) * .9
+        var xmean = d3.mean(data)
+        var xmed = d3.median(data);
+        var xmin = Math.max(0, d3.min(data))
+        var xmax = d3.max(data)
         if (js_vars.variance_choice == "high") {
             var xAxis = d3.scaleLinear()
                 .domain([0, xmax])
@@ -242,7 +244,8 @@
             //var xmin = d3.min(data) - d3.min(data) % stepSize
             //var xmax = d3.max(data) + d3.max(data) % stepSize
             var xAxis = d3.scaleLinear()
-                .domain([0, 1400])
+                //.domain(xmean >= xmed? [0, (1 - xmed/xmean) * xmax] : [(1 - xmean/xmed) * xmin, xmax])  // 1400
+                .domain([0, xmax * (xmean > xmed? xmed/xmean: xmed / xmean) ** 2])
                 .range([0, width])
 
             var xticks = xAxis.ticks(10)

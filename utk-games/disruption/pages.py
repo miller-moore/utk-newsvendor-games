@@ -9,24 +9,17 @@ import numpy as np
 from otree.api import Currency, Page
 from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
-from rich import print
 
-from .formvalidation import default_error_message, register_form_field_validator
+from .constants import DISRUPTION_ROUND_IN_GAMES
+from .formvalidation import (default_error_message,
+                             register_form_field_validator)
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
-from .util import (
-    get_app_name,
-    get_game_number,
-    get_game_rounds,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_round_in_game,
-    get_time,
-    is_absolute_final_round,
-    is_disruption_next_round,
-    is_disruption_this_round,
-    is_game_over,
-)
+from .util import (get_app_name, get_game_number, get_game_rounds,
+                   get_optimal_order_quantity, get_page_name,
+                   get_round_in_game, get_time, is_absolute_final_round,
+                   is_disruption_next_round, is_disruption_this_round,
+                   is_game_over)
 
 Page.error_message = staticmethod(default_error_message)
 
@@ -63,7 +56,9 @@ def validate_does_consent(does_consent: bool) -> Optional[str]:
 
 def vars_for_template(player: Player) -> dict:
 
-    from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
+    from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                REAL_WORLD_CURRENCY_CODE,
+                                REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
@@ -84,6 +79,9 @@ def vars_for_template(player: Player) -> dict:
         participant_code=player.participant.code,
         variance_choice=treatment.variance_choice if treatment else None,
         disruption_choice=treatment.disruption_choice if treatment else None,
+        disruption_round=DISRUPTION_ROUND_IN_GAMES.get(player.game_number, None)
+        if treatment.disruption_choice and player.game_number == 1
+        else None,
         is_disruption_this_round=is_disruption_this_round(player),
         is_disruption_next_round=is_disruption_next_round(player),
         is_game_over=is_game_over(player.round_number),
@@ -109,6 +107,7 @@ def vars_for_template(player: Player) -> dict:
         game_results=player.participant.vars.get("game_results", None),
         payoff_round=player.participant.vars.get("payoff_round", None),
         payoff=player.participant.vars.get("payoff", None),
+        treatment=treatment.idx,
     )
 
     # make Currency (Decimal) objects json serializable
@@ -161,7 +160,7 @@ class HydratePlayer(Page):
 
         extras = dict(su=player.su, ooq=player.ooq, is_planner=player.field_maybe_none("is_planner"))
         print(
-            f"[green]hydrate_player: Round {player.round_number}: {get_page_name(player)} Page, Game {player.game_number} (ends on round {get_game_rounds(player.round_number)[-1]}), Period number: {player.period_number}, player extras: {extras}"
+            f"hydrate_player: Round {player.round_number}: {get_page_name(player)} Page, Game {player.game_number} (ends on round {get_game_rounds(player.round_number)[-1]}), Period number: {player.period_number}, player extras: {extras}"
         )
 
 
@@ -257,6 +256,7 @@ class Decide(Page):
 
         if player.round_number == player.participant.payoff_round:
             player.payoff = Currency(min(1750, max(750, player.profit * 0.05)))
+            player.participant.payoff = player.payoff
         else:
             player.payoff = Currency(0)
 
@@ -270,6 +270,7 @@ class Results(Page):
             player.participant.game_results.append(player.participant.history)
             player.participant.history = initialize_game_history()
             player.participant.stock_units = 0
+            player.participant.treatment.reset()
 
 
 class FinalResults(Page):
