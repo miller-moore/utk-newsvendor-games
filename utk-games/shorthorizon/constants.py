@@ -56,11 +56,11 @@ class Constants(ConstantsBase):
     # custom constants
     num_games = GAMES
     rounds_per_game = ROUNDS
-    app_name = APP_DIR.name
+    app_name = APP_NAME
     static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
     rvs_size = RVS_SIZE
 
-    # paths for templates used in include tags, e.g., {{ include "disruption/style.html" }} or {{ include Constants.style_template }}
+    # paths for templates used in include tags, e.g., {{ include "<APP_NAME>/style.html" }} or {{ include Constants.style_template }}
     style_template = get_includable_template_path("style.html")
     scripts_template = get_includable_template_path("scripts.html")
     sections_template = get_includable_template_path("sections.html")

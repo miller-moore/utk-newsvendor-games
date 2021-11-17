@@ -84,7 +84,7 @@ def is_disruption_this_round(player: BasePlayer) -> bool:
 
     # game 1 special case: only the players with True disruption_choice treatment will experience game 1 disruption
     if game_number == 1:
-        return is_this_round_disruption and treatment.has_disruption()
+        return is_this_round_disruption and treatment.disruption_choice
     return is_this_round_disruption
 
 
@@ -110,7 +110,7 @@ def is_disruption_next_round(player: BasePlayer) -> bool:
 
     # game 1 special case: only the players with True disruption_choice treatment will experience game 1 disruption
     if game_number == 1:
-        return is_next_round_disruption and treatment.has_disruption()
+        return is_next_round_disruption and treatment.disruption_choice
     return is_next_round_disruption
 
 
