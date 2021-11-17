@@ -57,9 +57,21 @@ SESSION_CONFIGS = [
 # Rooms
 ROOMS = [
     dict(
-        name="pilotstudy",
-        display_name="Student pilot study",
-    )
+        name="pilotstudy1",
+        display_name="Student pilot study - 1",
+    ),
+    dict(
+        name="pilotstudy2",
+        display_name="Student pilot study - 2",
+    ),
+    dict(
+        name="pilotstudy3",
+        display_name="Student pilot study - 3",
+    ),
+    dict(
+        name="pilotstudy4",
+        display_name="Student pilot study - 4",
+    ),
 ]
 
 # ISO-639 code
