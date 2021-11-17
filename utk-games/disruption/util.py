@@ -3,6 +3,7 @@ import time
 import warnings
 from collections import namedtuple
 from datetime import datetime
+from logging import StringTemplateStyle
 from pathlib import Path
 from types import ModuleType
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
@@ -15,7 +16,13 @@ from otree.models import Participant
 from pydantic import BaseConfig, BaseModel
 from scipy import stats
 
-from .constants import DISRUPTION_ROUND_IN_GAMES, Constants
+from .constants import APP_NAME, DISRUPTION_ROUND_IN_GAMES, STATIC_DIR, Constants
+
+
+def as_static_path(path: Path):
+    if str(STATIC_DIR) + "/" in str(path):
+        return str(path).replace(str(STATIC_DIR) + "/", APP_NAME + "/")
+    raise ValueError(f"path must begin with {str(STATIC_DIR) +'/'!r} - got {path!r}")
 
 
 def get_game_number(round_number: int) -> int:

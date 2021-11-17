@@ -97,22 +97,34 @@
         var formatter = new Intl.NumberFormat(language_code + '-US', kwargs);
         return formatter.format(n);
     }
-    // '#4daf4a'
-    // '#6160eb'
-    // '#377eb8'
-    // '#60d3eb'
-    // '#ff56c6'
-    // '#aa3382'
+
+    const Colors = {
+        red: '#f12761',
+        darkmango: '#eb6e08',
+        orange: "#eeac4d",
+        mango: '#ffbf34',
+        lightgreen: '#75e0b0',
+        green: '#4daf4a',
+        darkgreen: '#006f60',
+        cyan: '#60d3eb',
+        blue: '#377eb8',
+        darkblue: '#6160eb',
+        purple: '#6f3098',
+        darkpink: '#aa3382',
+        pink: '#ff56c6',
+    }
+
+    var _game = 'disruption'
 
     function distributionColor() {
-        return '#aa3382'
+        return js_vars.app_name === _game? Colors.darkmango: Colors.lightgreen
     }
 
     function orderQuantityColor() {
-        return '#60d3eb'
+        return js_vars.app_name === _game?  Colors.darkblue: Colors.purple
     }
     function demandQuantityColor() {
-        return '#aa3382'
+        return js_vars.app_name === _game?  Colors.pink: Colors.orange
     }
 </script>
 
@@ -289,6 +301,8 @@
         // var meanstep = d3.mean(d3.sort(vals));
         var ymax = Math.max(...yvals);
 
+        ymax = 0.01 //
+
         // add the y Axis
         var yAxis = d3.scaleLinear()
             .domain([0, ymax])
@@ -345,7 +359,7 @@
                 .y(function (d) { return yAxis(d[1]); })
             );
 
-        hideLoadingMessage();
+        hideDistributionLoadingMessage();
 
         /* Listen to the slider?
         d3.select("#mySlider").on("change", function (d) {
@@ -378,7 +392,7 @@
                 .x(function (d) { return xAxis(d[0]); })
                 .y(function (d) { return yAxis(d[1]); })
             );
-        hideLoadingMessage();
+        hideDistributionLoadingMessage();
     }
 
 
@@ -398,7 +412,7 @@
     function showLoadingMessage() {
         $('#distribution-curve-loading-message').show();
     }
-    function hideLoadingMessage() {
+    function hideDistributionLoadingMessage() {
         $('#distribution-curve-loading-message').hide();
     }
     function updateUnitCostsTable() {
@@ -430,7 +444,8 @@
     function renderSituationalInfoContainer() {
         show($("#situational-info-container"));
         updateUnitCostsTable();
-        plotDistributionCurve();
+        //plotDistributionCurve();
+        hideDistributionLoadingMessage();
     }
 </script>
 

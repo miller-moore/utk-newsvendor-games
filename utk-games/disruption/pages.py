@@ -15,8 +15,8 @@ from .formvalidation import (default_error_message,
                              register_form_field_validator)
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
-from .util import (get_app_name, get_game_number, get_game_rounds,
-                   get_optimal_order_quantity, get_page_name,
+from .util import (as_static_path, get_app_name, get_game_number,
+                   get_game_rounds, get_optimal_order_quantity, get_page_name,
                    get_round_in_game, get_time, is_absolute_final_round,
                    is_disruption_next_round, is_disruption_this_round,
                    is_game_over)
@@ -62,6 +62,8 @@ def vars_for_template(player: Player) -> dict:
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
+    distribution_png, disrupted_distribution_png = treatment.save_distribution_plots()
+
     _vars = dict(
         language_code=LANGUAGE_CODE,
         real_world_currency_code=REAL_WORLD_CURRENCY_CODE,
@@ -82,6 +84,8 @@ def vars_for_template(player: Player) -> dict:
         disruption_round=DISRUPTION_ROUND_IN_GAMES.get(player.game_number, None)
         if treatment.disruption_choice and player.game_number == 1
         else None,
+        distribution_png=as_static_path(distribution_png),
+        disrupted_distribution_png=as_static_path(distribution_png if player.game_number == 1 and not treatment.disruption_choice else disrupted_distribution_png),
         is_disruption_this_round=is_disruption_this_round(player),
         is_disruption_next_round=is_disruption_next_round(player),
         is_game_over=is_game_over(player.round_number),

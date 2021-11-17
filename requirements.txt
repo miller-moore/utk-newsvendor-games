@@ -1,7 +1,7 @@
-# otree==5.4.0
 otree
 pandas
-rich
 pydantic
 scipy
 circus
+matplotlib
+seaborn

@@ -4,3 +4,4 @@ setuptools
 black
 rope
 matplotlib
+seaborn

@@ -4,6 +4,7 @@ import traceback
 from enum import Enum
 from functools import lru_cache
 from itertools import product
+from pathlib import Path
 from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
@@ -14,74 +15,8 @@ from pydantic import BaseModel, Field, StrBytes, typing, validator
 from pydantic.main import Extra
 from pydantic.types import conint
 
-from .constants import NATURAL_MEAN, Constants
-
-IntStr = Union[int, str]
-AbstractSetIntStr = AbstractSet[IntStr]
-DictIntStrAny = Dict[IntStr, Any]
-DictStrAny = Dict[str, Any]
-MappingIntStrAny = Mapping[IntStr, Any]
-
-
-class PydanticModel(BaseModel):
-    def tuple(self: BaseModel) -> Tuple[Any]:
-        """Return a tuple of the pydantic model's attribute values."""
-        return tuple(self.dict().values())
-
-    @classmethod
-    def from_args(cls, *args, **kwargs) -> "PydanticModel":
-        arg_fields = [field_name for field_name in cls.__fields__ if field_name not in kwargs]
-        kwargs.update(dict(zip(arg_fields, args)))
-        return cls(**kwargs)
-
-    def __repr_args__(self) -> Any:
-        return self.dict().items()
-
-    def dict(
-        self,
-        *,
-        include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
-        exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
-        by_alias: bool = False,
-        skip_defaults: bool = None,
-        exclude_unset: bool = False,
-        exclude_defaults: bool = False,
-        exclude_none: bool = False,
-    ) -> "DictStrAny":
-        return super().dict(
-            include=include or set([c for c in self.__fields__]),
-            exclude=exclude,
-            by_alias=by_alias,
-            skip_defaults=skip_defaults,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-        )
-
-    def json(
-        self,
-        *,
-        include: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
-        exclude: Union["AbstractSetIntStr", "MappingIntStrAny"] = None,
-        by_alias: bool = False,
-        skip_defaults: bool = None,
-        exclude_unset: bool = False,
-        exclude_defaults: bool = False,
-        exclude_none: bool = False,
-        encoder: Optional[Callable[[Any], Any]] = None,
-        **dumps_kwargs: Any,
-    ) -> str:
-        return super().json(
-            include=include or set([c for c in self.__fields__]),
-            exclude=exclude,
-            by_alias=by_alias,
-            skip_defaults=skip_defaults,
-            exclude_unset=exclude_unset,
-            exclude_defaults=exclude_defaults,
-            exclude_none=exclude_none,
-            encoder=encoder,
-            **dumps_kwargs,
-        )
+from .constants import NATURAL_MEAN, STATIC_DIR, Constants
+from .pydanticmodel import PydanticModel
 
 
 class UnitCosts(PydanticModel):
@@ -129,6 +64,8 @@ class Treatment(PydanticModel):
     _sigma: float = None
     _payoff_round: int = None
     _demand_rvs: List[float] = []
+    _png_file: Path = None
+    _disrupted_png_file: Path = None
 
     class Config:
         extra = Extra.allow
@@ -181,7 +118,7 @@ class Treatment(PydanticModel):
             ## transform mu & sigma
             self._mu *= 1
             self._sigma *= 2
-        self._demand_rvs = generate_demand_rvs(self._mu, self._sigma, size)
+        self._demand_rvs = sample_demand_rvs(self._mu, self._sigma, size)
         return self._demand_rvs
 
     def reset(self):
@@ -191,7 +128,59 @@ class Treatment(PydanticModel):
         self._demand_rvs = []
         _ = self.get_demand_rvs(size=size)
 
+    def save_distribution_plots(self) -> Tuple[Path, Path]:
+        """Returns two file paths: file path of regular disruption plot & file path of disrupted disruption plot."""
+
+        from datetime import datetime
+
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        png_file = Path(STATIC_DIR).joinpath(f"distribution-{self.idx}.png")
+        disrupted_png_file = Path(STATIC_DIR).joinpath(f"distribution-disrupt-{self.idx}.png")
+
+        if png_file.exists() and (datetime.now().timestamp() - png_file.stat().st_mtime) < 86400:
+            self._png_file = png_file
+
+        if disrupted_png_file.exists() and (datetime.now().timestamp() - png_file.stat().st_mtime) < 86400:
+            self._disrupted_png_file = disrupted_png_file
+
+        if self._png_file and self._disrupted_png_file:
+            return self._png_file, self._disrupted_png_file
+
+        # original props - restore in `finally` block after disrupt
+        _mu, _sigma, _demand_rvs = self._mu, self._sigma, self._demand_rvs
+
+        color = "#eb6e08"
+        try:
+            # regular distribution
+            rvs = self.get_demand_rvs(size=int(1e5))
+            sns.displot(rvs, color=color, kind="kde", fill=True)
+            ymax = plt.gca().get_ylim()[1]
+            plt.ylim(0, max(0.01, min(ymax, 1)))
+            plt.xlim((0, min(2000, max(rvs))))
+            plt.ylabel(None)
+            plt.savefig(png_file)
+
+            # disrupted distribution
+            rvs = self.get_demand_rvs(size=int(1e5), disrupt=True)
+            sns.displot(rvs, color=color, kind="kde", fill=True)
+            ymax = plt.gca().get_ylim()[1]
+            plt.ylim(0, max(0.01, min(ymax, 1)))
+            plt.xlim((0, min(2000, max(rvs))))
+            plt.ylabel(None)
+            plt.savefig(disrupted_png_file)
+
+            self._png_file, self._disrupted_png_file = png_file, disrupted_png_file
+            return self._png_file, self._disrupted_png_file
+        finally:
+            # reset self params to provided values
+            if _mu and _sigma and _demand_rvs and (_mu != self._mu or _sigma != self._sigma):
+                self._mu, self._sigma, self._demand_rvs = _mu, _sigma, _demand_rvs
+            else:
+                self.reset()
+
 
 @lru_cache(maxsize=5)
-def generate_demand_rvs(mu: float, sigma: float, size: int = int(1e4)) -> List[float]:
+def sample_demand_rvs(mu: float, sigma: float, size: int = int(1e4)) -> List[float]:
     return np.random.lognormal(mu, sigma, size).tolist()

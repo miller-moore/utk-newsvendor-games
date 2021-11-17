@@ -5,10 +5,15 @@ from otree.constants import BaseConstantsMeta
 
 GAMES = 1
 ROUNDS = 12
+
+MEANS = [500, 597]
+SIGMAS = [50, 100]
+COSTS = [dict(rcpu=20, wcpu=7.5, scpu=5), dict(rcpu=43, wcpu=6, scpu=5)]
 RVS_SIZE = int(1e4)
+
 APP_DIR = Path(__file__).resolve().parent
 APP_NAME = APP_DIR.name
-STATIC_DIR = APP_DIR / "static"
+STATIC_DIR = APP_DIR / ".." / "_static" / APP_NAME
 INCLUDES_DIR = APP_DIR / "includes"
 
 
@@ -57,7 +62,6 @@ class Constants(ConstantsBase):
     num_games = GAMES
     rounds_per_game = ROUNDS
     app_name = APP_NAME
-    static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
     rvs_size = RVS_SIZE
 
     # paths for templates used in include tags, e.g., {{ include "<APP_NAME>/style.html" }} or {{ include Constants.style_template }}

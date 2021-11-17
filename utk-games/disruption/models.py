@@ -33,7 +33,7 @@ def isiterable(value):
 
 
 @filters.register
-def add(value, other=0):
+def add(value, other):
     try:
         if int(value) == value and int(other) == other:
             return int(value + other)

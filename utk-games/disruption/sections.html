@@ -53,6 +53,11 @@
                 <!-- Add a slider -->
                 <!-- <input type="range" name="mySlider" id=mySlider min="10" max="100" value="50"> -->
                 <div id="distribution-curve">
+                    {{ if is_disruption_this_round }}
+                        <img src="{{ static disrupted_distribution_png }}"/>
+                    {{ else }}
+                        <img src="{{ static distribution_png }}"/>
+                    {{ endif }}
                 </div>
             </div>
         </div>

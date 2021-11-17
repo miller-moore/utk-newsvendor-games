@@ -15,7 +15,7 @@ NATURAL_MEAN = 500
 RVS_SIZE = int(1e5)
 APP_DIR = Path(__file__).resolve().parent
 APP_NAME = APP_DIR.name
-STATIC_DIR = APP_DIR / "static"
+STATIC_DIR = APP_DIR / ".." / "_static" / APP_NAME
 INCLUDES_DIR = APP_DIR / "includes"
 
 
@@ -64,12 +64,6 @@ class Constants(ConstantsBase):
     num_games = GAMES
     rounds_per_game = ROUNDS
     app_name = APP_DIR.name
-    authors = [
-        "Anne Dohmen, University of Tennessee - Knoxville, Department of Supply Chain Management",
-        "Miller Moore, University of Tennessee - Knoxville, Department of Business Analytics & Statistics",
-    ]
-    static_asset_prefix = str("/" / Path(APP_NAME))  # TODO: append "/static" ?
-
     allow_disruption = ALLOW_DISRUPTION
     rvs_size = RVS_SIZE
 
