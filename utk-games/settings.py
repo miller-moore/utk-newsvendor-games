@@ -36,9 +36,7 @@ SESSION_CONFIG_DEFAULTS = dict(
 )
 
 
-# NOTE: When oTree starts, data models are loaded from the apps defined in SESSION_CONFIGS and models are shared w/ other subsessions thereafter.
-# NOTE: The model loaded last (by the last subsession in the list) overrides models loaded from app subsessions earlier in the session config.
-# NOTE: Hence, Group & Player should use the same model during a session because
+#
 SESSION_CONFIGS = [
     dict(
         name="disruption",
