@@ -145,6 +145,7 @@ class Treatment(PydanticModel):
         ymax = plt.gca().get_ylim()[1]
         plt.ylim(0, max(0.01, min(ymax, 1)))
         plt.xlim((0, min(2000, max(rvs))))
+        plt.yticks([])
         plt.ylabel(None)
         plt.savefig(png_file)
 

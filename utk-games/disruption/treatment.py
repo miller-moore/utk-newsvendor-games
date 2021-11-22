@@ -5,7 +5,8 @@ from enum import Enum
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
@@ -54,8 +55,8 @@ class DisributionParameters(PydanticModel):
         return DisributionParameters(mu=mu, sigma=sigma)
 
 
-TREATMENT_GROUPS = list(product(["high", "low"], [True, False]))
-# TREATMENT_GROUPS = list(product(["high", "high"], [True, True]))
+# TREATMENT_GROUPS = list(product(["high", "low"], [True, False]))
+TREATMENT_GROUPS = list(product(["low", "high"], [True, True]))
 
 
 class Treatment(PydanticModel):
@@ -66,6 +67,7 @@ class Treatment(PydanticModel):
     _demand_rvs: List[float] = []
     _png_file: Path = None
     _disrupted_png_file: Path = None
+    _disrupted: bool = False
 
     class Config:
         extra = Extra.allow
@@ -85,6 +87,9 @@ class Treatment(PydanticModel):
     @classmethod
     def from_json(cls, json: StrBytes) -> "Treatment":
         return Treatment.parse_raw(json)
+
+    def is_disrupted(self):
+        return self._disrupted
 
     def get_optimal_order_quantity(self) -> float:
         rcpu, wcpu, hcpu = self.get_unit_costs().tuple()
@@ -115,6 +120,7 @@ class Treatment(PydanticModel):
 
         mu, sigma = self.get_distribution_parameters().tuple()
         if disrupt:
+            self._disrupted = True
             ## transform mu & sigma
             self._mu *= 1
             self._sigma *= 2
@@ -127,6 +133,7 @@ class Treatment(PydanticModel):
         self._sigma = None
         self._demand_rvs = []
         _ = self.get_demand_rvs(size=size)
+        self._disrupted = False
 
     def save_distribution_plots(self) -> Tuple[Path, Path]:
         """Returns two file paths: file path of regular disruption plot & file path of disrupted disruption plot."""
@@ -153,21 +160,37 @@ class Treatment(PydanticModel):
 
         color = "#eb6e08"
         try:
-            # regular distribution
-            rvs = self.get_demand_rvs(size=int(1e5))
-            sns.displot(rvs, color=color, kind="kde", fill=True)
-            ymax = plt.gca().get_ylim()[1]
-            plt.ylim(0, max(0.01, min(ymax, 1)))
-            plt.xlim((0, min(2000, max(rvs))))
+            rvs_regular = self.get_demand_rvs(size=int(1e5))
+            rvs_disrupted = self.get_demand_rvs(size=int(1e5), disrupt=True)
+
+            ## get sensible axis limits
+
+            # yaxis max
+            sns.displot(rvs_regular, color=color, kind="kde", fill=True)
+            ymax_regular = plt.gca().get_ylim()[1]
+            plt.cla()
+            sns.displot(rvs_disrupted, color=color, kind="kde", fill=True)
+            ymax_disrupted = plt.gca().get_ylim()[1]
+            plt.cla()
+            ymax = max(0.01, ymax_regular, ymax_disrupted)
+
+            # xaxis max
+            # xmax = max(rvs_regular + rvs_disrupted)
+            xmax = 2000
+
+            # plot regular distribution
+            sns.displot(rvs_regular, color=color, kind="kde", fill=True)
+            plt.xlim((0, 2000 if xmax > 2000 else xmax))
+            plt.ylim(0, ymax)
+            plt.yticks([])
             plt.ylabel(None)
             plt.savefig(png_file)
 
-            # disrupted distribution
-            rvs = self.get_demand_rvs(size=int(1e5), disrupt=True)
-            sns.displot(rvs, color=color, kind="kde", fill=True)
-            ymax = plt.gca().get_ylim()[1]
-            plt.ylim(0, max(0.01, min(ymax, 1)))
-            plt.xlim((0, min(2000, max(rvs))))
+            # plot disrupted distribution
+            sns.displot(rvs_disrupted, color=color, kind="kde", fill=True)
+            plt.xlim((0, 2000 if xmax > 2000 else xmax))
+            plt.ylim(0, ymax)
+            plt.yticks([])
             plt.ylabel(None)
             plt.savefig(disrupted_png_file)
 
@@ -175,10 +198,7 @@ class Treatment(PydanticModel):
             return self._png_file, self._disrupted_png_file
         finally:
             # reset self params to provided values
-            if _mu and _sigma and _demand_rvs and (_mu != self._mu or _sigma != self._sigma):
-                self._mu, self._sigma, self._demand_rvs = _mu, _sigma, _demand_rvs
-            else:
-                self.reset()
+            self.reset()
 
 
 @lru_cache(maxsize=5)

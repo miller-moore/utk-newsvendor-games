@@ -86,6 +86,7 @@ def vars_for_template(player: Player) -> dict:
         else None,
         distribution_png=as_static_path(distribution_png),
         disrupted_distribution_png=as_static_path(distribution_png if player.game_number == 1 and not treatment.disruption_choice else disrupted_distribution_png),
+        is_disrupted=treatment.is_disrupted(),
         is_disruption_this_round=is_disruption_this_round(player),
         is_disruption_next_round=is_disruption_next_round(player),
         is_game_over=is_game_over(player.round_number),
