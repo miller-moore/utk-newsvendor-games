@@ -1,77 +1,83 @@
 import json
 import time
+import warnings
 from collections import namedtuple
 from datetime import datetime
 from pathlib import Path
 from types import ModuleType
-from typing import Any, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from otree.api import BasePlayer, Currency, currency_range
+from otree.models import Participant
 from pydantic import BaseConfig, BaseModel
 from scipy import stats
 
+from .constants import APP_NAME, STATIC_DIR, Constants
 
-def compute_profit(player: Any) -> float:
-    """Compute & return the planner's profit at the end of each game (single playthrough).
 
-    Parameters
-    ----------
-    player: BasePlayer
-        The player
+def as_static_path(path: Path):
+    if str(STATIC_DIR) + "/" in str(path):
+        return str(path).replace(str(STATIC_DIR) + "/", APP_NAME + "/")
+    raise ValueError(f"path must begin with {str(STATIC_DIR) +'/'!r} - got {path!r}")
 
-    ## Important attributes
-    retail_cost : float
-        Rc - get from low/high variance options
-    wholesale_cost : float
-        Wc - get from low/high variance options
-    holding_cost : float
-        Hc - get from low/high variance options
-    excess_quantity : float
-        Eq - get from player cache
-    order_quantity : float
-        Oq - get from player's input each round
-    demand_quantity : float
-        Dq - draw dynamically from distribution
 
-    # Pseudo-code:
-    if sq + oq > dq:
-        # we still have an excess
-        rev = Dq * Rc
-        sq = sq + oq - dq
-        costs = oq * Wc + sq * Hc
-        return rev - costs
+def get_game_number(round_number: int) -> int:
+    return ((round_number - 1) - (round_number - 1) % Constants.rounds_per_game) // Constants.rounds_per_game + 1
+
+
+def get_game_rounds(round_number: int) -> List[int]:
+    game_number = get_game_number(round_number)
+    last_round = Constants.rounds_per_game * game_number + 1
+    first_round = last_round - Constants.rounds_per_game
+    return list(range(first_round, last_round))
+
+
+def get_round_in_game(round_number: int) -> int:
+    game_number = get_game_number(round_number)
+    return round_number - (game_number - 1) * Constants.rounds_per_game
+
+
+def get_page_name(player: BasePlayer) -> str:
+    participant: Participant = player.participant
+    return participant._current_page_name
+
+
+def get_app_name(player: BasePlayer) -> str:
+    participant: Participant = player.participant
+    return participant._current_app_name
+
+
+def get_optimal_order_quantity(player: BasePlayer) -> int:
+    from .models import Player
+
+    assert isinstance(player, Player), f"""this function is only valid for player type {Player!r}"""
+    if player.participant.vars.get("treatment", None) is None:
+        return 0
+    return max(0, round(player.participant.treatment.get_optimal_order_quantity() - player.participant.stock_units))
+
+
+def is_game_over(round_number: int) -> bool:
+    game_number = get_game_number(round_number)
+    return round_number == game_number * Constants.rounds_per_game
+
+
+def is_absolute_final_round(round_number: int):
+    return round_number == Constants.rounds_per_game * Constants.num_games
+
+
+def frontend_format_currency(currency: Currency, as_integer: bool = False) -> str:
+    import re
+
+    symbol = re.sub(r"([^0-9.]+)(.*)", "\\1", str(currency))
+    if as_integer:
+        decimals = 0
     else:
-        rev = ( sq + oq ) * Rc
-        costs = oq * Wc
-        return rev - costs
-
-    Returns
-    -------
-    float
-        Profit amount
-    """
-
-    from .models import Costs
-
-    # get from player treatment group & map to values defined in above dictionaries
-    Rc, Wc, Hc = Costs.tuple()
-
-    # NOTE: get excess_stock from participant's cache (round_i - 1)
-    Eq_1 = player.cache.get("excess_stock")
-    # Oq: get from page input
-    Oq = None
-    # Dq: draw from the lognorm
-    Dq = None
-
-    # update the player's excess_stock for next round
-    player.cache["excess_stock"] = Eq_1 + Oq - Dq
-
-    if Eq_1 + Oq > Dq:
-        return Dq * Rc - Oq * Wc - player.cache["excess_stock"] * Hc
-    return (Eq_1 + Oq) * Rc - Oq * Wc
+        decimals = len(str(currency).split(".")[1])
+    c_str = f"{symbol}{float(str(currency).replace(symbol,'')):,.{decimals}f}"
+    return c_str
 
 
 def get_demand_data_csv_path(as_asset_url: bool, participantid: str) -> str:
@@ -136,14 +142,6 @@ def get_settings() -> ModuleType:
 
 def json_dump_settings(**kwargs) -> str:
     return json.dumps(get_settings().asdict(), **kwargs)
-
-
-def apply_distribution_disruption(player: BasePlayer):
-    # player distribution is generated at beginning of each playthrough & cached to the player
-    # it is regenerated between the two playthroughs
-    # 1st playthrough: if disruption is True in the player's treatment group, apply the disruption in round int(1/4 * playthrough_rounds) (6th when 24 rounds)
-    # 2nd playthrough: all participants have a disruption in round int(3/4 * playthrough_rounds) (18th when 24 rounds)
-    pass
 
 
 def lognormalize_normal_samples(normal_rvs: np.ndarray) -> np.ndarray:
@@ -231,7 +229,7 @@ def normalize_lognormal_samples(lognormal_rvs: np.ndarray) -> np.ndarray:
 
 
 def get_time(iso: bool = False) -> float:
-    t = datetime.utcnow()
+    t = datetime.now()
     if not iso:
         return t.timestamp()
     return t.isoformat()

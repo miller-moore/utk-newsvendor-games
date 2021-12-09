@@ -1,24 +1,28 @@
 from os import environ
 
-# NOTE: participant fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#participant-fields
-# NOTE: participant fields are stored internally as participant.vars, but also participant.xyz is same as participant.vars['xyz']
+# NOTE: participant/session fields: https://otree.readthedocs.io/en/latest/rounds.html?#participant-fields
+# NOTE: attributes can always be stored in participant.vars/session.vars (dictionaries)
+# NOTE: however, they may also be assigned as familiar class properties (e.g. object.myattr) if added first to PARTICIPANT_FIELDS/SESSION_FIELDS
 
 # This allows to set any type of data to player.participant (not constrained to oTree's orm column types)
 PARTICIPANT_FIELDS = [
+    "uuid",
     "starttime",
-    "treatment",
+    "is_planner",
+    "years_as_planner",
+    "company_name",
+    "does_consent",
     "unit_costs",
-    "demand_rvs",
     "stock_units",
-    "game_results",
+    "treatment",
+    # "demand_rvs",
     "history",
-    "endtime",
+    "game_results",
+    "payoff_round",
 ]
 
 # NOTE: session fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#session-fields
-# NOTE: session fields are stored internally in session.vars
-SESSION_FIELDS = ["global_var_1", "global_var_2"]
-
+SESSION_FIELDS = []
 
 # if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
 # in SESSION_CONFIGS, except those that explicitly override it.
@@ -26,20 +30,47 @@ SESSION_FIELDS = ["global_var_1", "global_var_2"]
 # e.g. self.session.config['participation_fee']
 SESSION_CONFIG_DEFAULTS = dict(
     doc="",
-    use_secure_urls=True,
+    use_secure_urls=False,
     real_world_currency_per_point=1.00,
     participation_fee=0.00,
 )
 
+
+#
 SESSION_CONFIGS = [
     dict(
-        name="demandplanning",
-        display_name="Demand Planning Game",
+        name="disruption",
+        display_name="Disruption Game",
         num_demo_participants=1,
-        app_sequence=["demandplanning"],
+        app_sequence=["disruption"],
+    ),
+    dict(
+        name="shorthorizon",
+        display_name="Short Horizon Game",
+        num_demo_participants=1,
+        app_sequence=["shorthorizon"],
     ),
 ]
 
+# Rooms
+ROOMS = [
+    dict(
+        name="pilotstudy1",
+        display_name="Student pilot study - 1",
+    ),
+    dict(
+        name="pilotstudy2",
+        display_name="Student pilot study - 2",
+    ),
+    dict(
+        name="pilotstudy3",
+        display_name="Student pilot study - 3",
+    ),
+    dict(
+        name="pilotstudy4",
+        display_name="Student pilot study - 4",
+    ),
+]
 
 # ISO-639 code
 # for example: de, fr, ja, ko, zh-hans
@@ -49,9 +80,12 @@ LANGUAGE_CODE = "en"
 REAL_WORLD_CURRENCY_CODE = "USD"
 USE_POINTS = False
 
-ADMIN_USERNAME = "admin"
 # for security, best to set admin password in an environment variable
-ADMIN_PASSWORD = environ.get("OTREE_ADMIN_PASSWORD")
+ADMIN_USERNAME = environ.get("OTREE_ADMIN_USERNAME", "admin")
+if environ.get("OTREE_ADMIN_PASSWORD"):
+    ADMIN_PASSWORD = environ.get("OTREE_ADMIN_PASSWORD")
+    AUTH_LEVEL = environ.get("OTREE_AUTH_LEVEL", "DEMO")
+
 
 DEMO_PAGE_INTRO_HTML = """ """
 

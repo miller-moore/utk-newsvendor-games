@@ -1,0 +1,7 @@
+pip
+wheel
+setuptools
+black
+rope
+matplotlib
+seaborn

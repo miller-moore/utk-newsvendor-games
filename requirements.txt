@@ -1,12 +1,7 @@
-# otree==5.4.0
-pip
-wheel
-setuptools
 otree
 pandas
-black
-rope
 pydantic
 scipy
+circus
 matplotlib
-rich
+seaborn

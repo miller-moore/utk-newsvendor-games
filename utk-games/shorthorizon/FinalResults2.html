@@ -1,0 +1,26 @@
+{{ block title }}
+    Game {{ game_number }} Complete!
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include Constants.style_template }}
+    {{ include Constants.sections_template }}
+    {{ include Constants.scripts_template }}
+
+    <script>
+        renderFinalResultsContainer();
+    </script>
+
+    {{ if not is_absolute_final_round }}
+        <h6>Game {{ game_number|add(1) }} begins next.</h6>
+
+        <center class="w-100 m-4">
+            {{ next_button }}
+        </center>
+    {{ else }}
+        <h6>Thanks for playing!</h6>
+        {# <h5>Thanks for playing! Your payoff for participating in this survey is {{ participant.payoff }}!</h5> #}
+    {{ endif }}
+
+{{ endblock }}
