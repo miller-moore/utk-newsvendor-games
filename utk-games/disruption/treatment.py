@@ -37,14 +37,21 @@ class UnitCosts(PydanticModel):
         return UnitCosts(rcpu=rcpu, wcpu=wcpu, hcpu=hcpu)
 
 
-class DisributionParameters(PydanticModel):
+class DistributionParameters(PydanticModel):
     mu: float
     sigma: float
-    natural_mu: float
-    natural_sigma: float
+    natural_mu: float = None
+    natural_sigma: float = None
+
+    def __init__(__pydantic_self__, **data: Any) -> None:
+        mu = data["mu"]
+        sigma = data["sigma"]
+        data["natural_mu"] = NATURAL_MEAN
+        data["natural_sigma"] = np.sqrt((np.exp(sigma ** 2) - 1) * (np.exp(2 * np.log(NATURAL_MEAN) + sigma ** 2)))
+        super().__init__(**data)
 
     @classmethod
-    def from_treatment(cls, treatment: "Treatment") -> "DisributionParameters":
+    def from_treatment(cls, treatment: "Treatment") -> "DistributionParameters":
         if treatment.variance_choice == "low":
             sigma = 0.067
             # mu, sigma = 6.212, 0.067
@@ -52,9 +59,8 @@ class DisributionParameters(PydanticModel):
             # mu, sigma = 6.15, 0.35
             sigma = 0.35
         mu = np.log(NATURAL_MEAN) - 0.5 * sigma ** 2
-        natural_sigma = np.sqrt((np.exp(sigma ** 2) - 1) * (np.exp(2 * np.log(NATURAL_MEAN) + sigma ** 2)))
 
-        return DisributionParameters(mu=mu, sigma=sigma, natural_mu=NATURAL_MEAN, natural_sigma=natural_sigma)
+        return DistributionParameters(mu=mu, sigma=sigma)
 
 
 # TREATMENT_GROUPS = list(product(["high", "low"], [True, False]))
@@ -98,18 +104,20 @@ class Treatment(PydanticModel):
     def get_optimal_order_quantity(self) -> float:
         rcpu, wcpu, hcpu = self.get_unit_costs().tuple()
         cf = float((rcpu - wcpu) / (rcpu - wcpu + hcpu))
-        _, sigma = self.get_distribution_parameters().tuple()
-        return float(NATURAL_MEAN * np.exp(stats.norm.ppf(cf) * sigma))
+        distpars = self.get_distribution_parameters()
+        return float(distpars.natural_mu * np.exp(stats.norm.ppf(cf) * distpars.sigma))
 
     def get_unit_costs(self) -> UnitCosts:
         return UnitCosts.from_treatment(self)
 
-    def get_distribution_parameters(self) -> DisributionParameters:
+    def get_distribution_parameters(self) -> DistributionParameters:
         if self._mu is None or self._sigma is None:
-            self._mu, self._sigma, self._natural_mu, self._natural_sigma = DisributionParameters.from_treatment(self).tuple()
-        return DisributionParameters(
-            mu=self._mu, sigma=self._sigma, natural_mu=self._natural_mu, natural_sigma=self._natural_sigma
-        )
+            distpars = DistributionParameters.from_treatment(self)
+            self._mu = distpars.mu
+            self._sigma = distpars.sigma
+            self._natural_mu = distpars.natural_mu
+            self._natural_sigma = distpars.natural_sigma
+        return DistributionParameters(mu=self._mu, sigma=self._sigma)
 
     def get_payoff_round(self):
         if self._payoff_round is None:
@@ -124,12 +132,13 @@ class Treatment(PydanticModel):
         if len(self._demand_rvs) == size and not disrupt:
             return self._demand_rvs
 
-        mu, sigma = self.get_distribution_parameters().tuple()
         if disrupt:
             self._disrupted = True
             ## transform mu & sigma
-            self._mu *= 1
-            self._sigma *= 2
+            mu = self._mu * 1
+            sigma = self._sigma * 2
+            distpars = DistributionParameters(mu=mu, sigma=sigma)
+            self._mu, self._sigma, self._natural_mu, self._natural_sigma = distpars.tuple()
         self._demand_rvs = sample_demand_rvs(self._mu, self._sigma, size)
         return self._demand_rvs
 
