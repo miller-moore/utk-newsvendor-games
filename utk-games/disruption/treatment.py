@@ -5,8 +5,7 @@ from enum import Enum
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
-                    Tuple, Union)
+from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as stats
@@ -41,6 +40,8 @@ class UnitCosts(PydanticModel):
 class DisributionParameters(PydanticModel):
     mu: float
     sigma: float
+    natural_mu: float
+    natural_sigma: float
 
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "DisributionParameters":
@@ -51,8 +52,9 @@ class DisributionParameters(PydanticModel):
             # mu, sigma = 6.15, 0.35
             sigma = 0.35
         mu = np.log(NATURAL_MEAN) - 0.5 * sigma ** 2
+        natural_sigma = np.sqrt((np.exp(sigma ** 2) - 1) * (np.exp(2 * np.log(NATURAL_MEAN) + sigma ** 2)))
 
-        return DisributionParameters(mu=mu, sigma=sigma)
+        return DisributionParameters(mu=mu, sigma=sigma, natural_mu=NATURAL_MEAN, natural_sigma=natural_sigma)
 
 
 # TREATMENT_GROUPS = list(product(["high", "low"], [True, False]))
@@ -63,6 +65,8 @@ class Treatment(PydanticModel):
     idx: conint(strict=True, ge=1, le=len(TREATMENT_GROUPS))
     _mu: float = None
     _sigma: float = None
+    _natural_mu: float = None
+    _natural_sigma: float = None
     _payoff_round: int = None
     _demand_rvs: List[float] = []
     _png_file: Path = None
@@ -102,8 +106,10 @@ class Treatment(PydanticModel):
 
     def get_distribution_parameters(self) -> DisributionParameters:
         if self._mu is None or self._sigma is None:
-            self._mu, self._sigma = DisributionParameters.from_treatment(self).tuple()
-        return DisributionParameters(mu=self._mu, sigma=self._sigma)
+            self._mu, self._sigma, self._natural_mu, self._natural_sigma = DisributionParameters.from_treatment(self).tuple()
+        return DisributionParameters(
+            mu=self._mu, sigma=self._sigma, natural_mu=self._natural_mu, natural_sigma=self._natural_sigma
+        )
 
     def get_payoff_round(self):
         if self._payoff_round is None:
