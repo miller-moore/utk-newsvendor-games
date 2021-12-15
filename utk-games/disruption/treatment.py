@@ -5,7 +5,8 @@ from enum import Enum
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
@@ -64,8 +65,8 @@ class DistributionParameters(PydanticModel):
 
 
 # TREATMENT_GROUPS = list(product(["high", "low"], [True, False]))
-TREATMENT_GROUPS = list(product(["low", "high"], [True, True]))
-
+TREATMENT_GROUPS = list(product(["low", "high"], [True, False]))
+# mapping: {1: ('low', True), 2: ('low', False), 3: ('high', True), 4: ('high', False)}
 
 class Treatment(PydanticModel):
     idx: conint(strict=True, ge=1, le=len(TREATMENT_GROUPS))
@@ -154,6 +155,71 @@ class Treatment(PydanticModel):
         self._disrupted = False
 
     def save_distribution_plots(self) -> Tuple[Path, Path]:
+        """Returns two file paths: file path of regular disruption plot & file path of disrupted disruption plot."""
+
+        from datetime import datetime
+
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        png_file = Path(STATIC_DIR).joinpath(f"distribution-{self.idx}.png")
+        disrupted_png_file = Path(STATIC_DIR).joinpath(f"distribution-disrupt-{self.idx}.png")
+
+        if png_file.exists() and (datetime.now().timestamp() - png_file.stat().st_mtime) < 86400:
+            self._png_file = png_file
+
+        if disrupted_png_file.exists() and (datetime.now().timestamp() - png_file.stat().st_mtime) < 86400:
+            self._disrupted_png_file = disrupted_png_file
+
+        if self._png_file and self._disrupted_png_file:
+            return self._png_file, self._disrupted_png_file
+
+        # original props - restore in `finally` block after disrupt
+        _mu, _sigma, _demand_rvs = self._mu, self._sigma, self._demand_rvs
+
+        color = "#eb6e08"
+        try:
+            rvs_regular = self.get_demand_rvs(size=int(1e5))
+            rvs_disrupted = self.get_demand_rvs(size=int(1e5), disrupt=True)
+
+            ## get sensible axis limits
+
+            # yaxis max
+            sns.displot(rvs_regular, color=color, kind="kde", fill=True)
+            ymax_regular = plt.gca().get_ylim()[1]
+            plt.cla()
+            sns.displot(rvs_disrupted, color=color, kind="kde", fill=True)
+            ymax_disrupted = plt.gca().get_ylim()[1]
+            plt.cla()
+            ymax = max(0.01, ymax_regular, ymax_disrupted)
+
+            # xaxis max
+            # xmax = max(rvs_regular + rvs_disrupted)
+            xmax = 2000
+
+            # plot regular distribution
+            sns.displot(rvs_regular, color=color, kind="kde", fill=True)
+            plt.xlim((0, 2000 if xmax > 2000 else xmax))
+            plt.ylim(0, ymax)
+            plt.yticks([])
+            plt.ylabel(None)
+            plt.savefig(png_file)
+
+            # plot disrupted distribution
+            sns.displot(rvs_disrupted, color=color, kind="kde", fill=True)
+            plt.xlim((0, 2000 if xmax > 2000 else xmax))
+            plt.ylim(0, ymax)
+            plt.yticks([])
+            plt.ylabel(None)
+            plt.savefig(disrupted_png_file)
+
+            self._png_file, self._disrupted_png_file = png_file, disrupted_png_file
+            return self._png_file, self._disrupted_png_file
+        finally:
+            # reset self params to provided values
+            self.reset()
+
+    def save_distribution_plots_old(self) -> Tuple[Path, Path]:
         """Returns two file paths: file path of regular disruption plot & file path of disrupted disruption plot."""
 
         from datetime import datetime
