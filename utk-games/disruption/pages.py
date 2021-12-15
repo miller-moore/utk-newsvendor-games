@@ -113,6 +113,8 @@ def vars_for_template(player: Player) -> dict:
         payoff_round=player.participant.vars.get("payoff_round", None),
         payoff=player.participant.vars.get("payoff", None),
         treatment=treatment.idx,
+        mean=treatment._natural_mu,
+        stddev=treatment._natural_sigma,
     )
 
     # make Currency (Decimal) objects json serializable
