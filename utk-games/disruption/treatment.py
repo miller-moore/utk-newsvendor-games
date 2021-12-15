@@ -68,6 +68,7 @@ class DistributionParameters(PydanticModel):
 TREATMENT_GROUPS = list(product(["low", "high"], [True, False]))
 # mapping: {1: ('low', True), 2: ('low', False), 3: ('high', True), 4: ('high', False)}
 
+
 class Treatment(PydanticModel):
     idx: conint(strict=True, ge=1, le=len(TREATMENT_GROUPS))
     _mu: float = None
@@ -182,24 +183,17 @@ class Treatment(PydanticModel):
             rvs_regular = self.get_demand_rvs(size=int(1e5))
             rvs_disrupted = self.get_demand_rvs(size=int(1e5), disrupt=True)
 
-            ## get sensible axis limits
-
-            # yaxis max
-            sns.displot(rvs_regular, color=color, kind="kde", fill=True)
-            ymax_regular = plt.gca().get_ylim()[1]
-            plt.cla()
-            sns.displot(rvs_disrupted, color=color, kind="kde", fill=True)
-            ymax_disrupted = plt.gca().get_ylim()[1]
-            plt.cla()
-            ymax = max(0.01, ymax_regular, ymax_disrupted)
-
-            # xaxis max
-            # xmax = max(rvs_regular + rvs_disrupted)
-            xmax = 2000
+            # set axis limits
+            if self.variance_choice == "low":
+                # 'low' variability
+                xmax, ymax = 1000, 0.012
+            else:
+                # 'high' variability
+                xmax, ymax = 1500, 0.003
 
             # plot regular distribution
             sns.displot(rvs_regular, color=color, kind="kde", fill=True)
-            plt.xlim((0, 2000 if xmax > 2000 else xmax))
+            plt.xlim((0, xmax))
             plt.ylim(0, ymax)
             plt.yticks([])
             plt.ylabel(None)
@@ -207,7 +201,7 @@ class Treatment(PydanticModel):
 
             # plot disrupted distribution
             sns.displot(rvs_disrupted, color=color, kind="kde", fill=True)
-            plt.xlim((0, 2000 if xmax > 2000 else xmax))
+            plt.xlim((0, xmax))
             plt.ylim(0, ymax)
             plt.yticks([])
             plt.ylabel(None)
