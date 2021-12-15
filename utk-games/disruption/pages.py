@@ -11,15 +11,23 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
 from .constants import DISRUPTION_ROUND_IN_GAMES
-from .formvalidation import (default_error_message,
-                             register_form_field_validator)
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Constants, Player, initialize_game_history
 from .treatment import Treatment, UnitCosts
-from .util import (as_static_path, get_app_name, get_game_number,
-                   get_game_rounds, get_optimal_order_quantity, get_page_name,
-                   get_round_in_game, get_time, is_absolute_final_round,
-                   is_disruption_next_round, is_disruption_this_round,
-                   is_game_over)
+from .util import (
+    as_static_path,
+    get_app_name,
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_round_in_game,
+    get_time,
+    is_absolute_final_round,
+    is_disruption_next_round,
+    is_disruption_this_round,
+    is_game_over,
+)
 
 Page.error_message = staticmethod(default_error_message)
 
@@ -56,9 +64,7 @@ def validate_does_consent(does_consent: bool) -> Optional[str]:
 
 def vars_for_template(player: Player) -> dict:
 
-    from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                REAL_WORLD_CURRENCY_CODE,
-                                REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+    from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
 
@@ -85,7 +91,9 @@ def vars_for_template(player: Player) -> dict:
         if treatment.disruption_choice and player.game_number == 1
         else None,
         distribution_png=as_static_path(distribution_png),
-        disrupted_distribution_png=as_static_path(distribution_png if player.game_number == 1 and not treatment.disruption_choice else disrupted_distribution_png),
+        disrupted_distribution_png=as_static_path(
+            distribution_png if player.game_number == 1 and not treatment.disruption_choice else disrupted_distribution_png
+        ),
         is_disrupted=treatment.is_disrupted(),
         is_disruption_this_round=is_disruption_this_round(player),
         is_disruption_next_round=is_disruption_next_round(player),

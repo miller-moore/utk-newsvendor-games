@@ -132,6 +132,9 @@ class Treatment(PydanticModel):
         if len(self._demand_rvs) == size and not disrupt:
             return self._demand_rvs
 
+        if self._mu is None or self._sigma is None:
+            _ = self.get_distribution_parameters()
+
         if disrupt:
             self._disrupted = True
             ## transform mu & sigma
