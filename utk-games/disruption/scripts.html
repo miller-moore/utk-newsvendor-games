@@ -418,13 +418,17 @@
         var costsWholesaleRow = $("#row-wcpu");
         var costsRetailRow = $("#row-rcpu");
         var costsHoldingRow = $("#row-hcpu");
+        var DistRow = $("#row-dist");
         var wcpu = formatCurrency(js_vars.wcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
         var rcpu = formatCurrency(js_vars.rcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
         var hcpu = formatCurrency(js_vars.hcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
+        var mean = formatNumber(js_vars.mean, {minimumFractionDigits: 0, maximumFractionDigits: 0} );
+        var stddev = formatNumber(js_vars.stddev, {minimumFractionDigits: 0, maximumFractionDigits: 0} );
 
         costsWholesaleRow.append(`<td id="row-wcpu">${wcpu} / unit / period</td>`);
         costsRetailRow.append(`<td id="row-rcpu">${rcpu} / unit / period</td>`);
         costsHoldingRow.append(`<td id="row-hcpu">${hcpu} / unit / period</td>`);
+        DistRow.append(`<td id="row-dist">N~(mu:${mean}, stddev:${stddev})</td>`);
 
         try {
             costsTable.bootstrapTable({
