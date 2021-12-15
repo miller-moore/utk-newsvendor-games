@@ -428,7 +428,7 @@
         costsWholesaleRow.append(`<td id="row-wcpu">${wcpu} / unit / period</td>`);
         costsRetailRow.append(`<td id="row-rcpu">${rcpu} / unit / period</td>`);
         costsHoldingRow.append(`<td id="row-hcpu">${hcpu} / unit / period</td>`);
-        DistRow.append(`<td id="row-dist">N~(mu:${mean}, stddev:${stddev})</td>`);
+        DistRow.append(`<td id="row-dist">N~(${mean}, ${stddev})</td>`);
 
         try {
             costsTable.bootstrapTable({
