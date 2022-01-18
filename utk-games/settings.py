@@ -19,6 +19,8 @@ PARTICIPANT_FIELDS = [
     "history",
     "game_results",
     "payoff_round",
+    "q1",
+    "q2",
 ]
 
 # NOTE: session fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#session-fields

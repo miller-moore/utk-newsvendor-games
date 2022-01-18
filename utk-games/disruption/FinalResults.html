@@ -12,15 +12,14 @@
         renderFinalResultsContainer();
     </script>
 
-    {{ if not is_absolute_final_round }}
-        <h5>Game {{ game_number|add(1) }} begins next.</h5>
-
-        <center class="w-100 m-4">
-            {{ next_button }}
-        </center>
+    {{ if is_absolute_final_round }}
+        <h5>Congrats, you've completed all games!</h5>
     {{ else }}
-        <h5>Thanks for playing!</h5>
-        {# <h5>Thanks for playing! Your payoff for participating in this survey is {{ participant.payoff }}!</h5> #}
+        <h5>Game {{ game_number|add(1) }} begins next.</h5>
     {{ endif }}
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
 
 {{ endblock }}

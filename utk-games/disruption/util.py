@@ -57,7 +57,8 @@ def get_optimal_order_quantity(player: BasePlayer) -> int:
     assert isinstance(player, Player), f"""this function is only valid for player type {Player!r}"""
     if player.participant.vars.get("treatment", None) is None:
         return 0
-    return max(0, round(player.participant.treatment.get_optimal_order_quantity() - player.participant.stock_units))
+    ooq = player.participant.treatment.get_optimal_order_quantity(player)
+    return max(0, round(ooq - player.participant.stock_units))
 
 
 def is_game_over(round_number: int) -> bool:

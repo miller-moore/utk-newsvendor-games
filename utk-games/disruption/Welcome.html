@@ -11,11 +11,24 @@
     {{ include Constants.sections_template }}
     {{ include Constants.scripts_template }}
 
-    <div class="col-12">
-        {{ formfield 'is_planner' }}
-        {{ formfield 'years_as_planner' }}
-        {{ formfield 'company_name' }}
-        {{ formfield 'does_consent' }}
+    <div class="row border mb-4" id="welcome-questions-container">
+        <div class="card border">
+            <div class="card-body">
+                {# <h5 class="card-title">Final Questions</h5> #}
+                <p>
+                    {{ formfield 'is_planner' }}
+                </p>
+                <p>
+                    {{ formfield 'years_as_planner' }}
+                </p>
+                <p>
+                    {{ formfield 'company_name' }}
+                </p>
+                <p>
+                    {{ formfield 'does_consent' }}
+                </p>
+            </div>
+        </div>
     </div>
 
 

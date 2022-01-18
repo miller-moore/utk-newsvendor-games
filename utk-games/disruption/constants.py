@@ -66,6 +66,7 @@ class Constants(ConstantsBase):
     app_name = APP_DIR.name
     allow_disruption = ALLOW_DISRUPTION
     rvs_size = RVS_SIZE
+    prolific_code = "THIS_CODE_IS_TOTALLY_CONTRIVED"
 
     # paths for templates used in include tags, e.g., {{ include "disruption/style.html" }} or {{ include Constants.style_template }}
     style_template = get_includable_template_path("style.html")

@@ -13,7 +13,7 @@ from otree.models import Participant
 from .constants import DISRUPTION_ROUND_IN_GAMES
 from .formvalidation import default_error_message, register_form_field_validator
 from .models import Constants, Player, initialize_game_history
-from .treatment import Treatment, UnitCosts
+from .treatment import Distribution, Treatment, UnitCosts
 from .util import (
     as_static_path,
     get_app_name,
@@ -67,8 +67,7 @@ def vars_for_template(player: Player) -> dict:
     from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
-
-    distribution_png, disrupted_distribution_png = treatment.save_distribution_plots()
+    distribution: Distribution = treatment.get_distribution(player=player)
 
     _vars = dict(
         language_code=LANGUAGE_CODE,
@@ -90,10 +89,7 @@ def vars_for_template(player: Player) -> dict:
         disruption_round=DISRUPTION_ROUND_IN_GAMES.get(player.game_number, None)
         if treatment.disruption_choice and player.game_number == 1
         else None,
-        distribution_png=as_static_path(distribution_png),
-        disrupted_distribution_png=as_static_path(
-            distribution_png if player.game_number == 1 and not treatment.disruption_choice else disrupted_distribution_png
-        ),
+        distribution_png=as_static_path(treatment.get_distribution_plot(player=player)),
         is_disrupted=treatment.is_disrupted(),
         is_disruption_this_round=is_disruption_this_round(player),
         is_disruption_next_round=is_disruption_next_round(player),
@@ -121,8 +117,8 @@ def vars_for_template(player: Player) -> dict:
         payoff_round=player.participant.vars.get("payoff_round", None),
         payoff=player.participant.vars.get("payoff", None),
         treatment=treatment.idx,
-        mean=treatment._natural_mu,
-        stddev=treatment._natural_sigma,
+        mu=distribution.mu,
+        sigma=distribution.sigma,
     )
 
     # make Currency (Decimal) objects json serializable
@@ -136,7 +132,7 @@ def vars_for_template(player: Player) -> dict:
 def js_vars(player: Player) -> dict:
     _vars = Page.vars_for_template(player).copy()
     treatment = player.participant.treatment
-    _vars.update(demand_rvs=treatment.get_demand_rvs())
+    _vars.update(demand_rvs=treatment.get_demand_rvs(player=player))
     return _vars
 
 
@@ -203,7 +199,7 @@ class Disruption(Page):
     @staticmethod
     def before_next_page(player: Player, **kwargs):
         if Constants.allow_disruption:
-            player.participant.treatment.get_demand_rvs(Constants.rvs_size, disrupt=True)
+            player.participant.treatment.disrupt()
 
 
 class Decide(Page):
@@ -220,9 +216,13 @@ class Decide(Page):
         wcpu = float(unit_costs.wcpu)
         hcpu = float(unit_costs.hcpu)
 
-        # unit quantities
+        # Get demand units!
+        du = round(
+            player.participant.treatment.get_demand(randomly=False, player=player)
+        )  # NOTE: not randomly means from pre-determined data
+
+        # stock & order units
         su = round(player.participant.stock_units)
-        du = round(random.choice(player.participant.treatment._demand_rvs))
         ou = round(player.ou)
 
         # compute revenue, cost, profit
@@ -294,6 +294,28 @@ class FinalResults(Page):
         return is_game_over(player.round_number)
 
 
+class FinalQuestions(Page):
+
+    form_model = "player"
+    form_fields = ["q1", "q2"]
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_absolute_final_round(player.round_number)
+
+    @staticmethod
+    def before_next_page(player: Player, timeout_happened):
+        if is_absolute_final_round(player.round_number):
+            player.participant.q1 = player.q1
+            player.participant.q2 = player.q2
+
+
+class Prolific(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_absolute_final_round(player.round_number)
+
+
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [HydratePlayer, Welcome, Disruption, Decide, Results, FinalResults]
+page_sequence = [HydratePlayer, Welcome, Disruption, Decide, Results, FinalResults, FinalQuestions, Prolific]
