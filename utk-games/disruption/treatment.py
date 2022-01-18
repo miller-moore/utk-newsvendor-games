@@ -35,7 +35,7 @@ class DisruptionGameOne(Flag):
 
 # NOTE: mapping of treatment parameters, values are all combinations of VariabilityDegree x DisruptionGameOne, keys are treatment indexes (1-4)
 # {1: ('low', True), 2: ('low', False), 3: ('high', True): 4: ('high', False) }
-TREATMENT_MAP: dict[int, tuple[VariabilityDegree, DisruptionGameOne]] = {
+TREATMENT_MAP: Dict[int, Tuple[VariabilityDegree, DisruptionGameOne]] = {
     i + 1: params for i, params in enumerate(product(list(VariabilityDegree), list(DisruptionGameOne)))
 }
 
@@ -257,7 +257,7 @@ class Treatment(PydanticModel):
 
 
 # NOTE: mapping of demand data, values are tuples (list[float], list[float]) for game 1 & game 2 demand vectors, keys are treatment indexes
-TREATMENT_DEMAND_MAP: dict[int, tuple[float, float]] = {
+TREATMENT_DEMAND_MAP: Dict[int, Tuple[float, float]] = {
     1: (  # 1: ('low', True)
         [
             495.2006,
