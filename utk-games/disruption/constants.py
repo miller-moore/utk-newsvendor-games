@@ -9,7 +9,7 @@ ROUNDS = 12
 # NOTE: disruption stuff
 # NOTE: a disruption only applies to the first game - everybody gets a disruption in the second game
 ALLOW_DISRUPTION = True
-DISRUPTION_ROUND_IN_GAMES = {1: int(1 / 2 * ROUNDS), 2: int(1 / 2 * ROUNDS)}
+DISRUPTION_ROUND_IN_GAMES = {1: int(1 + 1 / 2 * ROUNDS), 2: int(1 + 1 / 2 * ROUNDS)}
 NATURAL_MEAN = 500
 
 RVS_SIZE = int(1e5)
