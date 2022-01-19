@@ -10,7 +10,7 @@ from otree.api import Currency, Page
 from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
-from .constants import DISRUPTION_ROUND_IN_GAMES
+from .constants import DISRUPTION_ROUND_IN_GAMES, STATIC_DIR
 from .formvalidation import default_error_message, register_form_field_validator
 from .models import Constants, Player, initialize_game_history
 from .treatment import Distribution, Treatment, UnitCosts
@@ -90,6 +90,15 @@ def vars_for_template(player: Player) -> dict:
         if treatment.disruption_choice and player.game_number == 1
         else None,
         distribution_png=as_static_path(treatment.get_distribution_plot(player=player)),
+        instructions_demand_page_1=as_static_path(
+            Path(STATIC_DIR).joinpath("instructions-demand-page-1.png")
+        ),  # see Instructions3.html
+        instructions_demand_page_2=as_static_path(
+            Path(STATIC_DIR).joinpath("instructions-demand-page-2.png")
+        ),  # see Instructions3.html
+        instructions_demand_page_3=as_static_path(
+            Path(STATIC_DIR).joinpath("instructions-demand-page-3.png")
+        ),  # see Instructions3.html
         is_disrupted=treatment.is_disrupted(),
         is_disruption_this_round=is_disruption_this_round(player),
         is_disruption_next_round=is_disruption_next_round(player),
@@ -189,6 +198,24 @@ class Welcome(Page):
         player.participant.years_as_planner = player.years_as_planner
         player.participant.company_name = player.company_name
         player.participant.does_consent = player.does_consent
+
+
+class Instructions1(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == 1
+
+
+class Instructions2(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == 1
+
+
+class Instructions3(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == 1
 
 
 class Disruption(Page):
@@ -318,4 +345,16 @@ class Prolific(Page):
 
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [HydratePlayer, Welcome, Disruption, Decide, Results, FinalResults, FinalQuestions, Prolific]
+page_sequence = [
+    HydratePlayer,
+    Welcome,
+    Instructions1,
+    Instructions2,
+    Instructions3,
+    Disruption,
+    Decide,
+    Results,
+    FinalResults,
+    FinalQuestions,
+    Prolific,
+]

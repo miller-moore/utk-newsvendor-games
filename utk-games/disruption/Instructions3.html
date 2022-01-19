@@ -1,0 +1,46 @@
+{{ block title }}
+    Demand Planning Game: Welcome
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include Constants.style_template }}
+    {{ include Constants.sections_template }}
+    {{ include Constants.scripts_template }}
+
+    <p>
+        After clicking next below, you will come to the first demand page. Because of their importance and repitition throughout the game, the key components of this page are described briefly as follows:
+
+        <br>
+        <br>
+        <center>
+            <img src="{{ static instructions_demand_page_1 }}" width="1100" height="817" />  <!-- 689 × 512, ratio=0.7431 -->
+            <br>
+            <br>
+            <img src="{{ static instructions_demand_page_2 }}" width="1100" height="1036" />  <!-- 637 × 600, ratio=0.9419 -->
+        </center>
+    </p>
+    <p class="mt-5">
+        At the bottom, there is a place for you to input how much you want to order for the next round:
+        <br>
+        <br>
+        <center>
+            <img src="{{ static instructions_demand_page_3 }}" width="1100" height="540" />  <!-- 697x342, ratio=0.4907 -->
+        </center>
+    </p>
+    <p class="mt-5">
+        Bonus pay will be calculated by multiplying profit from one round by .75%. For example, a single round profit of $4,000 would lead to a bonus pay of 4,000*.00075= $3.  This pay will be added to your account in the next week.
+    </p>
+    <p>
+        At the end of the game, there will be a code to input into Prolific to get the base pay. Make sure you copy the code from this page before exiting out of the game.
+    </p>
+    <p>
+        Please click the next button below to start the game and thank you!
+    </p>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+{{ endblock }}
+

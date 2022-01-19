@@ -1,0 +1,70 @@
+{{ block title }}
+    Game Instructions
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include Constants.style_template }}
+    {{ include Constants.sections_template }}
+    {{ include Constants.scripts_template }}
+
+    <p>
+        In this experiment, you have the role of an inventory manager. You must decide how many units of a
+        product you want to order and stock to sell them to your customers.
+    </p>
+    <p>
+        You are making these decisions over multiple rounds. In every round, you are deciding on an
+        order quantity.
+    </p>
+    <p>
+        You are making your decision under uncertainty, i.e., at the time of the order decision you do
+        not know the exact demand of the period. However, you do know the probability distribution of
+        the demand. The demand for your product will be show by a distribution curve, shown on the
+        decision-making page. Demand is independent between rounds.
+    </p>
+    <p>
+        You have no starting inventory in your warehouse at the beginning of the game. You will order
+        units which then get delivered before demand is realized. Any leftover inventory after demand is
+        realized will be carried over to the next round (starting inventory). Starting inventory and order
+        quantity sum up to the available inventory as follows:
+    </p>
+    <p>
+        {# &nbsp;&nbsp;&nbsp;&nbsp; #}
+        <code class="ml-5">available inventory = starting inventory + order quantity</code>
+    </p>
+    <p>
+        Note that you cannot order more than 1,000 units per round.
+    </p>
+    <p>
+        Holding costs occur for holding inventory which is carried over between rounds. E.g., if your
+        available inventory is 90 units but demand is only 80 units, you can only 80 sell units (because
+        demand was only 80). The left-over 10 units are stocked in inventory and holding costs are
+        charged for these. Holding costs are charged for the resulting left-over 10 units that are stocked
+        in inventory. If you purchased too few units in a period to fulfill this period’s demand, the
+        unfulfilled demand is lost. You cannot reorder within a period or shift demand to later periods.
+        E.g., if your available inventory is only 30 units and demand is 80 units, you can only sell 30
+        units (since you did not order more).
+    </p>
+    <p>
+        You are trying to maximize your Cash Flow (CF) in this experiment. The CF is calculated as
+        follows:
+    </p>
+    <p>
+        <code class="ml-5">CF = Selling price x units sold - purchasing price x order quantity – holding costs * holding inventory</code>
+    </p>
+    <p>
+        Note that the units sold is the minimum of demand and available inventory. You receive the
+        selling price for every unit sold. From this amount, you need to deduct the purchasing costs for
+        the products bought. Additionally, you need to deduct the holding costs for the holding
+        inventory.
+    </p>
+    <p>
+        In this experiment, your costs will be displayed on the decision page.
+    </p>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+{{ endblock }}
+

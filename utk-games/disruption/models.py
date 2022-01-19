@@ -122,17 +122,26 @@ class Player(BasePlayer):
 
     # participant data
     treatment = models.IntegerField(min=1)
+
     # participant Welcome formfields
-    is_planner = models.BooleanField(widget=widgets.RadioSelectHorizontal(), label="Are you presently employed as a planner?")
-    years_as_planner = models.IntegerField(
-        label="How many years in your career have you held the role of planner (rounded to the nearest year)?"
+    is_planner = models.BooleanField(
+        widget=widgets.RadioSelectHorizontal(),
+        # label="Are you presently employed as a planner?"
+        label="Are you presently employed as a Proflific employee and do you have experience in a manufacturing and/or operations management role?",
     )
+    years_as_planner = models.IntegerField(
+        label="How many years have you been employed in a manufacturing and/or operations management role (rounded to the nearest year)?"
+    )
+    # company_name = models.StringField(
+    #     label="What is the name of the company your currently work for?",
+    # )
     company_name = models.StringField(
-        label="What is the name of the company your currently work for?",
+        label="Please input your Prolific ID here.",
     )
     does_consent = models.BooleanField(
         widget=widgets.CheckboxInput(),
-        label="By checking this box, you consent to participate in this study. You understand that all data will be kept confidential by the researcher. Your personal information will not be stored in backend databases. You are free to withdraw at any time without giving a reason.",
+        # label="By checking this box, you consent to participate in this study. You understand that all data will be kept confidential by the researcher. Your personal information will not be stored in backend databases. You are free to withdraw at any time without giving a reason.",
+        label="""By checking the button to the left you agree to participate in this survey.""",
     )
 
     # player data
@@ -141,7 +150,7 @@ class Player(BasePlayer):
 
     # stock units, order units, demand units
     su = models.IntegerField(min=0, initial=0)
-    ou = models.IntegerField(min=0)  # formfield 'ou'
+    ou = models.IntegerField(min=0, max=1000)  # formfield 'ou'
     du = models.IntegerField(min=0)
     ooq = models.IntegerField(min=0)
 

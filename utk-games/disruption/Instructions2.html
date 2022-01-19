@@ -1,0 +1,52 @@
+{{ block title }}
+    Demand Planning Game: Welcome
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include Constants.style_template }}
+    {{ include Constants.sections_template }}
+    {{ include Constants.scripts_template }}
+
+    <p>
+        Two examples of calculating the CF in a period follow below:
+        <ol>
+            <li>
+                Example 1:
+                <ul>
+                    <li>selling price: 20 USD / unit</li>
+                    <li>purchasing price: 7.5 USD / unit</li>
+                    <li>inventory holding costs: 5 USD / unit</li>
+                    <li>starting inventory 10 units</li>
+                    <li>order quantity: 50 units</li>
+                    <li>available inventory: 60 units [ = 10 units available inventory + 50 units order quantity]</li>
+                    <li>demand: 20 units</li>
+                </ul>
+                <br>
+                <code>CF = 20 USD * 20 units [units sold = Minimum of demand and available inventory] - 7.5 USD * 50 units [order quantity] - 5 USD * 40 units [final inventory= available inventory - units sold]</code>
+                <br>
+                <br>
+                <code class="ml-2">&nbsp;&nbsp;= -175 USD</code>
+            </li>
+
+            <li class="mt-4">
+                Example 2:
+                <ul>
+                    <li>demand: 100 units</li>
+                    <li>other constants from example 1 apply</li>
+                </ul>
+                <br>
+                <code>CF = 20 USD * 60 units [units sold = Minimum of demand and available inventory] - 7.5 USD * 50 units [order quantity] - 5 USD * 0 units [final inventory= 0]</code>
+                <br>
+                <br>
+                <code class="ml-2">&nbsp;&nbsp;= 825 USD</code>
+            </li>
+        </ol>
+    </p>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+{{ endblock }}
+
