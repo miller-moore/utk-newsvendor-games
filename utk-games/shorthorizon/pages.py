@@ -79,6 +79,7 @@ class ShortHorizonPage(Page):
             session_code=player.session.code,
             participant_code=player.participant.code,
             distribution_png=as_static_path(treatment.get_distribution_plot(player=player)),
+            is_pilot_test=player.session.config.get('is_pilot_test', False),
             is_game_over=is_game_over(player.round_number),
             is_absolute_final_round=is_absolute_final_round(player.round_number),
             uuid=player.field_maybe_none("uuid"),
@@ -197,17 +198,19 @@ class Decide2(ShortHorizonPage):
         ou = round(player.ou)
         su = max(0, ou - du)
 
-        # compute revenue, cost, profit
-        cost = ou * wcpu
-        revenue = du * rcpu + su * scpu
+        # revenue = rcpu * du
+        # cost = wcpu * ou + scpu * su
+        # profit = revenue - cost
+        revenue = rcpu * du
+        cost = wcpu * ou + scpu * su
         profit = revenue - cost
 
+        # update player su, du, revenue, cost, & profit
+        player.su = su
+        player.du = du
         player.revenue = Currency(revenue)
         player.cost = Currency(cost)
         player.profit = Currency(profit)
-
-        player.su = su
-        player.du = du
 
         # cumulative profit
         first_round_in_game = get_game_rounds(player.round_number)[0]

@@ -158,7 +158,7 @@ class Player(BasePlayer):
     scpu = models.CurrencyField()
 
     # revenue = rcpu * du
-    # cost = wcpu * ou + hcpu * su
+    # cost = wcpu * ou + scpu * su
     # profit = revenue - cost
     revenue = models.CurrencyField(initial=0)
     cost = models.CurrencyField(initial=0)
