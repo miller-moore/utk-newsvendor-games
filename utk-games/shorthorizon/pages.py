@@ -10,27 +10,20 @@ from otree.api import Currency, Page
 from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
-from .formvalidation import default_error_message, register_form_field_validator
+from .formvalidation import (default_error_message,
+                             register_form_field_validator)
 from .models import Constants, Player, initialize_game_history
 from .treatment import Distribution, Treatment, UnitCosts
-from .util import (
-    as_static_path,
-    get_app_name,
-    get_game_number,
-    get_game_rounds,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_round_in_game,
-    get_time,
-    is_absolute_final_round,
-    is_game_over,
-)
+from .util import (as_static_path, get_app_name, get_game_number,
+                   get_game_rounds, get_optimal_order_quantity, get_page_name,
+                   get_round_in_game, get_time, is_absolute_final_round,
+                   is_game_over)
 
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
 def validate_is_planner(is_planner: bool) -> Optional[str]:
-    if is_planner is False:
-        return f"""Must be True."""
+    # if is_planner is False:
+    #     return f"""Must be True."""
     return
 
 
@@ -64,15 +57,12 @@ class ShortHorizonPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (
-            LANGUAGE_CODE,
-            LANGUAGE_CODE_ISO,
-            REAL_WORLD_CURRENCY_CODE,
-            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
-        )
+        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                    REAL_WORLD_CURRENCY_CODE,
+                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
         treatment: Treatment = player.participant.vars.get("treatment", None)
-        distribution: Distribution = treatment.get_distribution(player=player)
+        distribution: Distribution = treatment.get_distribution()
 
         _vars = dict(
             language_code=LANGUAGE_CODE,
@@ -88,7 +78,8 @@ class ShortHorizonPage(Page):
             period_number=player.period_number,  # game_round,
             session_code=player.session.code,
             participant_code=player.participant.code,
-            distribution_png=as_static_path(distribution_png),
+            distribution_png=as_static_path(treatment.get_distribution_plot(player=player)),
+            is_pilot_test=player.session.config.get('is_pilot_test', False),
             is_game_over=is_game_over(player.round_number),
             is_absolute_final_round=is_absolute_final_round(player.round_number),
             uuid=player.field_maybe_none("uuid"),
@@ -113,6 +104,8 @@ class ShortHorizonPage(Page):
             payoff_round=player.participant.vars.get("payoff_round", None),
             payoff=player.participant.vars.get("payoff", None),
             treatment=treatment.idx,
+            mu=distribution.mu,
+            sigma=distribution.sigma,
         )
 
         # make Currency (Decimal) objects json serializable
@@ -205,17 +198,19 @@ class Decide2(ShortHorizonPage):
         ou = round(player.ou)
         su = max(0, ou - du)
 
-        # compute revenue, cost, profit
-        cost = ou * wcpu
-        revenue = du * rcpu + su * scpu
+        # revenue = rcpu * du
+        # cost = wcpu * ou + scpu * su
+        # profit = revenue - cost
+        revenue = rcpu * du
+        cost = wcpu * ou + scpu * su
         profit = revenue - cost
 
+        # update player su, du, revenue, cost, & profit
+        player.su = su
+        player.du = du
         player.revenue = Currency(revenue)
         player.cost = Currency(cost)
         player.profit = Currency(profit)
-
-        player.su = su
-        player.du = du
 
         # cumulative profit
         first_round_in_game = get_game_rounds(player.round_number)[0]
@@ -260,6 +255,12 @@ class FinalResults2(ShortHorizonPage):
         return is_game_over(player.round_number)
 
 
+class Prolific2(Page):
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_absolute_final_round(player.round_number)
+
+
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [HydratePlayer2, Welcome2, Decide2, Results2, FinalResults2]
+page_sequence = [HydratePlayer2, Welcome2, Decide2, Results2, FinalResults2, Prolific2]

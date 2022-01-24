@@ -6,6 +6,20 @@
 
 {# miscellaneous javascript functions #}
 <script>
+    function addClickNextOnEnterKey() {
+        $(document).keyup(function(event) {
+            if (event.keyCode === 13) {
+                $('[class*="otree-btn-next"]').click();
+            }
+        });
+    }
+    function addClickNextOnOrderUnits() {
+        $("#id_ou").keyup(function(event) {
+            if (event.keyCode === 13) {
+                $('[class*="otree-btn-next"]').click();
+            }
+        });
+    }
     function sort(array, reverse = false) {
         var acopy = Array.from(array);
         acopy.sort((a,b) => reverse === true? b - a: a - b);
