@@ -16,7 +16,8 @@ from otree.models import Participant
 from pydantic import BaseConfig, BaseModel
 from scipy import stats
 
-from .constants import APP_NAME, DISRUPTION_ROUND_IN_GAMES, STATIC_DIR, Constants
+from .constants import (APP_NAME, DISRUPTION_ROUND_IN_GAMES, STATIC_DIR,
+                        Constants)
 
 
 def as_static_path(path: Path):
@@ -57,7 +58,7 @@ def get_optimal_order_quantity(player: BasePlayer) -> int:
     assert isinstance(player, Player), f"""this function is only valid for player type {Player!r}"""
     if player.participant.vars.get("treatment", None) is None:
         return 0
-    ooq = player.participant.treatment.get_optimal_order_quantity(player)
+    ooq = player.participant.treatment.get_optimal_order_quantity()
     return max(0, round(ooq - player.participant.stock_units))
 
 

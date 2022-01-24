@@ -68,7 +68,7 @@ def vars_for_template(player: Player) -> dict:
     from otree.settings import LANGUAGE_CODE, LANGUAGE_CODE_ISO, REAL_WORLD_CURRENCY_CODE, REAL_WORLD_CURRENCY_DECIMAL_PLACES
 
     treatment: Treatment = player.participant.vars.get("treatment", None)
-    distribution: Distribution = treatment.get_distribution(player=player)
+    distribution: Distribution = treatment.get_distribution()
 
     _vars = dict(
         language_code=LANGUAGE_CODE,
@@ -142,7 +142,7 @@ def vars_for_template(player: Player) -> dict:
 def js_vars(player: Player) -> dict:
     _vars = Page.vars_for_template(player).copy()
     treatment = player.participant.treatment
-    _vars.update(demand_rvs=treatment.get_demand_rvs(player=player))
+    _vars.update(demand_rvs=treatment.get_demand_rvs())
     return _vars
 
 

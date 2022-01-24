@@ -5,8 +5,7 @@ from enum import Enum, Flag
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
-                    Tuple, Union)
+from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as stats
@@ -16,11 +15,9 @@ from pydantic import BaseModel, Field, StrBytes, typing, validator
 from pydantic.main import Extra
 from pydantic.types import conint
 
-from .constants import (DISRUPTION_ROUND_IN_GAMES, NATURAL_MEAN, STATIC_DIR,
-                        Constants)
+from .constants import DISRUPTION_ROUND_IN_GAMES, NATURAL_MEAN, STATIC_DIR, Constants
 from .pydanticmodel import PydanticModel
-from .util import (get_round_in_game, lognormalize_normal_samples,
-                   normalize_lognormal_samples)
+from .util import get_round_in_game, lognormalize_normal_samples, normalize_lognormal_samples
 
 
 class VariabilityDegree(str, Enum):
@@ -49,6 +46,21 @@ class Distribution(PydanticModel):
     mu: float
     sigma: float
 
+    @classmethod
+    def from_treatment(cls, treatment: "Treatment") -> "UnitCosts":
+        if treatment.variance_choice == "low":
+            if not treatment.is_disrupted():
+                mu, sigma = 500, 50
+            else:
+                mu, sigma = 500, 100
+        else:
+            if not treatment.is_disrupted():
+                mu, sigma = 500, 100
+            else:
+                mu, sigma = 500, 200
+
+        return Distribution(mu=mu, sigma=sigma)
+
 
 class UnitCosts(PydanticModel):
     rcpu: Currency  # retail cost / unit (revenue)
@@ -61,12 +73,7 @@ class UnitCosts(PydanticModel):
 
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "UnitCosts":
-        # if treatment.variance_choice == "low":
-        #     rcpu, wcpu, hcpu = [3.00, 1.00, 0.05]
-        # else:
-        #     rcpu, wcpu, hcpu = [25.00, 14.00, 6.00]
-        rcpu, wcpu, hcpu = 15.0, 6.0, 1.0
-        return UnitCosts(rcpu=rcpu, wcpu=wcpu, hcpu=hcpu)
+        return UnitCosts(rcpu=15.0, wcpu=6.0, hcpu=1.0)
 
 
 class Treatment(PydanticModel):
@@ -112,59 +119,11 @@ class Treatment(PydanticModel):
     def is_disrupted(self) -> bool:
         return self._disrupted
 
-    def get_optimal_order_quantity(self, player: Optional[BasePlayer] = None) -> float:
-        rcpu, wcpu, hcpu = self.get_unit_costs().tuple()
-        cf = float((rcpu - wcpu) / (rcpu - wcpu + hcpu))
-        distribution = self.get_distribution(player)
-        # return float(distribution.mu * np.exp(stats.norm.ppf(cf) * distribution.sigma))
-        return int(distribution.mu + distribution.sigma * stats.norm.ppf(cf))
-
     def get_unit_costs(self) -> UnitCosts:
         return UnitCosts.from_treatment(self)
 
-    def get_distribution(self, player: Optional[BasePlayer] = None) -> Distribution:
-        # from .models import Player
-
-        # assert isinstance(
-        #     player, Player
-        # ), f'currently, distributions can only be derived from pre-determined data (which is specific to game_number & round_number, which in turn is why player must be provided and be type `models.Player`) - additional logic is needed to accommodate a "from-mu/sigma" approach as well'
-
-        # # get part of game data
-        # game_data = TREATMENT_DEMAND_MAP[self.idx][player.game_number - 1]
-        # disruption_round = DISRUPTION_ROUND_IN_GAMES[player.game_number]
-        # if self.disruption_choice is True:  # disruption in both games
-        #     if player.round_number <= disruption_round:
-        #         # use 1st half of data
-        #         data = game_data[:disruption_round]
-        #     else:
-        #         # use 2nd half of data
-        #         data = game_data[disruption_round:]
-        # else:  # disruption in game 2 only
-        #     if player.game_number == 1:
-        #         # use all the data in game 1
-        #         data = game_data
-        #     elif player.round_number <= disruption_round:
-        #         # use 1st half of data
-        #         data = game_data[:disruption_round]
-        #     else:
-        #         # use 2nd half of data
-        #         data = game_data[disruption_round:]
-
-        # # compute mu & sigma from data
-        # mu, sigma = np.mean(data), np.std(data)
-
-        if self.variance_choice == "low":
-            if not self.is_disrupted():
-                mu, sigma = 500, 50
-            else:
-                mu, sigma = 500, 100
-        else:
-            if not self.is_disrupted():
-                mu, sigma = 500, 100
-            else:
-                mu, sigma = 500, 200
-
-        return Distribution(mu=mu, sigma=sigma)
+    def get_distribution(self) -> Distribution:
+        return Distribution.from_treatment(self)
 
     def get_payoff_round(self) -> int:
         if self._payoff_round is None:
@@ -183,11 +142,20 @@ class Treatment(PydanticModel):
 
             return TREATMENT_DEMAND_MAP[self.idx][player.game_number - 1][get_round_in_game(player.round_number) - 1]
 
-    def get_demand_rvs(self, player: Optional[BasePlayer] = None, size: int = Constants.rvs_size) -> List[float]:
-        """Return samples from the applicable treatment distribution"""
-        distribution = self.get_distribution(player)
+    def get_demand_rvs(self, size: int = Constants.rvs_size) -> List[float]:
+        """Return samples from the treatment's distribution"""
+        distribution = self.get_distribution()
         self._demand_rvs = sample_normal_rvs(distribution.mu, distribution.sigma, size=size)
         return self._demand_rvs
+
+    def get_optimal_order_quantity(self) -> float:
+        unit_costs = self.get_unit_costs()
+        distribution = self.get_distribution()
+        # critical fractile
+        critical_fractile = float((unit_costs.rcpu - unit_costs.wcpu) / (unit_costs.rcpu - unit_costs.wcpu + unit_costs.hcpu))
+        # critical_demand: inverse CDF at critical fractile
+        critical_demand = stats.norm.ppf(critical_fractile)
+        return float(distribution.mu + critical_demand * distribution.sigma)
 
     @staticmethod
     def check_png(png_file: Path) -> bool:
@@ -208,7 +176,7 @@ class Treatment(PydanticModel):
 
         color = "#eb6e08"  # orange-ish
 
-        distribution = self.get_distribution(player)
+        distribution = self.get_distribution()
         mu, sigma = distribution.mu, distribution.sigma
 
         png_file = Path(STATIC_DIR).joinpath(f"mu-{mu}-sigma-{sigma:.01f}.png")
@@ -256,8 +224,8 @@ class Treatment(PydanticModel):
         return png_file
 
 
-# NOTE: mapping of demand data, values are tuples (list[float], list[float]) for game 1 & game 2 demand vectors, keys are treatment indexes
-TREATMENT_DEMAND_MAP: Dict[int, Tuple[float, float]] = {
+# NOTE: mapping of demand data: keys are treatment indexes, values are Tuple[List[float]], where the tuple has length Constants.num_games & each list has length Constants.rounds_per_game
+TREATMENT_DEMAND_MAP: Dict[int, Tuple[List[float]]] = {
     1: (  # 1: ('low', True)
         [
             495.2006,

@@ -56,7 +56,7 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         uuid = player.participant.vars.get("uuid", str(uuid4()))
         treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
         unit_costs: UnitCosts = treatment.get_unit_costs()
-        _ = treatment.get_demand_rvs(player=player)  # initialize treatment._demand_rvs
+        _ = treatment.get_demand_rvs()  # initializes treatment._demand_rvs
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
         years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
         does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
