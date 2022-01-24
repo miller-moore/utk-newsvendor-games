@@ -8,10 +8,6 @@
     {{ include Constants.sections_template }}
     {{ include Constants.scripts_template }}
 
-    <script>
-        renderFinalResultsContainer();
-    </script>
-
     {{ if is_absolute_final_round }}
         <h5>Congrats, you've completed all games!</h5>
     {{ else }}
@@ -21,5 +17,10 @@
     <center class="w-100 m-4">
         {{ next_button }}
     </center>
+
+    <script>
+        addClickNextOnEnterKey();
+        renderFinalResultsContainer();
+    </script>
 
 {{ endblock }}

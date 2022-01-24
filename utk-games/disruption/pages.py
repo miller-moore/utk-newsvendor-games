@@ -100,6 +100,7 @@ def vars_for_template(player: Player) -> dict:
         snapshot_instructions_3=as_static_path(
             Path(STATIC_DIR).joinpath("snapshot-instructions-3.png")
         ),  # see Instructions3.html
+        is_pilot_test=player.session.config.get("is_pilot_test", False),
         is_disrupted=treatment.is_disrupted(),
         is_disruption_this_round=is_disruption_this_round(player),
         is_disruption_next_round=is_disruption_next_round(player),
