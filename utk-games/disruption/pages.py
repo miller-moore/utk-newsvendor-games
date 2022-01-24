@@ -34,31 +34,32 @@ Page.error_message = staticmethod(default_error_message)
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
 def validate_is_planner(is_planner: bool) -> Optional[str]:
-    if is_planner is False:
-        return f"""Must be True to proceed."""
+    # if is_planner is False:
+    #     return f"""Must be True."""
     return
 
 
 @register_form_field_validator(form_field="years_as_planner", expect_type=int)
 def validate_years_as_planner(years_as_planner: int) -> Optional[str]:
     if years_as_planner < 0:
-        return f"""Number must be >= 0."""
+        return f"""Years in role must be >= 0."""
     return
 
 
-@register_form_field_validator(form_field="company_name", expect_type=str)
-def validate_company_name(company_name: str) -> Optional[str]:
+@register_form_field_validator(form_field="prolific_id", expect_type=str)
+def validate_prolific_id(prolific_id: str) -> Optional[str]:
     import re
 
-    if not re.findall(r"[a-zA-Z]", str(company_name)):
-        return f"""Enter a name."""
+    chars = 24
+    if not re.findall(f"[a-zA-Z0-9]{ {chars} }", str(prolific_id)):
+        return f"""Prolific ID must be a string with exactly {chars} alphanumeric characters (i.e., a-z, A-Z, and 0-9; special characters are not allowed)."""
     return
 
 
 @register_form_field_validator(form_field="does_consent", expect_type=bool)
 def validate_does_consent(does_consent: bool) -> Optional[str]:
     if does_consent is False:
-        return f"""Must consent to proceed."""
+        return f"""Must consent."""
     return
 
 
@@ -90,14 +91,14 @@ def vars_for_template(player: Player) -> dict:
         if treatment.disruption_choice and player.game_number == 1
         else None,
         distribution_png=as_static_path(treatment.get_distribution_plot(player=player)),
-        instructions_demand_page_1=as_static_path(
-            Path(STATIC_DIR).joinpath("instructions-demand-page-1.png")
+        snapshot_instructions_1=as_static_path(
+            Path(STATIC_DIR).joinpath("snapshot-instructions-1.png")
         ),  # see Instructions3.html
-        instructions_demand_page_2=as_static_path(
-            Path(STATIC_DIR).joinpath("instructions-demand-page-2.png")
+        snapshot_instructions_2=as_static_path(
+            Path(STATIC_DIR).joinpath("snapshot-instructions-2.png")
         ),  # see Instructions3.html
-        instructions_demand_page_3=as_static_path(
-            Path(STATIC_DIR).joinpath("instructions-demand-page-3.png")
+        snapshot_instructions_3=as_static_path(
+            Path(STATIC_DIR).joinpath("snapshot-instructions-3.png")
         ),  # see Instructions3.html
         is_disrupted=treatment.is_disrupted(),
         is_disruption_this_round=is_disruption_this_round(player),
@@ -109,8 +110,8 @@ def vars_for_template(player: Player) -> dict:
         endtime=player.field_maybe_none("endtime"),
         is_planner=player.field_maybe_none("is_planner"),
         years_as_planner=player.field_maybe_none("years_as_planner"),
-        company_name=player.field_maybe_none("company_name"),
         does_consent=player.field_maybe_none("does_consent"),
+        prolific_id=player.field_maybe_none("prolific_id"),
         su=player.field_maybe_none("su"),
         ou=player.field_maybe_none("ou"),
         du=player.field_maybe_none("du"),
@@ -162,8 +163,8 @@ class HydratePlayer(Page):
         player.treatment = player.participant.treatment.idx
         player.is_planner = player.participant.is_planner
         player.years_as_planner = player.participant.years_as_planner
-        player.company_name = player.participant.company_name
         player.does_consent = player.participant.does_consent
+        player.prolific_id = player.participant.prolific_id
         player.game_number = get_game_number(player.round_number)
         player.period_number = get_round_in_game(player.round_number)
         player.su = player.participant.stock_units
@@ -186,7 +187,7 @@ class HydratePlayer(Page):
 
 class Welcome(Page):
     form_model = "player"
-    form_fields = ["is_planner", "years_as_planner", "company_name", "does_consent"]
+    form_fields = ["is_planner", "years_as_planner", "does_consent", "prolific_id"]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -196,8 +197,8 @@ class Welcome(Page):
     def before_next_page(player: Player, timeout_happened):
         player.participant.is_planner = player.is_planner
         player.participant.years_as_planner = player.years_as_planner
-        player.participant.company_name = player.company_name
         player.participant.does_consent = player.does_consent
+        player.participant.prolific_id = player.prolific_id
 
 
 class Instructions1(Page):

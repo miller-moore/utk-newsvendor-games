@@ -62,8 +62,8 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         _ = treatment.get_demand_rvs(Constants.rvs_size)  # initialize treatment._demand_rvs
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
         years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
-        company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
         does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
+        prolific_id = player.participant.vars.get("prolific_id", player.field_maybe_none("prolific_id"))
         game_number = get_game_number(player.round_number)
         round_in_game = get_round_in_game(player.round_number)
         game_rounds = get_game_rounds(player.round_number)
@@ -72,8 +72,8 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         player.participant.starttime = get_time()
         player.participant.is_planner = is_planner
         player.participant.years_as_planner = years_as_planner
-        player.participant.company_name = company_name
         player.participant.does_consent = does_consent
+        player.participant.prolific_id = prolific_id
         player.participant.unit_costs = unit_costs
         player.participant.stock_units = 0
         player.participant.treatment = treatment
@@ -129,13 +129,17 @@ class Player(BasePlayer):
     years_as_planner = models.IntegerField(
         label="How many years in your career have you held the role of planner (rounded to the nearest year)?"
     )
-    company_name = models.StringField(
-        label="What is the name of the company your currently work for?",
-    )
     does_consent = models.BooleanField(
         widget=widgets.CheckboxInput(),
-        label="By checking this box, you consent to participate in this study. You understand that all data will be kept confidential by the researcher. Your personal information will not be stored in backend databases. You are free to withdraw at any time without giving a reason.",
+        label="""By checking the button to the left, you  your consent with the terms of this survey as specified above and agree to participate in this survey.""",  # NOTE: new label (Jan 2022)
+        # label="By checking this box, you consent to participate in this study. You understand that all data will be kept confidential by the researcher. Your personal information will not be stored in backend databases. You are free to withdraw at any time without giving a reason.", # NOTE: old label
     )
+    prolific_id = models.StringField(  # NOTE: added (Jan 2022)
+        label="Please type or copy/paste your Prolific ID here:",
+    )
+    # company_name = models.StringField( # NOTE: replaced by prolific_id (Jan 2022)
+    #     label="What is the name of the company your currently work for?",
+    # )
 
     # player data
     game_number = models.IntegerField(min=1, initial=1)
@@ -176,8 +180,8 @@ class Player(BasePlayer):
 #         "treatment",
 #         "is_planner",
 #         "years_as_planner",
-#         "company_name",
 #         "does_consent",
+#         "prolific_id",
 #         "game_number",
 #         "period_number",
 #         "su",

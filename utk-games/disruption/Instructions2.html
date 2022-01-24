@@ -14,32 +14,35 @@
             <li>
                 Example 1:
                 <ul>
-                    <li>selling price: 20 USD / unit</li>
-                    <li>purchasing price: 7.5 USD / unit</li>
-                    <li>inventory holding costs: 5 USD / unit</li>
+                    <li>selling price = {{ 20 | cu }} / unit</li>
+                    <li>purchasing price = {{ 7.5 | cu }} / unit</li>
+                    <li>inventory holding costs = {{ 5 | cu }} / unit</li>
                     <li>starting inventory 10 units</li>
-                    <li>order quantity: 50 units</li>
-                    <li>available inventory: 60 units [ = 10 units available inventory + 50 units order quantity]</li>
-                    <li>demand: 20 units</li>
+                    <li>your order quantity = 50 units</li>
+                    <li>available inventory = 60 units (10 units in inventory + 50 units ordered)</li>
+                    <li>demand = 20 units</li>
                 </ul>
                 <br>
-                <code>CF = 20 USD * 20 units [units sold = Minimum of demand and available inventory] - 7.5 USD * 50 units [order quantity] - 5 USD * 40 units [final inventory= available inventory - units sold]</code>
-                <br>
-                <br>
-                <code class="ml-2">&nbsp;&nbsp;= -175 USD</code>
+                <code>Profit = {{ 20 | cu }} * 20 units [units sold = Minimum of demand and available inventory]</code>
+                <br><code class="ml-5">&nbsp;&nbsp;- {{ 7.5 | cu }} * 50 units [order quantity]</code>
+                <br><code class="ml-5">&nbsp;&nbsp;- {{ 5 | cu }} * 40 units [final inventory= available inventory - units sold]</code>
+                <br><code class="ml-5"><span style="color:red;">&nbsp;&nbsp;= - {{ 175 | cu }}</span></code>
             </li>
 
             <li class="mt-4">
                 Example 2:
                 <ul>
-                    <li>demand: 100 units</li>
-                    <li>other constants from example 1 apply</li>
+                    <li>Prices of Example 1 apply here.</li>
+                    <li>starting inventory = 10 units</li>
+                    <li>your order quantity = 50 units</li>
+                    <li>available inventory = 60 units (10 units in inventory + 50 units ordered)</li>
+                    <li>demand = 100 units</li>
                 </ul>
                 <br>
-                <code>CF = 20 USD * 60 units [units sold = Minimum of demand and available inventory] - 7.5 USD * 50 units [order quantity] - 5 USD * 0 units [final inventory= 0]</code>
-                <br>
-                <br>
-                <code class="ml-2">&nbsp;&nbsp;= 825 USD</code>
+                <code>Profit = {{ 20 | cu }} * 60 units [units sold = Minimum of demand and available inventory]</code>
+                <br><code class="ml-5">&nbsp;&nbsp;- {{ 7.5 | cu }} * 50 units [order quantity]</code>
+                <br><code class="ml-5">&nbsp;&nbsp;- {{ 5 | cu }} * 0 units [final inventory= ]</code>
+                <br><code class="ml-5"><span style="color:red;">&nbsp;&nbsp;= {{ 825 | cu }}</span></code>
             </li>
         </ol>
     </p>

@@ -10,53 +10,74 @@
 
     <p>
         In this experiment, you have the role of an inventory manager. You must decide how many units of a
-        product you want to order and stock to sell them to your customers.
+        product you want to order and stock to sell to your customers.
     </p>
     <p>
-        You are making these decisions over multiple rounds. In every round, you are deciding on an
+        You are making these decisions over multiple rounds. In each round, you are deciding on an
         order quantity.
     </p>
     <p>
-        You are making your decision under uncertainty, i.e., at the time of the order decision you do
-        not know the exact demand of the period. However, you do know the probability distribution of
-        the demand. The demand for your product will be show by a distribution curve, shown on the
-        decision-making page. Demand is independent between rounds.
+        You are making your decision under uncertainty. This means at the time of the order decision
+        you do not know the exact demand of the period. However, you do know the probability
+        distribution of the demand. The demand for your product will be shown by a distribution curve,
+        shown on the decision-making page. Demand is independent between rounds.
     </p>
     <p>
         You have no starting inventory in your warehouse at the beginning of the game. You will order
-        units which then get delivered before demand is realized. Any leftover inventory after demand is
-        realized will be carried over to the next round (starting inventory). Starting inventory and order
-        quantity sum up to the available inventory as follows:
+        an amount of units between 0 and 1,000 which then get delivered before demand is realized. Any leftover inventory after demand is
+        realized will be carried over to the next round, which becomes starting inventory for the next
+        period. The starting inventory and order quantity sum up to the available inventory as follows:
     </p>
     <p>
         {# &nbsp;&nbsp;&nbsp;&nbsp; #}
-        <code class="ml-5">available inventory = starting inventory + order quantity</code>
+        <code class="ml-4">Available inventory = starting inventory + order quantity</code>
     </p>
     <p>
-        Note that you cannot order more than 1,000 units per round.
+        Holding costs occur for holding inventory which is carried over between rounds. For example:
+        <ul>
+            <code>
+                <li>
+                    Available inventory: 90 units
+                </li>
+                <li>
+                    Demand: 80 units
+                </li>
+                <li>
+                    Leftover inventory: 90 - 80 = 10 units
+                </li>
+            </code>
+        </ul>
     </p>
     <p>
-        Holding costs occur for holding inventory which is carried over between rounds. E.g., if your
-        available inventory is 90 units but demand is only 80 units, you can only 80 sell units (because
-        demand was only 80). The left-over 10 units are stocked in inventory and holding costs are
-        charged for these. Holding costs are charged for the resulting left-over 10 units that are stocked
-        in inventory. If you purchased too few units in a period to fulfill this period’s demand, the
-        unfulfilled demand is lost. You cannot reorder within a period or shift demand to later periods.
-        E.g., if your available inventory is only 30 units and demand is 80 units, you can only sell 30
-        units (since you did not order more).
+        Holding costs are charged for the 10 units leftover in inventory.
     </p>
     <p>
-        You are trying to maximize your Cash Flow (CF) in this experiment. The CF is calculated as
-        follows:
+        If you purchased too few units in a period to fulfill this period’s demand, the unfulfilled demand is lost.
+        You cannot reorder within a period or shift demand to later periods. For example:
+        <ul>
+            <code>
+                <li>
+                    Available inventory: 30 units
+                </li>
+                <li>
+                    Demand: 80 units
+                </li>
+                <li>
+                    Units sold: 30 units
+                </li>
+            </code>
+        </ul>
     </p>
     <p>
-        <code class="ml-5">CF = Selling price x units sold - purchasing price x order quantity – holding costs * holding inventory</code>
+        You are trying to maximize your Profits in this experiment. Profit per round is calculated as follows:
     </p>
     <p>
-        Note that the units sold is the minimum of demand and available inventory. You receive the
-        selling price for every unit sold. From this amount, you need to deduct the purchasing costs for
-        the products bought. Additionally, you need to deduct the holding costs for the holding
-        inventory.
+        <code class="ml-4">Profit = sell price x units sold - purchase price x units ordered - holding cost x units leftover</code>
+        {# <br><code>&nbsp;&nbsp;&nbsp;&nbsp;- purchasing price x units ordered</code> #}
+        {# <br><code>&nbsp;&nbsp;&nbsp;&nbsp;- holding costs x units leftover</code> #}
+    </p>
+    <p>
+        Therefore, profit = revenue - purchase costs - holding costs.
     </p>
     <p>
         In this experiment, your costs will be displayed on the decision page.
