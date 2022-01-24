@@ -59,7 +59,7 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         uuid = player.participant.vars.get("uuid", str(uuid4()))
         treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
         unit_costs: UnitCosts = treatment.get_unit_costs()
-        _ = treatment.get_demand_rvs(Constants.rvs_size)  # initialize treatment._demand_rvs
+        _ = treatment.get_demand_rvs()  # initializes treatment._demand_rvs
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
         years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
         does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
@@ -135,7 +135,7 @@ class Player(BasePlayer):
         # label="By checking this box, you consent to participate in this study. You understand that all data will be kept confidential by the researcher. Your personal information will not be stored in backend databases. You are free to withdraw at any time without giving a reason.", # NOTE: old label
     )
     prolific_id = models.StringField(  # NOTE: added (Jan 2022)
-        label="Please type or copy/paste your Prolific ID here:",
+        label="Please type or copy/paste your Prolific ID here (e.g., 5b96601d3400a939db45dac9):",
     )
     # company_name = models.StringField( # NOTE: replaced by prolific_id (Jan 2022)
     #     label="What is the name of the company your currently work for?",
@@ -147,7 +147,7 @@ class Player(BasePlayer):
 
     # stock units, order units, demand units
     su = models.IntegerField(min=0, initial=0)
-    ou = models.IntegerField(min=0)  # formfield 'ou'
+    ou = models.IntegerField(min=0, max=1000, label="How many units will you order?")
     du = models.IntegerField(min=0)
     ooq = models.IntegerField(min=0)
 
