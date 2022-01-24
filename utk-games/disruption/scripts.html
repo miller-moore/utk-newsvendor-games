@@ -412,26 +412,22 @@
         $('#distribution-curve-loading-message').hide();
     }
     function updateUnitCostsTable() {
+        // clear table data
         $('#unit-costs-table').find('td').remove();
 
-        var costsTable = $("#unit-costs-table")
-        var costsWholesaleRow = $("#row-wcpu");
-        var costsRetailRow = $("#row-rcpu");
-        var costsHoldingRow = $("#row-hcpu");
-        var DistRow = $("#row-dist");
-        var wcpu = formatCurrency(js_vars.wcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
-        var rcpu = formatCurrency(js_vars.rcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
-        var hcpu = formatCurrency(js_vars.hcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} );
-        var mu = formatNumber(js_vars.mu, {minimumFractionDigits: 0, maximumFractionDigits: 0} );
-        var sigma = formatNumber(js_vars.sigma, {minimumFractionDigits: 0, maximumFractionDigits: 0} );
+        var wcpu = formatCurrency(js_vars.wcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} ),
+            rcpu = formatCurrency(js_vars.rcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} ),
+            hcpu = formatCurrency(js_vars.hcpu, {minimumFractionDigits: 2, maximumFractionDigits: 2} ),
+            mu = formatNumber(js_vars.mu, {minimumFractionDigits: 0, maximumFractionDigits: 0} ),
+            sigma = formatNumber(js_vars.sigma, {minimumFractionDigits: 0, maximumFractionDigits: 0} );
 
-        costsWholesaleRow.append(`<td id="row-wcpu">${wcpu} / unit / period</td>`);
-        costsRetailRow.append(`<td id="row-rcpu">${rcpu} / unit / period</td>`);
-        costsHoldingRow.append(`<td id="row-hcpu">${hcpu} / unit / period</td>`);
-        DistRow.append(`<td id="row-dist">N~(${mu}, ${sigma})</td>`);
+        $("#row-wcpu").append(`<td id="row-wcpu">${wcpu} / unit / period</td>`);
+        $("#row-rcpu").append(`<td id="row-rcpu">${rcpu} / unit / period</td>`);
+        $("#row-hcpu").append(`<td id="row-hcpu">${hcpu} / unit / period</td>`);
+        $("#row-dist").append(`<td id="row-dist">N~(${mu}, ${sigma})</td>`);
 
         try {
-            costsTable.bootstrapTable({
+            $("#unit-costs-table").bootstrapTable({
                 //pagination: false,
                 showColumns: true
             });

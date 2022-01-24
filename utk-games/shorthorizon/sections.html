@@ -1,66 +1,5 @@
-<!-- Inclusion template 'disruption/visualizations.html' -->
-
 <br>
 <br>
-
-<!-- text-container-->
-{# <div class="row border mb-4" id="text-container">
-    <div class="card border">
-        <div class="card-body">
-            <p class="text-muted">* Anne: maybe add text here. *</p>
-        </div>
-    </div>
-
-    <br>
-</div> #}
-
-
-<!-- situational-info-container-->
-<div class="row border mb-4" id="situational-info-container">
-    <h4 class="mt-2">Situational Information</h4>
-
-    <!-- unit-costs-table -->
-    <div class="col-6 my-2">
-        <div class="card">
-            <div class="card-body">
-                <h6 class="card-title text-center">Unit costs</h6>
-                <div class="table-responsive">
-                    <table id="unit-costs-table">
-                        <thead></thead>
-                        <tbody>
-                            <tr id="row-rcpu">
-                                <th scope="row"><strong>Retail</strong></th>
-                            </tr>
-                            <tr id="row-wcpu">
-                                <th scope="row"><strong>Wholesale</strong></th>
-                            </tr>
-                            <tr id="row-scpu">
-                                <th scope="row"><strong>Salvage</strong></th>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- distribution-curve -->
-    <div class="col-6 my-2">
-        <div class="card" id="distribution-card">
-            <div class="card-body">
-                <h6 class="card-title text-center">Market demand probability distribution</h6>
-                <p id="distribution-curve-loading-message" style="font-size:0.8rem;"><br>&nbsp;Loading Demand Distribution...&nbsp;</p>
-                <!-- Add a slider -->
-                <!-- <input type="range" name="mySlider" id=mySlider min="10" max="100" value="50"> -->
-                <div id="distribution-curve">
-                    <img src="{{ static distribution_png }}"/>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <br>
-</div>
 
 <!-- results-container -->
 <div class="row border mb-4" id="results-container">
@@ -122,7 +61,8 @@
                         </thead>
                         <tbody>
                             <tr id="row-stock">
-                                <th scope="row" style="white-space: nowrap;"><strong>Excess inventory</strong></th>
+                                {# <th scope="row" style="white-space: nowrap;"><strong>Excess inventory</strong></th> #}
+                                <th scope="row" style="white-space: nowrap;"><strong>Starting inventory<br>(before order)</strong></th>
                             </tr>
                             <tr id="row-order">
                                 <th scope="row" style="white-space: nowrap;"><strong>Order quantity</strong></th>
@@ -146,3 +86,53 @@
     <br>
 </div>
 
+
+<!-- situational-info-container-->
+<div class="row border mb-4" id="situational-info-container">
+    <h4 class="mt-2">Situational Information</h4>
+
+    <!-- unit-costs-table -->
+    <div class="col-6 my-2">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Game Parameters</h6>
+                <div class="table-responsive">
+                    <table id="unit-costs-table">
+                        <thead></thead>
+                        <tbody>
+                            <tr id="row-rcpu">
+                                <th scope="row"><strong>Retail</strong></th>
+                            </tr>
+                            <tr id="row-wcpu">
+                                <th scope="row"><strong>Wholesale</strong></th>
+                            </tr>
+                            <tr id="row-scpu">
+                                <th scope="row"><strong>Salvage</strong></th>
+                            </tr>
+                            <tr id="row-dist">
+                                <th scope="row"><strong>Demand Distribution</strong></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- distribution-curve -->
+    <div class="col-6 my-2">
+        <div class="card" id="distribution-card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Market demand probability distribution</h6>
+                <p id="distribution-curve-loading-message" style="font-size:0.8rem;"><br>&nbsp;Loading Demand Distribution...&nbsp;</p>
+                <!-- Add a slider -->
+                <!-- <input type="range" name="mySlider" id=mySlider min="10" max="100" value="50"> -->
+                <div id="distribution-curve">
+                    <img src="{{ static distribution_png }}" width="500" height="400"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+</div>
