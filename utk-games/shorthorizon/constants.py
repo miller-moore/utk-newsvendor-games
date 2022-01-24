@@ -4,11 +4,7 @@ from otree.api import BaseConstants, Currency
 from otree.constants import BaseConstantsMeta
 
 GAMES = 1
-ROUNDS = 12
-
-MEANS = [500, 597]
-SIGMAS = [50, 100]
-COSTS = [dict(rcpu=20, wcpu=7.5, scpu=5), dict(rcpu=43, wcpu=6, scpu=5)]
+ROUNDS_PER_GAME = 12
 RVS_SIZE = int(1e4)
 
 APP_DIR = Path(__file__).resolve().parent
@@ -53,16 +49,17 @@ class ConstantsBase(BaseConstants, metaclass=BaseConstantsMeta):
 class Constants(ConstantsBase):
     # otree constants
     name_in_url = APP_NAME
-    num_rounds = GAMES * ROUNDS
+    num_rounds = GAMES * ROUNDS_PER_GAME
     players_per_group = None
     endowment = Currency(0)
     instructions_template = None
 
     # custom constants
     num_games = GAMES
-    rounds_per_game = ROUNDS
+    rounds_per_game = ROUNDS_PER_GAME
     app_name = APP_NAME
     rvs_size = RVS_SIZE
+    prolific_code = "THIS_CODE_IS_TOTALLY_CONTRIVED"
 
     # paths for templates used in include tags, e.g., {{ include "<APP_NAME>/style.html" }} or {{ include Constants.style_template }}
     style_template = get_includable_template_path("style.html")

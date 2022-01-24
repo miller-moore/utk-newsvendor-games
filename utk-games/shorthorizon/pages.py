@@ -12,7 +12,7 @@ from otree.models import Participant
 
 from .formvalidation import default_error_message, register_form_field_validator
 from .models import Constants, Player, initialize_game_history
-from .treatment import Treatment, UnitCosts
+from .treatment import Distribution, Treatment, UnitCosts
 from .util import (
     as_static_path,
     get_app_name,
@@ -72,7 +72,7 @@ class ShortHorizonPage(Page):
         )
 
         treatment: Treatment = player.participant.vars.get("treatment", None)
-        distribution_png = treatment.save_distribution_plots()
+        distribution: Distribution = treatment.get_distribution(player=player)
 
         _vars = dict(
             language_code=LANGUAGE_CODE,

@@ -6,7 +6,8 @@ from enum import Enum
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
@@ -16,22 +17,12 @@ from pydantic import BaseModel, Field, StrBytes, typing, validator
 from pydantic.main import Extra
 from pydantic.types import confloat, conint
 
-from .constants import COSTS, MEANS, SIGMAS, STATIC_DIR, Constants
+from .constants import STATIC_DIR, Constants
 from .pydanticmodel import PydanticModel
 
-
-class UnitCosts(PydanticModel):
-    rcpu: Currency  # retail cost / unit
-    wcpu: Currency  # wholesale cost / unit
-    scpu: Currency  # salvage cost / unit
-
-    class Config:
-        json_encoders = dict(Currency=_CurrencyEncoder)
-        arbitrary_types_allowed = True
-
-    @classmethod
-    def from_treatment(cls, treatment: "Treatment") -> "UnitCosts":
-        return TREATMENT_GROUPS[treatment.idx - 1][1]
+MEANS = [500, 597]
+SIGMAS = [50, 100]
+UNIT_COSTS = [dict(rcpu=20, wcpu=7.5, scpu=5), dict(rcpu=43, wcpu=6, scpu=5)]
 
 
 class DisributionParameters(PydanticModel):
@@ -48,10 +39,24 @@ class DisributionParameters(PydanticModel):
 
         return TREATMENT_GROUPS[treatment.idx - 1][0]
 
+class UnitCosts(PydanticModel):
+    rcpu: Currency  # retail cost per unit
+    wcpu: Currency  # wholesale cost per unit
+    scpu: Currency  # salvage cost per unit
+
+    class Config:
+        json_encoders = dict(Currency=_CurrencyEncoder)
+        arbitrary_types_allowed = True
+
+    @classmethod
+    def from_treatment(cls, treatment: "Treatment") -> "UnitCosts":
+        return TREATMENT_GROUPS[treatment.idx - 1][1]
+
+
 
 TREATMENT_GROUPS = [
     (DisributionParameters.from_args(mu=mu, sigma=sigma), UnitCosts.from_args(**costs))
-    for mu, sigma, costs in itertools.product(MEANS, SIGMAS, COSTS)
+    for mu, sigma, costs in itertools.product(MEANS, SIGMAS, UNIT_COSTS)
 ]
 
 

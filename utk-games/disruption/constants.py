@@ -4,12 +4,12 @@ from otree.api import BaseConstants, Currency
 from otree.constants import BaseConstantsMeta
 
 GAMES = 2
-ROUNDS = 12
+ROUNDS_PER_GAME = 12
 
 # NOTE: disruption stuff
 # NOTE: a disruption only applies to the first game - everybody gets a disruption in the second game
 ALLOW_DISRUPTION = True
-DISRUPTION_ROUND_IN_GAMES = {1: int(1 + 1 / 2 * ROUNDS), 2: int(1 + 1 / 2 * ROUNDS)}
+DISRUPTION_ROUND_IN_GAMES = {1: int(1 + 1 / 2 * ROUNDS_PER_GAME), 2: int(1 + 1 / 2 * ROUNDS_PER_GAME)}
 NATURAL_MEAN = 500
 
 RVS_SIZE = int(1e5)
@@ -55,14 +55,14 @@ class ConstantsBase(BaseConstants, metaclass=BaseConstantsMeta):
 class Constants(ConstantsBase):
     # otree constants
     name_in_url = APP_NAME
-    num_rounds = GAMES * ROUNDS
+    num_rounds = GAMES * ROUNDS_PER_GAME
     players_per_group = None
     endowment = Currency(0)
     instructions_template = None
 
     # custom constants
     num_games = GAMES
-    rounds_per_game = ROUNDS
+    rounds_per_game = ROUNDS_PER_GAME
     app_name = APP_DIR.name
     allow_disruption = ALLOW_DISRUPTION
     rvs_size = RVS_SIZE
