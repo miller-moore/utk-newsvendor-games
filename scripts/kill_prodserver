@@ -2,7 +2,7 @@
 
 PROJECT_ROOT=`cd "$(dirname ${0})"/../ && pwd`
 
-pushd $PROJECT_ROOT/utk-games >/dev/null
+pushd $PROJECT_ROOT/games >/dev/null
 
 
 killprodserver() {

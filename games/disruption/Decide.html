@@ -1,0 +1,36 @@
+{{ block title }}
+    Order Quantity: Game {{ game_number }}, Period {{ game_round }}
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <div class="row border mb-4" id="decision-form-container">
+        <div class="card border">
+            <div class="card-body">
+                <h5 class="card-title">Decision</h5>
+                <p>
+                    {# Note: according to commercial forecasting software, the optimal order quantity for this period is <strong id="optimal-order-quantity"></strong>. #}
+                    {{ formfield 'ou' label="How many units will you order?" }}
+                </p>
+            </div>
+        </div>
+        <br>
+    </div>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        addClickNextOnOrderUnits();
+        renderGameHistoryContainer();
+        renderDecisionFormContainer();
+        renderSituationalInfoContainer();
+    </script>
+
+{{ endblock }}
+

@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+PROJECT_ROOT=`cd "$(dirname ${0})"/../ && pwd`
+
+
+if [ ! "$(hostname)" = "scmotree" ]; then
+  echo Host is not scmotree. Exiting.
+  exit 1
+fi
+
+# activate virtualenv
+[ -z "$VIRTUAL_ENV" ] && source ${PROJECT_ROOT}/venv/bin/activate
+
+[ -f "$PROJECT_ROOT/requirements-prod.txt" ] && pip install -r "$PROJECT_ROOT/requirements-prod.txt"
+
+pushd $PROJECT_ROOT/games >/dev/null
+
+BROADCAST_IP=$(ifconfig | /usr/bin/grep -Po 'broadcast \K[\d.]+')
+
+OTREE_PRODUCTION="1" \
+  OTREE_AUTH_LEVEL="${OTREE_AUTH_LEVEL:-DEMO}" \
+  OTREE_ADMIN_USERNAME="${OTREE_ADMIN_USERNAME:-myadminuser1}" \
+  OTREE_ADMIN_PASSWORD="${OTREE_ADMIN_PASSWORD:-myadminpassword1}" \
+  otree prodserver "$BROADCAST_IP:8000" > ./logs/prodserver.log 2>&1 & disown
+
+popd >/dev/null

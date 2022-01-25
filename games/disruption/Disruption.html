@@ -1,0 +1,44 @@
+{{ block title }}
+    Uh oh! An exogenous event has disrupted market demand behavior!
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <p>
+        Going forward, market demand in a given period is expected to be much more uncertain than before... {{ disruption_uncertainty_factor }} times more uncertain, to be exact!
+    </p>
+    <p>
+        <center>
+            <div class="row border mb-4">
+                <div class="card border">
+                    <div class="card-body">
+                        <img src="{{ static snapshot_disruption_1 }}" width="1000" height="495" />  <!-- raw height/width 0.495 -->
+                    </div>
+                </div>
+            </div>
+        </center>
+    </p>
+
+
+    {{ if not C.ALLOW_DISRUPTION }}
+        <br>
+        <p>
+            <b>THIS IS JUST A TEST.</b>
+        </p>
+        <p>
+            The demand distribution will NOT actually change because ALLOW_DISRUPTION is False.
+            Set ALLOW_DISRUPTION = True in 'disruption/models.py' to allow the disruption to change the distribution.
+        </p>
+        <br>
+    {{endif}}
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+{{ endblock }}
+

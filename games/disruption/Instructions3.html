@@ -1,0 +1,57 @@
+{{ block title }}
+    Demand Planning Game: Welcome
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <p>
+        After clicking next below, you will come to the first demand page:
+        <center>
+            <div class="row border mb-4">
+                <div class="card border">
+                    <div class="card-body">
+                        <img src="{{ static snapshot_instructions_1 }}" width="1000" height="777" />  <!-- raw height/width 0.777 -->
+                    </div>
+                </div>
+            </div>
+            <div class="row border mb-4">
+                <div class="card border">
+                    <div class="card-body">
+                        <img src="{{ static snapshot_instructions_2 }}" width="1000" height="942" />  <!-- raw height/width 0.942 -->
+                    </div>
+                </div>
+            </div>
+        </center>
+    </p>
+    <p>
+        At the bottom, there is a place for you to input how much you want to order for the next round.
+        <center>
+            <div class="row border mb-4">
+                <div class="card border">
+                    <div class="card-body">
+                        <img src="{{ static snapshot_instructions_3 }}" width="1000" height="434" />  <!-- raw height/width 0.434 -->
+                    </div>
+                </div>
+            </div>
+        </center>
+    </p>
+    <p>
+        Bonus pay will be calculated by multiplying profit from one round by .075%. For example, a single round profit of $4,000 would lead to a bonus pay of 4,000*.00075= $3.  This pay will be added to your account in the next week.
+    </p>
+    <p>
+        At the end of the game, there will be a code to input into Prolific to get the base pay. <strong style="color:red;">MAKE SURE YOU COPY THE CODE FROM THIS PAGE BEFORE EXITING OUT OF THE GAME.</strong>
+    </p>
+    <p>
+        Please click the “Next” button below to start the game and thank you!
+    </p>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+{{ endblock }}
+

@@ -1,0 +1,23 @@
+{{ block title }}
+    Results: Game {{ game_number }}, Period {{ game_round }}
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        addClickNextOnEnterKey();
+        renderResultsContainer();
+        renderGameHistoryContainer();
+    </script>
+
+{{ endblock }}
+
+
