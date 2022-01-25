@@ -22,7 +22,7 @@ source venv/bin/activate
 # go to the games directory
 cd games/
 # run otree ...
-# if running otree devserver, should be able to open http://localhost:8000/ in a web browser but only if you're running `otree devserver` on your local machine. This is not likely to work on remote machines unless a port is forwarded from your local machine to the remote machine through ssh, which is a topic beyond the scope of this project.
+# if running `otree devserver`, you should be able to open http://localhost:8000/ in a web browser
 ```
 
 ### Useful links:
