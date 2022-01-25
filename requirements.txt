@@ -1,7 +1,0 @@
-otree
-pandas
-pydantic
-scipy
-circus
-matplotlib
-seaborn
