@@ -78,10 +78,10 @@
         var btnNext = $('[class*="otree-btn-next"]');
         var onClickBefore = btnNext.click;
 
-        /** @note uncomment below to add `onClickWrapped` as the onclick handler for the otree next button (i.e. `btnNext`)
-        */
+        /** @note uncomment the following line of code to implement `onClickWrapped` as the onclick handler for otree's next button (i.e. `btnNext`) */
         //btnNext.click(onClickWrapped);
 
+        allowClickNextOnEnterIfProlificIDInput();
     </script>
 
 {{ endblock }}

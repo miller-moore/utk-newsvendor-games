@@ -28,15 +28,22 @@
 </script>
 
 <script>
-    function addClickNextOnEnterKey() {
+    function allowClickNextOnEnter() {
         $(document).keyup(function(event) {
             if (event.keyCode === 13) {
                 $('[class*="otree-btn-next"]').click();
             }
         });
     }
-    function addClickNextOnOrderUnits() {
+    function allowClickNextOnEnterIfOrderUnitsInput() {
         $("#id_ou").keyup(function(event) {
+            if (event.keyCode === 13) {
+                $('[class*="otree-btn-next"]').click();
+            }
+        });
+    }
+    function allowClickNextOnEnterIfProlificIDInput() {
+        $("#id_prolific_id").keyup(function(event) {
             if (event.keyCode === 13) {
                 $('[class*="otree-btn-next"]').click();
             }
@@ -145,17 +152,22 @@
         pink: '#ff56c6',
     }
 
-    var _game = 'disruption'
-
     function distributionColor() {
-        return js_vars.app_name === _game? Colors.darkmango: Colors.lightgreen
+        switch(js_vars.app_name) {
+            case 'disruption':
+                return Colors.darkmango;
+            case 'shorthorizon':
+                return Colors.lightgreen;
+            default:
+                console.error(`js_vars.app_name is not a valid game application name: got ${js_vars.app_name}`);
+        }
     }
 
     function orderQuantityColor() {
-        return js_vars.app_name === _game?  Colors.darkblue: Colors.purple
+        return js_vars.app_name === 'disruption'?  Colors.darkblue: Colors.purple
     }
     function demandQuantityColor() {
-        return js_vars.app_name === _game?  Colors.pink: Colors.orange
+        return js_vars.app_name === 'disruption'?  Colors.pink: Colors.orange
     }
 </script>
 
@@ -768,7 +780,7 @@
         for (var i=0; i < js_vars.game_results.length; i++) {
             var tableId = `results-table-${i}`;
             var cardTitle = `Game ${i+1} Results`;
-            var cardCode = $(`<div class="col-12"><div class="card"><div class="card-body"><h5 class="card-title text-center">${cardTitle}</h5><table id="${tableId}"></table></div></div></div>`);
+            var cardCode = $(`<div class="col-auto"><div class="card"><div class="card-body"><h5 class="card-title text-center">${cardTitle}</h5><table id="${tableId}"></table></div></div></div>`);
             finalResultsContainer.append(cardCode);
             var table = $(`#${tableId}`);
 
@@ -818,7 +830,7 @@
                     value: formatNumber(total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }, {
                     id: 4,
-                    name: '<strong>Final inventory</strong>',
+                    name: '<strong>Total leftover inventory</strong>',
                     value: formatNumber(final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }]
             })
@@ -826,8 +838,8 @@
         }
 
         var tableId = `overall-table`;
-        var cardTitle = `Overall`;
-        var cardCode = $(`<div class="col-12"><div class="card"><div class="card-body"><h5 class="card-title text-center">${cardTitle}</h5><table id="${tableId}"></table></div></div></div>`);
+        var cardTitle = `Survey Totals`;
+        var cardCode = $(`<div class="col-auto"><div class="card"><div class="card-body"><h5 class="card-title text-center">${cardTitle}</h5><table id="${tableId}"></table></div></div></div>`);
         finalResultsContainer.append(cardCode);
         var table = $(`#${tableId}`);
         table.bootstrapTable({
@@ -852,7 +864,7 @@
                 value: formatNumber(overallResults.total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
             }, {
                 id: 4,
-                name: '<strong>Final inventory</strong>',
+                name: '<strong>Leftover inventory</strong>',
                 value: formatNumber(overallResults.final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
             }]
         })

@@ -147,16 +147,11 @@ class Treatment(PydanticModel):
 
         return png_file.exists()  # and (datetime.now().timestamp() - png_file.stat().st_mtime) < 86400
 
-    def get_distribution_plot(self, player: Optional[BasePlayer] = None) -> Tuple[Path, Path]:
+    def get_distribution_plot(self) -> Tuple[Path, Path]:
         """Plot & save the player's current demand distribution data to a png and return the png file path."""
 
         import matplotlib.pyplot as plt
         import seaborn as sns
-
-        if player:
-            from .models import Player
-
-            assert isinstance(player, Player)
 
         color = "#eb6e08"  # orange-ish
 

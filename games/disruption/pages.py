@@ -9,6 +9,7 @@ import numpy as np
 from otree.api import Currency, Page
 from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
+from otree.session import Session
 
 from .constants import DISRUPTION_ROUND_IN_GAMES, STATIC_DIR, C
 from .formvalidation import (default_error_message,
@@ -93,11 +94,12 @@ class DisruptionPage(Page):
             disruption_round=DISRUPTION_ROUND_IN_GAMES.get(player.game_number, None)
             if treatment.disruption_choice and player.game_number == 1
             else None,
-            distribution_png=as_static_path(treatment.get_distribution_plot(player=player)),
-            # NOTE: snapshot_instructions_png_1, snapshot_instructions_png_2, & snapshot_instructions_png_3 are all displayed from Page 'disruption/Instructions3.html'
-            snapshot_instructions_png_1=as_static_path(Path(STATIC_DIR).joinpath("snapshot-instructions-1.png")),
-            snapshot_instructions_png_2=as_static_path(Path(STATIC_DIR).joinpath("snapshot-instructions-2.png")),
-            snapshot_instructions_png_3=as_static_path(Path(STATIC_DIR).joinpath("snapshot-instructions-3.png")),
+            distribution_png=as_static_path(treatment.get_distribution_plot()),
+            # NOTE: snapshot_instructions_1, snapshot_instructions_2, & snapshot_instructions_3 are all displayed on Page 'disruption/Instructions3.html'
+            snapshot_instructions_1=as_static_path(Path(STATIC_DIR).joinpath("snapshot-instructions-1.png")),
+            snapshot_instructions_2=as_static_path(Path(STATIC_DIR).joinpath("snapshot-instructions-2.png")),
+            snapshot_instructions_3=as_static_path(Path(STATIC_DIR).joinpath("snapshot-instructions-3.png")),
+            # NOTE: snapshot_disruption_1 is displayed on Page 'disruption/Disruption.html'
             snapshot_disruption_1=as_static_path(Path(STATIC_DIR).joinpath("snapshot-disruption-1.png")),
             is_pilot_test=player.session.config.get("is_pilot_test", False),
             is_disrupted=treatment.is_disrupted(),
@@ -127,8 +129,8 @@ class DisruptionPage(Page):
             payoff_round=player.participant.vars.get("payoff_round", None),
             payoff=player.participant.vars.get("payoff", None),
             treatment=treatment.idx,
-            mu=distribution.mu,
-            sigma=distribution.sigma,
+            mu=distribution.mu if not treatment.is_disrupted() else distribution.mu_disrupted,
+            sigma=distribution.sigma if not treatment.is_disrupted() else distribution.sigma_disrupted,
         )
 
         # make Currency (Decimal) objects json serializable

@@ -9,14 +9,14 @@
     {{ include C.SCRIPTS_TEMPLATE }}
 
     <p>
-        Going forward, market demand in a given period is expected to be much more uncertain than before... {{ disruption_uncertainty_factor }} times more uncertain, to be exact!
+        Going forward, market demand each period will be more uncertain!
     </p>
     <p>
         <center>
             <div class="row border mb-4">
                 <div class="card border">
                     <div class="card-body">
-                        <img src="{{ static snapshot_disruption_1 }}" width="1000" height="495" />  <!-- raw height/width 0.495 -->
+                        <img src="{{ static snapshot_disruption_1 }}" width="1000" height="571" />  <!-- raw height/width 0.571 -->
                     </div>
                 </div>
             </div>
@@ -39,6 +39,10 @@
     <center class="w-100 m-4">
         {{ next_button }}
     </center>
+
+    <script>
+        allowClickNextOnEnter();
+    </script>
 
 {{ endblock }}
 

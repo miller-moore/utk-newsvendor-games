@@ -85,7 +85,7 @@ class ShortHorizonPage(Page):
             period_number=player.period_number,  # game_round,
             session_code=player.session.code,
             participant_code=player.participant.code,
-            distribution_png=as_static_path(treatment.get_distribution_plot(player=player)),
+            distribution_png=as_static_path(treatment.get_distribution_plot()),
             is_pilot_test=player.session.config.get("is_pilot_test", False),
             is_game_over=is_game_over(player.round_number),
             is_absolute_final_round=is_absolute_final_round(player.round_number),
@@ -261,6 +261,21 @@ class FinalResults(ShortHorizonPage):
     def is_displayed(player: Player):
         return is_game_over(player.round_number)
 
+class FinalQuestions(ShortHorizonPage):
+
+    form_model = "player"
+    form_fields = ["q1", "q2"]
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_absolute_final_round(player.round_number)
+
+    @staticmethod
+    def before_next_page(player: Player, timeout_happened):
+        if is_absolute_final_round(player.round_number):
+            player.participant.q1 = player.q1
+            player.participant.q2 = player.q2
+
 
 class Prolific(ShortHorizonPage):
     @staticmethod
@@ -270,4 +285,4 @@ class Prolific(ShortHorizonPage):
 
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [HydratePlayer, Welcome, Decide, Results, FinalResults, Prolific]
+page_sequence = [HydratePlayer, Welcome, Decide, Results, FinalResults, FinalQuestions, Prolific]

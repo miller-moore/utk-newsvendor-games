@@ -47,21 +47,21 @@ def sample_normal_rvs(mu: float, sigma: float, size: int = int(1e4)) -> List[flo
 class Distribution(PydanticModel):
     mu: float
     sigma: float
+    mu_disrupted: float = None
+    sigma_disrupted: float = None
+
+    class Config:
+        extra = Extra.allow
 
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "UnitCosts":
         if treatment.variance_choice == "low":
-            if not treatment.is_disrupted():
-                mu, sigma = 500, 50
-            else:
-                mu, sigma = 500, 100
+            mu, sigma = 500, 50
+            mu_disrupted, sigma_disrupted = 500, 100
         else:
-            if not treatment.is_disrupted():
-                mu, sigma = 500, 100
-            else:
-                mu, sigma = 500, 200
-
-        return Distribution(mu=mu, sigma=sigma)
+            mu, sigma = 500, 100
+            mu_disrupted, sigma_disrupted = 500, 200
+        return Distribution(mu=mu, sigma=sigma, mu_disrupted=mu_disrupted, sigma_disrupted=sigma_disrupted)
 
 
 class UnitCosts(PydanticModel):
@@ -147,17 +147,25 @@ class Treatment(PydanticModel):
     def get_demand_rvs(self, size: int = C.RVS_SIZE) -> List[float]:
         """Return samples from the treatment's distribution"""
         distribution = self.get_distribution()
-        self._demand_rvs = sample_normal_rvs(distribution.mu, distribution.sigma, size=size)
+        if self.is_disrupted():
+            mu, sigma = distribution.mu_disrupted, distribution.sigma_disrupted
+        else:
+            mu, sigma = distribution.mu, distribution.sigma
+        self._demand_rvs = sample_normal_rvs(mu, sigma, size=size)
         return self._demand_rvs
 
     def get_optimal_order_quantity(self) -> float:
         unit_costs = self.get_unit_costs()
         distribution = self.get_distribution()
+        if self.is_disrupted():
+            mu, sigma = distribution.mu_disrupted, distribution.sigma_disrupted
+        else:
+            mu, sigma = distribution.mu, distribution.sigma
         # critical fractile
         critical_fractile = float((unit_costs.rcpu - unit_costs.wcpu) / (unit_costs.rcpu - unit_costs.wcpu + unit_costs.hcpu))
         # critical_demand: inverse CDF at critical fractile
         critical_demand = stats.norm.ppf(critical_fractile)
-        return float(distribution.mu + critical_demand * distribution.sigma)
+        return float(mu + critical_demand * sigma)
 
     @staticmethod
     def check_png(png_file: Path) -> bool:
@@ -165,21 +173,19 @@ class Treatment(PydanticModel):
 
         return png_file.exists()  # and (datetime.now().timestamp() - png_file.stat().st_mtime) < 86400
 
-    def get_distribution_plot(self, player: Optional[BasePlayer] = None) -> Tuple[Path, Path]:
+    def get_distribution_plot(self) -> Tuple[Path, Path]:
         """Plot & save the player's current demand distribution data to a png and return the png file path."""
 
         import matplotlib.pyplot as plt
         import seaborn as sns
 
-        if player:
-            from .models import Player
-
-            assert isinstance(player, Player)
-
         color = "#eb6e08"  # orange-ish
 
         distribution = self.get_distribution()
-        mu, sigma = distribution.mu, distribution.sigma
+        if self.is_disrupted():
+            mu, sigma = distribution.mu_disrupted, distribution.sigma_disrupted
+        else:
+            mu, sigma = distribution.mu, distribution.sigma
 
         png_file = Path(STATIC_DIR).joinpath(f"mu-{mu}-sigma-{sigma:.01f}.png")
 
