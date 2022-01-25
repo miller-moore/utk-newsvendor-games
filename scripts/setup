@@ -21,6 +21,10 @@ fi
 # activate virtualenv
 source ${VIRTUALENV_DIR}/bin/activate
 
+## configure git pull & merge options
+git config pull.rebase false
+git config merge.ff true
+
 # ensure dev dependencies are installed
 # TODO: convert all this to a poetry managed project with a pyproject.toml file
 pip install -U -r ${PROJECT_ROOT}/requirements-dev.txt
