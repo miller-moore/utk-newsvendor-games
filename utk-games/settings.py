@@ -31,7 +31,12 @@ SESSION_FIELDS = []
 # the session config can be accessed from methods in your apps as self.session.config,
 # e.g. self.session.config['participation_fee']
 SESSION_CONFIG_DEFAULTS = dict(
-    doc="", use_secure_urls=False, real_world_currency_per_point=1.00, participation_fee=0.00, is_pilot_test=True
+    doc="",
+    use_secure_urls=False,
+    real_world_currency_per_point=1.00,
+    participation_fee=0.00,
+    is_pilot_test=True,
+    prolific_code="5B4E4089",
 )
 
 
