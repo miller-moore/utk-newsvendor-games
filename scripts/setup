@@ -25,9 +25,9 @@ source ${VIRTUALENV_DIR}/bin/activate
 git config pull.rebase false
 git config merge.ff true
 
-# ensure dev dependencies are installed
+# install dev dependencies are installed
 # TODO: convert all this to a poetry managed project with a pyproject.toml file
 pip install -U -r ${PROJECT_ROOT}/requirements-dev.txt
 
-# ensure main dependencies are installed
-pip install -U -r ${PROJECT_ROOT}/requirements.txt
+# install prod dependencies are installed
+pip install -U -r ${PROJECT_ROOT}/requirements-prod.txt
