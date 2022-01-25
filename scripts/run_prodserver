@@ -17,7 +17,7 @@ pushd $PROJECT_ROOT/games >/dev/null
 
 mkdir -p ./logs
 
-BROADCAST_IP=$(ifconfig | /usr/bin/grep -Po 'broadcast \K[\d.]+')
+BROADCAST_IP=$(ifconfig | grep broadcast | grep -Po 'inet \K[\d.]+')
 
 OTREE_PRODUCTION="1" \
   OTREE_AUTH_LEVEL="${OTREE_AUTH_LEVEL:-DEMO}" \
