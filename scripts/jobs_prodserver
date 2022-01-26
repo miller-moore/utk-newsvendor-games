@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+PROJECT_ROOT=`cd "$(dirname ${0})"/../ && pwd`
+
+pushd $PROJECT_ROOT/games >/dev/null
+
+ps xww -o pid,ppid,user,command 2>&1 | grep 'otree prodserver' | grep -v grep
+
+popd >/dev/null
