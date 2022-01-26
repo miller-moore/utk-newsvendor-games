@@ -1,6 +1,8 @@
 aiofiles==0.6.0
 backcall==0.2.0
 black==21.8b0
+certifi==2021.10.8
+charset-normalizer==2.0.10
 circus==0.17.1
 click==7.1.2
 colorama==0.4.4
@@ -9,7 +11,9 @@ cycler==0.10.0
 debugpy==1.4.3
 decorator==5.0.9
 entrypoints==0.3
+google-search-results==2.4.1
 h11==0.12.0
+idna==3.3
 ipykernel==6.4.1
 ipython==7.27.0
 ipython-genutils==0.2.0
@@ -43,6 +47,7 @@ python-multipart==0.0.5
 pytz==2021.1
 pyzmq==22.2.1
 regex==2021.8.28
+requests==2.27.1
 rich==10.12.0
 rope==0.20.1
 scipy==1.7.1
@@ -54,6 +59,7 @@ tomli==1.2.1
 tornado==6.1
 traitlets==5.1.0
 typing-extensions==3.10.0.2
+urllib3==1.26.8
 uvicorn==0.13.4
 wcwidth==0.2.5
 websockets==8.1

@@ -19,10 +19,11 @@ mkdir -p ./logs
 
 BROADCAST_IP=$(ifconfig | grep broadcast | grep -Po 'inet \K[\d.]+')
 
-OTREE_PRODUCTION="1" \
-  OTREE_AUTH_LEVEL="${OTREE_AUTH_LEVEL:-DEMO}" \
-  OTREE_ADMIN_USERNAME="${OTREE_ADMIN_USERNAME:-myadminuser1}" \
-  OTREE_ADMIN_PASSWORD="${OTREE_ADMIN_PASSWORD:-myadminpassword1}" \
+OTREE_PRODUCTION=1 \
+  OTREE_AUTH_LEVEL=${OTREE_AUTH_LEVEL} \
+  OTREE_ADMIN_USERNAME=${OTREE_ADMIN_USERNAME} \
+  OTREE_ADMIN_PASSWORD=${OTREE_ADMIN_PASSWORD} \
+  SERPAPI_KEY=${SERPAPI_KEY} \
   otree prodserver "$BROADCAST_IP:8000" > ./logs/prodserver.log 2>&1 & disown
 
 popd >/dev/null

@@ -16,10 +16,12 @@ from pydantic import BaseModel, Field, StrBytes, typing, validator
 from pydantic.main import Extra
 from pydantic.types import conint
 
-from .constants import DISRUPTION_ROUND_IN_GAMES, NATURAL_MEAN, STATIC_DIR, C
-from .pydanticmodel import PydanticModel
+from .constants import C
 from .util import (get_round_in_game, lognormalize_normal_samples,
                    normalize_lognormal_samples)
+
+from common.pydanticmodel import PydanticModel  # isort:skip
+from common.colors import COLORS  # isort:skip
 
 
 class VariabilityDegree(str, Enum):
@@ -82,7 +84,6 @@ class Treatment(PydanticModel):
     idx: conint(strict=True, ge=1, le=len(TREATMENT_MAP))
     _demand_rvs: List[float] = []
     _disrupted: bool = False
-    _disrupted_png_file: Path = None
     _distribution: Distribution = None
     _png_file: Path = None
     _payoff_round: int = None
@@ -94,7 +95,6 @@ class Treatment(PydanticModel):
         size = len(self._demand_rvs) if self._demand_rvs else C.RVS_SIZE
         self._demand_rvs = self.get_demand_rvs(size=size)
         self._disrupted = False
-        self._disrupted_png_file: Path = None
         self._distribution = None
         self._png_file: Path = None
         self._payoff_round: int = None
@@ -132,7 +132,7 @@ class Treatment(PydanticModel):
             self._payoff_round = random.choice(range(1, C.NUM_ROUNDS + 1))
         return self._payoff_round
 
-    def get_demand(self, randomly: bool = True, player: Optional[BasePlayer] = None) -> float:
+    def get_demand(self, randomly: bool = True, player: Optional[BasePlayer] = None) -> int:
         if randomly:
             return round(random.choice(self._demand_rvs))
         else:
@@ -140,9 +140,11 @@ class Treatment(PydanticModel):
 
             assert isinstance(
                 player, Player
-            ), f'currently, distributions can only be obtained directly from pre-determined data specific to game_number & round_number, which is why player must be provided and be type `models.Player` - additional logic is needed to accommodate a "from-mu-and-sigma" approach as well'
+            ), f"currently, demand can only be obtained directly from pre-determined, which depends on Player game_number & round_number and game_number is particular to `models.Player` (not a default field of BasePlayer)"
 
-            return TREATMENT_DEMAND_MAP[self.idx][player.game_number - 1][get_round_in_game(player.round_number) - 1]
+            game_idx = player.game_number - 1
+            round_idx = get_round_in_game(player.round_number) - 1
+            return int(TREATMENT_DEMAND_DATA_MAP[self.idx][game_idx][round_idx])
 
     def get_demand_rvs(self, size: int = C.RVS_SIZE) -> List[float]:
         """Return samples from the treatment's distribution"""
@@ -179,15 +181,16 @@ class Treatment(PydanticModel):
         import matplotlib.pyplot as plt
         import seaborn as sns
 
-        color = "#eb6e08"  # orange-ish
-
         distribution = self.get_distribution()
         if self.is_disrupted():
             mu, sigma = distribution.mu_disrupted, distribution.sigma_disrupted
         else:
             mu, sigma = distribution.mu, distribution.sigma
 
-        png_file = Path(STATIC_DIR).joinpath(f"mu-{mu}-sigma-{sigma:.01f}.png")
+        # color_key = "red" if C.APP_NAME == "disruption" and self.is_disrupted() else "ut_orange"
+        color_key = "ut_orange"
+
+        png_file = Path(C.STATIC_DIR).joinpath(f"mu-{mu}-sigma-{sigma:.01f}-color-{color_key}.png")
 
         ## TODO(mm): uncomment below to debug appearance of plot in frontend
         # png_file.unlink(missing_ok=True)
@@ -216,8 +219,8 @@ class Treatment(PydanticModel):
         figsize = (5, 4)  # (width, height)
         # figsize = None  # (width, height)
         fig, ax = plt.subplots(figsize=figsize)
-        ax.plot(x, p, alpha=0.7, color=color)
-        ax.fill_between(x, p, 0, alpha=0.2, color=color)
+        # ax.plot(x, p, alpha=0.7, color=COLORS["black"])  # alpha=0.7
+        ax.fill_between(x, p, 0, alpha=0.5, color=COLORS[color_key])  # alpha=0.2
 
         # plt.xlim((0, xmax))
         # plt.ylim(0, ymax)
@@ -232,8 +235,22 @@ class Treatment(PydanticModel):
         return png_file
 
 
-# NOTE: mapping of demand data: keys are treatment indexes, values are Tuple[List[float]], where the tuple has length C.NUM_GAMES & each list has length C.ROUNDS_PER_GAME
-TREATMENT_DEMAND_MAP: Dict[int, Tuple[List[float]]] = {
+def generate_treatment_demand_data_map() -> Dict[int, Tuple[List[float], ...]]:
+    return {
+        treatment_idx: tuple(
+            [
+                sample_normal_rvs(mu=distribution.mu, sigma=distribution.sigma, size=C.ROUNDS_PER_GAME)
+                for _ in range(C.NUM_GAMES)
+            ]
+        )
+        for treatment_idx, (distribution, unit_costs) in TREATMENT_MAP.items()
+    }
+
+
+# TREATMENT_DEMAND_DATA_MAP: Dict[int, Tuple[List[float], ...]] = generate_treatment_demand_data_map()
+
+## NOTE: hardcoded demand data map: keys are treatment indexes, values are Tuple[List[float], ...], where the tuple has length C.NUM_GAMES & each list has length C.ROUNDS_PER_GAME
+TREATMENT_DEMAND_DATA_MAP: Dict[int, Tuple[List[float], ...]] = {
     1: (  # 1: ('low', True)
         [
             495.2006,

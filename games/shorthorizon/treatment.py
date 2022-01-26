@@ -16,9 +16,11 @@ from pydantic import BaseModel, Field, StrBytes, typing, validator
 from pydantic.main import Extra
 from pydantic.types import confloat, conint
 
-from .constants import STATIC_DIR, C
-from .pydanticmodel import PydanticModel
+from .constants import C
 from .util import get_round_in_game
+
+from common.pydanticmodel import PydanticModel  # isort:skip
+from common.colors import COLORS  # isort:skip
 
 MEANS = [500, 597]
 SIGMAS = [50, 100]
@@ -63,12 +65,12 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts]] = {
     idx + 1: (Distribution.from_args(mu=mu, sigma=sigma), UnitCosts.from_args(**costs))
     for idx, (mu, sigma, costs) in enumerate(
         [
-            (MEANS[0], SIGMAS[1], UNIT_COSTS[0]),
-            (MEANS[0], SIGMAS[0], UNIT_COSTS[0]),
-            (MEANS[0], SIGMAS[0], UNIT_COSTS[1]),
-            (MEANS[0], SIGMAS[1], UNIT_COSTS[1]),
-            (MEANS[1], SIGMAS[0], UNIT_COSTS[1]),
-            (MEANS[1], SIGMAS[1], UNIT_COSTS[0]),
+            (MEANS[0], SIGMAS[1], UNIT_COSTS[0]),  # 1: low mean, high var, low CF
+            (MEANS[0], SIGMAS[0], UNIT_COSTS[0]),  # 2: low mean, low var, low CF
+            (MEANS[0], SIGMAS[0], UNIT_COSTS[1]),  # 3: low mean, low var, high CF
+            (MEANS[0], SIGMAS[1], UNIT_COSTS[1]),  # 4: low mean, high var, high CF
+            (MEANS[1], SIGMAS[0], UNIT_COSTS[1]),  # 5: high mean, low var, high CF
+            (MEANS[1], SIGMAS[1], UNIT_COSTS[0]),  # 6: high mean, high var, low CF
         ]
     )
 }
@@ -77,6 +79,7 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts]] = {
 class Treatment(PydanticModel):
     idx: conint(strict=True, ge=1, le=len(TREATMENT_MAP))
     _demand_rvs: List[float] = []
+    _disrupted: bool = False
     _distribution: Distribution = None
     _png_file: Path = None
     _payoff_round: int = None
@@ -88,6 +91,7 @@ class Treatment(PydanticModel):
         size = len(self._demand_rvs) if self._demand_rvs else C.RVS_SIZE
 
         self._demand_rvs = self.get_demand_rvs(size=size)
+        self._disrupted: bool = False
         self._distribution = None
         self._png_file: Path = None
         self._payoff_round: int = None
@@ -99,6 +103,13 @@ class Treatment(PydanticModel):
     @classmethod
     def choose(cls) -> "Treatment":
         return Treatment(idx=random.choice(list(TREATMENT_MAP)))
+
+    def disrupt(self) -> None:
+        # shorthorizon game has no disruptions
+        pass
+
+    def is_disrupted(self) -> bool:
+        return self._disrupted
 
     def get_unit_costs(self) -> UnitCosts:
         return UnitCosts.from_treatment(self)
@@ -112,7 +123,7 @@ class Treatment(PydanticModel):
 
         return self._payoff_round
 
-    def get_demand(self, randomly: bool = True, player: Optional[BasePlayer] = None) -> float:
+    def get_demand(self, randomly: bool = True, player: Optional[BasePlayer] = None) -> int:
         if randomly:
             return round(random.choice(self._demand_rvs))
         else:
@@ -120,9 +131,11 @@ class Treatment(PydanticModel):
 
             assert isinstance(
                 player, Player
-            ), f'currently, distributions can only be obtained directly from pre-determined data specific to game_number & round_number, which is why player must be provided and be type `models.Player` - additional logic is needed to accommodate a "from-mu-and-sigma" approach as well'
+            ), f"currently, demand can only be obtained directly from pre-determined, which depends on Player game_number & round_number and game_number is particular to `models.Player` (not a default field of BasePlayer)"
 
-            return TREATMENT_DEMAND_MAP[self.idx][player.game_number - 1][get_round_in_game(player.round_number) - 1]
+            game_idx = player.game_number - 1
+            round_idx = get_round_in_game(player.round_number) - 1
+            return int(TREATMENT_DEMAND_DATA_MAP[self.idx][game_idx][round_idx])
 
     def get_demand_rvs(self, size: int = C.RVS_SIZE) -> List[float]:
         """Return samples from the treatment's distribution"""
@@ -153,12 +166,13 @@ class Treatment(PydanticModel):
         import matplotlib.pyplot as plt
         import seaborn as sns
 
-        color = "#eb6e08"  # orange-ish
-
         distribution = self.get_distribution()
         mu, sigma = distribution.mu, distribution.sigma
 
-        png_file = Path(STATIC_DIR).joinpath(f"mu-{mu}-sigma-{sigma:.01f}.png")
+        # color_key = "red" if C.APP_NAME == "disruption" and self.is_disrupted() else "ut_orange"
+        color_key = "ut_orange"
+
+        png_file = Path(C.STATIC_DIR).joinpath(f"mu-{mu}-sigma-{sigma:.01f}-color-{color_key}.png")
 
         ## TODO(mm): uncomment below to debug appearance of plot in frontend
         # png_file.unlink(missing_ok=True)
@@ -187,8 +201,8 @@ class Treatment(PydanticModel):
         figsize = (5, 4)  # (width, height)
         # figsize = None  # (width, height)
         fig, ax = plt.subplots(figsize=figsize)
-        ax.plot(x, p, alpha=0.7, color=color)
-        ax.fill_between(x, p, 0, alpha=0.2, color=color)
+        ax.plot(x, p, alpha=1, color=COLORS["ut_smokey"])  # alpha=0.7
+        ax.fill_between(x, p, 0, alpha=1, color=COLORS[color_key])  # alpha=0.2
 
         # plt.xlim((0, xmax))
         # plt.ylim(0, ymax)
@@ -203,113 +217,66 @@ class Treatment(PydanticModel):
         return png_file
 
 
-## NOTE: mapping of demand data: keys are treatment indexes, values are Tuple[List[float]], where the tuple has length C.NUM_GAMES & each list has length C.ROUNDS_PER_GAME
-## NOTE: hardcoded values were first generated as follows before copy/pasting here:
-# TREATMENT_DEMAND_MAP: Dict[int, Tuple[List[float]]] = {
-#     treatment_idx: tuple(
-#         [
-#             sample_normal_rvs(mu=distribution.mu, sigma=distribution.sigma, size=C.ROUNDS_PER_GAME)
-#             for _ in range(C.NUM_GAMES)
-#         ]
-#     )
-#     for treatment_idx, (distribution, unit_costs) in TREATMENT_MAP.items()
-# }
+def generate_treatment_demand_data_map() -> Dict[int, Tuple[List[float], ...]]:
+    return {
+        treatment_idx: tuple(
+            [
+                sample_normal_rvs(mu=distribution.mu, sigma=distribution.sigma, size=C.ROUNDS_PER_GAME)
+                for _ in range(C.NUM_GAMES)
+            ]
+        )
+        for treatment_idx, (distribution, unit_costs) in TREATMENT_MAP.items()
+    }
 
-TREATMENT_DEMAND_MAP: Dict[int, Tuple[List[float]]] = {
+
+# TREATMENT_DEMAND_DATA_MAP: Dict[int, Tuple[List[float], ...]] = generate_treatment_demand_data_map()
+
+
+## NOTE: hardcoded demand data map: keys are treatment indexes, values are Tuple[List[float], ...], where the tuple has length C.NUM_GAMES & each list has length C.ROUNDS_PER_GAME
+
+TREATMENT_DEMAND_DATA_MAP: Dict[int, Tuple[List[float], ...]] = {
     1: (
         [
-            534.9053318194053,
-            670.9203703653983,
-            474.37305412386564,
-            582.8553459682171,
-            378.63474674663183,
-            312.63865239812594,
-            557.150915396498,
-            487.18811232203456,
-            613.1403593576564,
-            420.3806423206439,
-            439.7732574368345,
-            678.646620814376,
+            450.2354,
+            742.2161,
+            442.5504,
+            416.9702,
+            496.4876,
+            436.9613,
+            501.2679,
+            627.6485,
+            544.3831,
+            607.5208,
+            444.4205,
+            356.9525,
         ],
-    ),
+    ),  # 1: low mean, high var, low CF
     2: (
-        [
-            480.7979708723229,
-            505.2205827833862,
-            516.5768449513579,
-            468.2144445938311,
-            511.92880376973,
-            495.8836552726083,
-            439.17885277186355,
-            443.454816804914,
-            455.80250566977867,
-            449.37178314520924,
-            527.7373210895437,
-            544.0906451940888,
-        ],
-    ),
+        [538.7785, 581.5469, 528.2913, 485.1264, 441.1537, 486.3506, 440.1492, 502.098, 483.0678, 545.0162, 434.0178, 518.3234],
+    ),  # 2: low mean, low var, low CF
     3: (
         [
-            480.7979708723229,
-            505.2205827833862,
-            516.5768449513579,
-            468.2144445938311,
-            511.92880376973,
-            495.8836552726083,
-            439.17885277186355,
-            443.454816804914,
-            455.80250566977867,
-            449.37178314520924,
-            527.7373210895437,
-            544.0906451940888,
+            450.2354,
+            742.2161,
+            442.5504,
+            416.9702,
+            496.4876,
+            436.9613,
+            501.2679,
+            627.6485,
+            544.3831,
+            607.5208,
+            444.4205,
+            356.9525,
         ],
-    ),
+    ),  # 3: low mean, low var, high CF
     4: (
-        [
-            534.9053318194053,
-            670.9203703653983,
-            474.37305412386564,
-            582.8553459682171,
-            378.63474674663183,
-            312.63865239812594,
-            557.150915396498,
-            487.18811232203456,
-            613.1403593576564,
-            420.3806423206439,
-            439.7732574368345,
-            678.646620814376,
-        ],
-    ),
+        [538.7785, 581.5469, 528.2913, 485.1264, 441.1537, 486.3506, 440.1492, 502.098, 483.0678, 545.0162, 434.0178, 518.3234],
+    ),  # 4: low mean, high var, high CF
     5: (
-        [
-            578.3542511859991,
-            623.8368862359374,
-            546.1051281162959,
-            575.8432991364025,
-            600.5326327907826,
-            559.3172481590334,
-            594.5789837381884,
-            627.5667667669329,
-            564.690783854759,
-            596.9277387550078,
-            675.9308259578041,
-            590.2534937514266,
-        ],
-    ),
+        [650.5515, 582.6913, 611.7078, 583.359, 520.8227, 639.7342, 621.2895, 627.8933, 559.5997, 528.9632, 639.0492, 638.3807],
+    ),  # 5: high mean, low var, high CF
     6: (
-        [
-            494.29978060608084,
-            601.4799478965533,
-            530.4062884094968,
-            743.5241600073789,
-            649.3394450184093,
-            570.0086434841705,
-            681.6343655109528,
-            742.1071899207607,
-            450.6687728986678,
-            501.96103766254214,
-            719.0922973367033,
-            554.5020763312828,
-        ],
-    ),
+        [556.5388, 502.2176, 512.5776, 733.732, 575.3298, 530.3528, 599.3154, 477.2013, 749.3481, 729.0584, 666.4436, 527.9543],
+    ),  # 6: high mean, high var, low CF
 }

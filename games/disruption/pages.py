@@ -1,8 +1,11 @@
+import os
 import random
+from collections import deque
 from decimal import ROUND_HALF_UP, Decimal
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Type, Union
+from threading import Thread
+from typing import Any, Callable, Dict, Generator, List, Optional, Type, Union
 from uuid import uuid4
 
 import numpy as np
@@ -11,7 +14,7 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 from otree.session import Session
 
-from .constants import DISRUPTION_ROUND_IN_GAMES, STATIC_DIR, C
+from .constants import C
 from .formvalidation import (default_error_message,
                              register_form_field_validator)
 from .models import Player, initialize_game_history
@@ -21,6 +24,15 @@ from .util import (as_static_path, get_app_name, get_game_number,
                    get_room_display_name, get_room_name, get_round_in_game,
                    get_time, is_absolute_final_round, is_disruption_next_round,
                    is_disruption_this_round, is_game_over)
+
+from common.colors import COLORS  # isort:skip
+from common.google_image_downloader import GoogleImageDownloader  # isort:skip
+
+
+# fetch smokey images in the background
+smokey_the_dog_image_fetcher = GoogleImageDownloader(
+    query="utk-smokey-the-dog", api_key=os.getenv("SERPAPI_KEY", None), download_directory=C.STATIC_DIR, max_count=1000
+)
 
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
@@ -72,10 +84,17 @@ class DisruptionPage(Page):
         treatment: Treatment = player.participant.vars.get("treatment", None)
         distribution: Distribution = treatment.get_distribution()
 
+        try:
+            smokey_img_file = as_static_path(random.choice(smokey_the_dog_image_fetcher.smokey_images))
+        except:
+            smokey_img_file = None
+
         _vars = dict(
             language_code=LANGUAGE_CODE,
             real_world_currency_code=REAL_WORLD_CURRENCY_CODE,
             real_world_currency_decimal_places=REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+            smokey_img_file=smokey_img_file,
+            colors=COLORS.copy(),
             games=C.NUM_GAMES,
             rounds=C.ROUNDS_PER_GAME,
             room_name=get_room_name(player),
@@ -91,16 +110,16 @@ class DisruptionPage(Page):
             participant_code=player.participant.code,
             variance_choice=treatment.variance_choice if treatment else None,
             disruption_choice=treatment.disruption_choice if treatment else None,
-            disruption_round=DISRUPTION_ROUND_IN_GAMES.get(player.game_number, None)
+            disruption_round=C.DISRUPTION_ROUND_IN_GAMES.get(player.game_number, None)
             if treatment.disruption_choice and player.game_number == 1
             else None,
             distribution_png=as_static_path(treatment.get_distribution_plot()),
-            # NOTE: snapshot_instructions_1, snapshot_instructions_2, & snapshot_instructions_3 are all displayed on Page 'disruption/Instructions3.html'
-            snapshot_instructions_1=as_static_path(Path(STATIC_DIR).joinpath("snapshot-instructions-1.png")),
-            snapshot_instructions_2=as_static_path(Path(STATIC_DIR).joinpath("snapshot-instructions-2.png")),
-            snapshot_instructions_3=as_static_path(Path(STATIC_DIR).joinpath("snapshot-instructions-3.png")),
             # NOTE: snapshot_disruption_1 is displayed on Page 'disruption/Disruption.html'
-            snapshot_disruption_1=as_static_path(Path(STATIC_DIR).joinpath("snapshot-disruption-1.png")),
+            snapshot_disruption_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-disruption-1.png")),
+            # NOTE: snapshot_instructions_1, snapshot_instructions_2, & snapshot_instructions_3 are all displayed on Page 'disruption/Instructions3.html'
+            snapshot_instructions_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")),
+            snapshot_instructions_2=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")),
+            snapshot_instructions_3=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")),
             is_pilot_test=player.session.config.get("is_pilot_test", False),
             is_disrupted=treatment.is_disrupted(),
             is_disruption_this_round=is_disruption_this_round(player),
@@ -243,13 +262,12 @@ class Decide(DisruptionPage):
         hcpu = float(unit_costs.hcpu)
 
         # Get demand units!
-        du = round(
-            player.participant.treatment.get_demand(randomly=False, player=player)
-        )  # NOTE: not randomly means from pre-determined data
+        # NOTE: not randomly means from pre-determined data
+        du = player.participant.treatment.get_demand(randomly=False, player=player)
 
-        # stock & order units
-        su = round(player.participant.stock_units)
-        ou = round(player.ou)
+        # units availaboe
+        su = player.participant.stock_units
+        ou = player.ou
 
         # compute revenue, cost, profit
         if su + ou > du:
@@ -297,7 +315,6 @@ class Decide(DisruptionPage):
 
         if player.round_number == player.participant.payoff_round:
             player.payoff = Currency(min(1750, max(750, player.profit * 0.05)))
-            player.participant.payoff = player.payoff
         else:
             player.payoff = Currency(0)
 

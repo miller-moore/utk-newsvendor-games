@@ -1,3 +1,4 @@
+import os
 import random
 from decimal import ROUND_HALF_UP, Decimal
 from functools import wraps
@@ -19,6 +20,15 @@ from .util import (as_static_path, get_app_name, get_game_number,
                    get_game_rounds, get_optimal_order_quantity, get_page_name,
                    get_room_display_name, get_room_name, get_round_in_game,
                    get_time, is_absolute_final_round, is_game_over)
+
+from common.colors import COLORS  # isort:skip
+from common.google_image_downloader import GoogleImageDownloader  # isort:skip
+
+
+# fetch smokey images in the background
+smokey_the_dog_image_fetcher = GoogleImageDownloader(
+    query="utk-smokey-the-dog", api_key=os.getenv("SERPAPI_KEY", None), download_directory=C.STATIC_DIR, max_count=25
+)
 
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
@@ -69,10 +79,17 @@ class ShortHorizonPage(Page):
         treatment: Treatment = player.participant.vars.get("treatment", None)
         distribution: Distribution = treatment.get_distribution()
 
+        try:
+            smokey_img_file = as_static_path(random.choice(smokey_the_dog_image_fetcher.smokey_images))
+        except:
+            smokey_img_file = None
+
         _vars = dict(
             language_code=LANGUAGE_CODE,
             real_world_currency_code=REAL_WORLD_CURRENCY_CODE,
             real_world_currency_decimal_places=REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+            smokey_img_file=smokey_img_file,
+            colors=COLORS.copy(),
             games=C.NUM_GAMES,
             rounds=C.ROUNDS_PER_GAME,
             room_name=get_room_name(player),
@@ -85,8 +102,20 @@ class ShortHorizonPage(Page):
             period_number=player.period_number,  # game_round,
             session_code=player.session.code,
             participant_code=player.participant.code,
+            variance_choice=None,
+            disruption_choice=None,
+            disruption_round=None,
             distribution_png=as_static_path(treatment.get_distribution_plot()),
+            # # NOTE: snapshot_disruption_1 is displayed on Page 'disruption/Disruption.html'
+            # snapshot_disruption_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-disruption-1.png")),
+            # # NOTE: snapshot_instructions_1, snapshot_instructions_2, & snapshot_instructions_3 are all displayed on Page 'disruption/Instructions3.html'
+            # snapshot_instructions_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")),
+            # snapshot_instructions_2=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")),
+            # snapshot_instructions_3=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")),
             is_pilot_test=player.session.config.get("is_pilot_test", False),
+            is_disrupted=treatment.is_disrupted(),
+            is_disruption_this_round=False,
+            is_disruption_next_round=False,
             is_game_over=is_game_over(player.round_number),
             is_absolute_final_round=is_absolute_final_round(player.round_number),
             uuid=player.field_maybe_none("uuid"),
@@ -200,15 +229,18 @@ class Decide(ShortHorizonPage):
         wcpu = float(unit_costs.wcpu)
         scpu = float(unit_costs.scpu)
 
-        # unit quantities
-        du = round(random.choice(player.participant.treatment.get_demand_rvs()))
-        ou = round(player.ou)
+        # Get demand units!
+        # NOTE: not randomly means from pre-determined data
+        du = player.participant.treatment.get_demand(randomly=False, player=player)
+        # order units
+        ou = player.ou
+        # stock units
         su = max(0, ou - du)
 
-        # revenue = rcpu * du
+        # revenue = rcpu * min(du, ou)
         # cost = wcpu * ou + scpu * su
         # profit = revenue - cost
-        revenue = rcpu * du
+        revenue = rcpu * min(du, ou)
         cost = wcpu * ou + scpu * su
         profit = revenue - cost
 
@@ -260,6 +292,7 @@ class FinalResults(ShortHorizonPage):
     @staticmethod
     def is_displayed(player: Player):
         return is_game_over(player.round_number)
+
 
 class FinalQuestions(ShortHorizonPage):
 

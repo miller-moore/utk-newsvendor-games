@@ -4,9 +4,9 @@
 <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
 <script src="https://d3js.org/d3.v6.js"></script>
 
-{# miscellaneous javascript functions #}
-
 <script>
+    var Colors = js_vars.colors;
+
     function getBaseURL() {
         var baseUrl = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/').slice(1, 3).join("/");
         return baseUrl;
@@ -135,39 +135,15 @@
         var formatter = new Intl.NumberFormat(language_code + '-US', kwargs);
         return formatter.format(n);
     }
-
-    const Colors = {
-        red: '#f12761',
-        darkmango: '#eb6e08',
-        orange: "#eeac4d",
-        mango: '#ffbf34',
-        lightgreen: '#75e0b0',
-        green: '#4daf4a',
-        darkgreen: '#006f60',
-        cyan: '#60d3eb',
-        blue: '#377eb8',
-        darkblue: '#6160eb',
-        purple: '#6f3098',
-        darkpink: '#aa3382',
-        pink: '#ff56c6',
-    }
-
     function distributionColor() {
-        switch(js_vars.app_name) {
-            case 'disruption':
-                return Colors.darkmango;
-            case 'shorthorizon':
-                return Colors.lightgreen;
-            default:
-                console.error(`js_vars.app_name is not a valid game application name: got ${js_vars.app_name}`);
-        }
+        //return js_vars.app_name === 'disruption' && Boolean('{{ is_disrupted }}')? Colors.red: Colors.ut_orange;
+        return Colors.ut_orange;
     }
-
     function orderQuantityColor() {
-        return js_vars.app_name === 'disruption'?  Colors.darkblue: Colors.purple
+        return js_vars.app_name === 'disruption'? Colors.purple: Colors.pink;
     }
     function demandQuantityColor() {
-        return js_vars.app_name === 'disruption'?  Colors.pink: Colors.orange
+        return js_vars.app_name === 'disruption'? Colors.pink: Colors.purple;
     }
 </script>
 

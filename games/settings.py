@@ -1,3 +1,9 @@
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except:
+    pass
+
 from os import environ
 
 # NOTE: participant/session fields: https://otree.readthedocs.io/en/latest/rounds.html?#participant-fields

@@ -5,3 +5,4 @@ black
 rope
 matplotlib
 seaborn
+python-dotenv
