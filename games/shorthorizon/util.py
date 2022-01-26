@@ -17,13 +17,13 @@ from otree.session import Session
 from pydantic import BaseConfig, BaseModel
 from scipy import stats
 
-from .constants import APP_NAME, STATIC_DIR, C
+from .constants import C
 
 
 def as_static_path(path: Path):
-    if str(STATIC_DIR) + "/" in str(path):
-        return str(path).replace(str(STATIC_DIR) + "/", APP_NAME + "/")
-    raise ValueError(f"path must begin with {str(STATIC_DIR) +'/'!r} - got {path!r}")
+    if str(C.STATIC_DIR) + "/" in str(path):
+        return str(path).replace(str(C.STATIC_DIR) + "/", C.APP_NAME + "/")
+    raise ValueError(f"path must begin with {str(C.STATIC_DIR) +'/'!r} - got {path!r}")
 
 
 def get_game_number(round_number: int) -> int:
@@ -110,7 +110,7 @@ def get_demand_data_csv_path(as_asset_url: bool, participantid: str) -> str:
     if as_asset_url:
         return str(Path(C.URL_PREFIX) / file_name)
 
-    return str(STATIC_DIR / file_name)
+    return str(C.STATIC_DIR / file_name)
 
 
 def maybe_write_demand_data_csv(data: np.ndarray, participantid: str) -> None:

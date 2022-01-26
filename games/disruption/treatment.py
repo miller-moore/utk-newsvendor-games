@@ -219,8 +219,8 @@ class Treatment(PydanticModel):
         figsize = (5, 4)  # (width, height)
         # figsize = None  # (width, height)
         fig, ax = plt.subplots(figsize=figsize)
-        # ax.plot(x, p, alpha=0.7, color=COLORS["black"])  # alpha=0.7
-        ax.fill_between(x, p, 0, alpha=0.5, color=COLORS[color_key])  # alpha=0.2
+        # ax.plot(x, p, alpha=0.7, color=COLORS["black"])
+        ax.fill_between(x, p, 0, alpha=0.5, color=COLORS[color_key])
 
         # plt.xlim((0, xmax))
         # plt.ylim(0, ymax)

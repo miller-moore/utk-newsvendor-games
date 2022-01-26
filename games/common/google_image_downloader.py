@@ -17,7 +17,6 @@ class GoogleImageDownloader(Thread):
         self.max_count = max_count
         self._stop_event = Event()
         super().__init__(target=self.run, daemon=True)
-        self.start()
 
     def run(self):
         self.downloader()

@@ -6,7 +6,8 @@ from enum import Enum
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
@@ -201,8 +202,8 @@ class Treatment(PydanticModel):
         figsize = (5, 4)  # (width, height)
         # figsize = None  # (width, height)
         fig, ax = plt.subplots(figsize=figsize)
-        ax.plot(x, p, alpha=1, color=COLORS["ut_smokey"])  # alpha=0.7
-        ax.fill_between(x, p, 0, alpha=1, color=COLORS[color_key])  # alpha=0.2
+        # ax.plot(x, p, alpha=0.7, color=COLORS["black"])
+        ax.fill_between(x, p, 0, alpha=0.5, color=COLORS[color_key])
 
         # plt.xlim((0, xmax))
         # plt.ylim(0, ymax)

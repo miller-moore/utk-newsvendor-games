@@ -45,41 +45,13 @@
         </div>
     </div>
 
-    {{ if smokey_img_file }}
-        <!-- random image of Smokey from google-search-results -->
+    {{ if C.USE_SMOKEY_IMAGES }}
+        <!-- fill whitespace with a random image of Smokey the dog -->
         <div class="col-6 mb-4">
             <div class="card" id="smokey-img-container">
                 <div class="card-body">
                     <img id="smokey-img" src="{{ static smokey_img_file }}" >
                 </div>
-                <script>
-                    $(() => {
-                        var img = document.getElementById("smokey-img");
-                        var aspect = img.height/ img.width;
-                        var cardBody = document.getElementById("smokey-img-container").children[0];
-
-                        //if (img.height > cardBody.clientHeight) {
-                        //    var newheight = cardBody.clientHeight * .9
-                        //    img.setAttribute("height", newheight);
-                        //    //img.setAttribute("width", newheight / aspect);
-                        //}
-
-                        //if (img.width > cardBody.clientWidth) {
-                        //    var newwidth =  cardBody.clientWidth * .9
-                        //    img.setAttribute("width", newwidth);
-                        //    //img.setAttribute("height", newwidth * aspect);
-                        //}
-
-                        if (img.height > 500) {
-                            img.setAttribute("height", 500);
-                            img.setAttribute("width", 500 / aspect);
-                        }
-                        if (img.width > 500) {
-                            img.setAttribute("width", 500);
-                            img.setAttribute("height", 500 * aspect);
-                        }
-                    });
-                </script>
             </div>
         </div>
     {{ endif }}
@@ -99,14 +71,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr id="row-stock">
-                                <th scope="row" style="white-space: nowrap;"><strong>Salvaged inventory<br>(previous round)</strong></th>
-                            </tr>
                             <tr id="row-order">
                                 <th scope="row" style="white-space: nowrap;"><strong>Order quantity</strong></th>
                             </tr>
                             <tr id="row-demand">
                                 <th scope="row" style="white-space: nowrap;"><strong>Demand quantity<br>(realized)</strong></th>
+                            </tr>
+                            <tr id="row-stock">
+                                <th scope="row" style="white-space: nowrap;"><strong>Salvaged inventory</strong></th>
                             </tr>
                             <tr id="row-profit">
                                 <th scope="row" style="white-space: nowrap;"><strong>Profit</strong></th>

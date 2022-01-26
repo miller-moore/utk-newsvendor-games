@@ -485,6 +485,13 @@
         });
     }
 
+    function resizeSmokeyImage() {
+        var img = $("#smokey-img")
+        var aspect = img.height() / img.width();
+        //$("#smokey-img").css({ 'height' : `${$('#hist-quantities-barchart').height() * .9}px`});
+        $("#smokey-img").css({ 'width' : `${$('#hist-quantities-barchart').width()}px`});
+    }
+
     function plotQuantitiesBarchart() {
 
         $("#hist-quantities-barchart").empty();
@@ -686,6 +693,7 @@
         $("#hist-quantities-card").width(widthCard);
         $("#hist-quantities-card").height(widthCard / (460/400));
 
+        resizeSmokeyImage();
     }
 
     function renderGameHistoryContainer() {

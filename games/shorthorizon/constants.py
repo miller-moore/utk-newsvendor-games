@@ -11,7 +11,7 @@ APP_DIR = Path(__file__).resolve().parent
 APP_NAME = APP_DIR.name
 STATIC_DIR = (APP_DIR / ".." / "_static" / APP_NAME).resolve()
 INCLUDES_DIR = APP_DIR / "includes"
-
+USE_SMOKEY_IMAGES = True
 
 for dr in [STATIC_DIR, INCLUDES_DIR]:
     dr.mkdir(parents=True, exist_ok=True)
@@ -61,6 +61,7 @@ class C(ConstantsBase):
     RVS_SIZE = RVS_SIZE
     STATIC_DIR = STATIC_DIR
     INCLUDES_DIR = INCLUDES_DIR
+    USE_SMOKEY_IMAGES = USE_SMOKEY_IMAGES
 
     # paths for templates used in include tags, e.g., {{ include "disruption/style.html" }} or {{ include C.STYLE_TEMPLATE }}
     STYLE_TEMPLATE = get_includable_template_path("style.html")

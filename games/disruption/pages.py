@@ -15,24 +15,38 @@ from otree.models import Participant
 from otree.session import Session
 
 from .constants import C
-from .formvalidation import (default_error_message,
-                             register_form_field_validator)
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Player, initialize_game_history
 from .treatment import Distribution, Treatment
-from .util import (as_static_path, get_app_name, get_game_number,
-                   get_game_rounds, get_optimal_order_quantity, get_page_name,
-                   get_room_display_name, get_room_name, get_round_in_game,
-                   get_time, is_absolute_final_round, is_disruption_next_round,
-                   is_disruption_this_round, is_game_over)
+from .util import (
+    as_static_path,
+    get_app_name,
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_room_display_name,
+    get_room_name,
+    get_round_in_game,
+    get_time,
+    is_absolute_final_round,
+    is_disruption_next_round,
+    is_disruption_this_round,
+    is_game_over,
+)
 
 from common.colors import COLORS  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
 
+# fetch images of Smokey the dog to display in an otherwise blank canvas region in the browser page
+SMOKEY_IMAGES_DIR = (C.STATIC_DIR / ".." / "smokey_images").resolve()
+SMOKEY_IMAGES_DIR.mkdir(exist_ok=True)
+if len(list(SMOKEY_IMAGES_DIR.glob("*.jpg"))) < 5:
 
-# fetch smokey images in the background
-smokey_the_dog_image_fetcher = GoogleImageDownloader(
-    query="utk-smokey-the-dog", api_key=os.getenv("SERPAPI_KEY", None), download_directory=C.STATIC_DIR, max_count=1000
-)
+    smokey_the_dog_image_fetcher = GoogleImageDownloader(
+        query="utk-smokey-the-dog", api_key=os.getenv("SERPAPI_KEY", None), download_directory=SMOKEY_IMAGES_DIR, max_count=10
+    )
+    smokey_the_dog_image_fetcher.start()
 
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
@@ -73,9 +87,12 @@ class DisruptionPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                    REAL_WORLD_CURRENCY_CODE,
-                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+        from otree.settings import (
+            LANGUAGE_CODE,
+            LANGUAGE_CODE_ISO,
+            REAL_WORLD_CURRENCY_CODE,
+            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+        )
 
         # import importlib
         # from . import treatment as disruption_treatment
@@ -84,16 +101,13 @@ class DisruptionPage(Page):
         treatment: Treatment = player.participant.vars.get("treatment", None)
         distribution: Distribution = treatment.get_distribution()
 
-        try:
-            smokey_img_file = as_static_path(random.choice(smokey_the_dog_image_fetcher.smokey_images))
-        except:
-            smokey_img_file = None
-
         _vars = dict(
             language_code=LANGUAGE_CODE,
             real_world_currency_code=REAL_WORLD_CURRENCY_CODE,
             real_world_currency_decimal_places=REAL_WORLD_CURRENCY_DECIMAL_PLACES,
-            smokey_img_file=smokey_img_file,
+            smokey_img_file=str(
+                Path().joinpath(SMOKEY_IMAGES_DIR.name, random.choice(list(SMOKEY_IMAGES_DIR.glob("*.jpg"))).name)
+            ),
             colors=COLORS.copy(),
             games=C.NUM_GAMES,
             rounds=C.ROUNDS_PER_GAME,
