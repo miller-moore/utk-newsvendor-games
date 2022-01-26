@@ -287,7 +287,7 @@ class Decide(ShortHorizonPage):
         player.participant.history[idx] = hist
 
         if player.round_number == player.participant.payoff_round:
-            player.payoff = Currency(min(1750, max(750, player.profit * 0.05)))
+            player.payoff = Currency(min(1750, max(750, player.profit * 0.05)))  # TODO
         else:
             player.payoff = Currency(0)
 
