@@ -1,5 +1,7 @@
+import json
 import os
 import random
+import re
 from collections import deque
 from decimal import ROUND_HALF_UP, Decimal
 from functools import wraps
@@ -36,6 +38,7 @@ from .util import (
 )
 
 from common.colors import COLORS  # isort:skip
+from common.utils import serialize  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
 
 # fetch images of Smokey the dog to display in an otherwise blank canvas region in the browser page
@@ -63,20 +66,18 @@ def validate_years_as_planner(years_as_planner: int) -> Optional[str]:
     return
 
 
-@register_form_field_validator(form_field="prolific_id", expect_type=str)
-def validate_prolific_id(prolific_id: str) -> Optional[str]:
-    import re
-
-    chars = 24
-    if not re.findall(f"[a-zA-Z0-9]{ {chars} }", str(prolific_id)):
-        return f"""Prolific IDs must have exactly {chars} alphanumeric characters (only a-z, A-Z, or 0-9 are allowed). Special characters such as those in !@#$%^&*)(-=][/\\|,`~<>.?;:'"}}{{ are not allowed."""
-    return
-
-
 @register_form_field_validator(form_field="does_consent", expect_type=bool)
 def validate_does_consent(does_consent: bool) -> Optional[str]:
     if does_consent is False:
         return f"""Must consent."""
+    return
+
+
+@register_form_field_validator(form_field="prolific_id", expect_type=str)
+def validate_prolific_id(prolific_id: str) -> Optional[str]:
+
+    if not re.findall(r"[a-zA-Z0-9]{24}", str(prolific_id)):
+        return f"""The value entered is invalid. Prolific IDs are alphanumeric strings exactly 24 characters in length, e.g., 5b96601D3400a939Db45dAc9, 92Ee40aBAFcfa96f49E798c5, etc. You entered: {serialize(prolific_id)!r}."""
     return
 
 

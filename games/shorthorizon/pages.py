@@ -52,23 +52,6 @@ def validate_is_planner(is_planner: bool) -> Optional[str]:
     return
 
 
-@register_form_field_validator(form_field="prolific_id", expect_type=str)
-def validate_prolific_id(prolific_id: str) -> Optional[str]:
-    import re
-
-    chars = 24
-    if not re.findall(f"[a-zA-Z0-9]{ {chars} }", str(prolific_id)):
-        return f"""Prolific IDs must have exactly {chars} alphanumeric characters (only a-z, A-Z, or 0-9 are allowed). Special characters such as those in !@#$%^&*)(-=][/\\|,`~<>.?;:'"}}{{ are not allowed."""
-    return
-
-
-@register_form_field_validator(form_field="does_consent", expect_type=bool)
-def validate_does_consent(does_consent: bool) -> Optional[str]:
-    if does_consent is False:
-        return f"""Must consent."""
-    return
-
-
 class ShortHorizonPage(Page):
 
     error_message = staticmethod(default_error_message)
