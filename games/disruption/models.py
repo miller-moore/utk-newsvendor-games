@@ -134,7 +134,7 @@ class Player(BasePlayer):
         label="""By checking the box to the left you agree to participate in this survey.""",
     )
     prolific_id = models.StringField(
-        label="""What is your Prolific ID?<br><i style="font-size: 0.8rem;">Note that Prolific IDs are alphanumeric strings exactly 24 characters in length, e.g., 5b96601D3400a939Db45dAc9, 92Ee40aBAFcfa96f49E798c5, etc.</i>""",
+        label="""Please enter your Prolific ID below (e.g., 5b96601D3400a939Db45dAc9):""",
     )
 
     # player data
