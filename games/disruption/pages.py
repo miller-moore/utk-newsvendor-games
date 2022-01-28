@@ -51,8 +51,8 @@ if len(list(SMOKEY_IMAGES_DIR.glob("*.jpg"))) < 5:
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
 def validate_is_planner(is_planner: bool) -> Optional[str]:
-    # if is_planner is False:
-    #     return f"""Must be True."""
+    # This field really indicates whether the participant carries the desired role for the experiment.
+    # Allow anyone to participate - which has no consequence because authorization of the participants participation payoff is dictated by logic defined elsewhere
     return
 
 
@@ -69,7 +69,7 @@ def validate_prolific_id(prolific_id: str) -> Optional[str]:
 
     chars = 24
     if not re.findall(f"[a-zA-Z0-9]{ {chars} }", str(prolific_id)):
-        return f"""Prolific ID must be a string with exactly {chars} alphanumeric characters (i.e., a-z, A-Z, and 0-9; special characters are not allowed)."""
+        return f"""Prolific IDs must have exactly {chars} alphanumeric characters (only a-z, A-Z, or 0-9 are allowed). Special characters such as those in !@#$%^&*)(-=][/\\|,`~<>.?;:'"}}{{ are not allowed."""
     return
 
 

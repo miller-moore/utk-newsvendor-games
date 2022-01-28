@@ -43,6 +43,9 @@
         });
     }
     function allowClickNextOnEnterIfProlificIDInput() {
+        if (!$("#id_prolific_id").length) {
+            return
+        }
         $("#id_prolific_id").keyup(function(event) {
             if (event.keyCode === 13) {
                 $('[class*="otree-btn-next"]').click();
@@ -764,7 +767,7 @@
         }
         for (var i=0; i < js_vars.game_results.length; i++) {
             var tableId = `results-table-${i}`;
-            var cardTitle = `Game ${i+1} Results`;
+            var cardTitle = js_vars.game_results.length > 1? `Game ${i+1} Results`: `Game Results`;
             var cardCode = $(`<div class="col-auto"><div class="card"><div class="card-body"><h5 class="card-title text-center">${cardTitle}</h5><table id="${tableId}"></table></div></div></div>`);
             finalResultsContainer.append(cardCode);
             var table = $(`#${tableId}`);
@@ -822,38 +825,40 @@
             table.find('thead').empty();
         }
 
-        var tableId = `overall-table`;
-        var cardTitle = `Survey Totals`;
-        var cardCode = $(`<div class="col-auto"><div class="card"><div class="card-body"><h5 class="card-title text-center">${cardTitle}</h5><table id="${tableId}"></table></div></div></div>`);
-        finalResultsContainer.append(cardCode);
-        var table = $(`#${tableId}`);
-        table.bootstrapTable({
-            columns: [{
-                field: 'name',
-                title: ''
-            }, {
-                field: 'value',
-                title: ''
-            }],
-            data: [{
-                id: 1,
-                name: '<strong>Total profit</strong>',
-                value: formatCurrency(overallResults.cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-            }, {
-                id: 2,
-                name: '<strong>Total ordered</strong>',
-                value: formatNumber(overallResults.total_ordered, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-            }, {
-                id: 3,
-                name: '<strong>Total demanded</strong>',
-                value: formatNumber(overallResults.total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-            }, {
-                id: 4,
-                name: '<strong>Leftover inventory</strong>',
-                value: formatNumber(overallResults.final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-            }]
-        })
-        table.find('thead').empty();
+        if (js_vars.game_results.length > 1) {
+            var tableId = `overall-table`;
+            var cardTitle = `Survey Totals`;
+            var cardCode = $(`<div class="col-auto"><div class="card"><div class="card-body"><h5 class="card-title text-center">${cardTitle}</h5><table id="${tableId}"></table></div></div></div>`);
+            finalResultsContainer.append(cardCode);
+            var table = $(`#${tableId}`);
+            table.bootstrapTable({
+                columns: [{
+                    field: 'name',
+                    title: ''
+                }, {
+                    field: 'value',
+                    title: ''
+                }],
+                data: [{
+                    id: 1,
+                    name: '<strong>Total profit</strong>',
+                    value: formatCurrency(overallResults.cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                }, {
+                    id: 2,
+                    name: '<strong>Total ordered</strong>',
+                    value: formatNumber(overallResults.total_ordered, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                }, {
+                    id: 3,
+                    name: '<strong>Total demanded</strong>',
+                    value: formatNumber(overallResults.total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                }, {
+                    id: 4,
+                    name: '<strong>Leftover inventory</strong>',
+                    value: formatNumber(overallResults.final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                }]
+            })
+            table.find('thead').empty();
+        }
     }
 
     function renderFinalResultsContainer() {

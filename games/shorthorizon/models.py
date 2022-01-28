@@ -61,9 +61,6 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         unit_costs: UnitCosts = treatment.get_unit_costs()
         _ = treatment.get_demand_rvs()  # initializes treatment._demand_rvs
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
-        years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
-        does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
-        prolific_id = player.participant.vars.get("prolific_id", player.field_maybe_none("prolific_id"))
         game_number = get_game_number(player.round_number)
         round_in_game = get_round_in_game(player.round_number)
         game_rounds = get_game_rounds(player.round_number)
@@ -71,9 +68,6 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         player.participant.uuid = uuid
         player.participant.starttime = get_time()
         player.participant.is_planner = is_planner
-        player.participant.years_as_planner = years_as_planner
-        player.participant.does_consent = does_consent
-        player.participant.prolific_id = prolific_id
         player.participant.unit_costs = unit_costs
         player.participant.stock_units = 0
         player.participant.treatment = treatment
@@ -121,45 +115,32 @@ class Player(BasePlayer):
     uuid = models.StringField()
     starttime = models.FloatField(min=get_time())
     endtime = models.FloatField(min=get_time())
-
-    # participant data
     treatment = models.IntegerField(min=1)
-    # participant Welcome formfields
-    is_planner = models.BooleanField(widget=widgets.RadioSelectHorizontal(), label="Are you presently employed as a planner?")
-    years_as_planner = models.IntegerField(
-        label="How many years in your career have you held the role of planner (rounded to the nearest year)?"
+
+    # Welcome.html form fields
+    is_planner = models.BooleanField(
+        widget=widgets.RadioSelectHorizontal(),
+        label="""Are you presently either a Junior or Senior undergraduate or graduate student studying Supply Chain Management or another related field?""",
     )
-    does_consent = models.BooleanField(
-        widget=widgets.CheckboxInput(),
-        label="""By checking the button to the left, you  your consent with the terms of this survey as specified above and agree to participate in this survey.""",  # NOTE: new label (Jan 2022)
-        # label="By checking this box, you consent to participate in this study. You understand that all data will be kept confidential by the researcher. Your personal information will not be stored in backend databases. You are free to withdraw at any time without giving a reason.", # NOTE: old label
-    )
-    prolific_id = models.StringField(  # NOTE: added (Jan 2022)
-        label="Please type or copy/paste your Prolific ID here (e.g., 5b96601d3400a939db45dac9):",
-    )
-    # company_name = models.StringField( # NOTE: replaced by prolific_id (Jan 2022)
-    #     label="What is the name of the company your currently work for?",
-    # )
 
     # player data
     game_number = models.IntegerField(min=1, initial=1)
     period_number = models.IntegerField(min=1, initial=1)
 
-    # stock units, order units, demand units
-    su = models.IntegerField(min=0, initial=0)
-    ou = models.IntegerField(min=0, max=1000, label="How many units will you order?")
+    # demand units, stock units, & order units (see Decide.html)
     du = models.IntegerField(min=0)
+    su = models.IntegerField(min=0, initial=0)
+    ou = models.IntegerField(min=0, max=1000, label="How many units will you order?")  # Decide.html
+
+    # Optimal order quantity (see treatment.py)
     ooq = models.IntegerField(min=0)
 
-    # retail cost per unit (revenue), wholesale cost per unit (cost), salvage cost per unit (cost)
+    # Unit prices: retail price (revenue), wholesale price (cost), salvage price (cost)
     rcpu = models.CurrencyField()
     wcpu = models.CurrencyField()
-    # hcpu = models.CurrencyField()
     scpu = models.CurrencyField()
 
-    # revenue = rcpu * du
-    # cost = wcpu * ou + scpu * su
-    # profit = revenue - cost
+    # NOTE: revenue, cost, and profit fields are calculated in method `Decide.before_next_page` (pages.py:238)
     revenue = models.CurrencyField(initial=0)
     cost = models.CurrencyField(initial=0)
     profit = models.CurrencyField(initial=0)
@@ -169,43 +150,3 @@ class Player(BasePlayer):
     # final questions
     q1 = models.LongStringField(label="How did your decisions change between the two games?")
     q2 = models.LongStringField(label="How did your decisions change after the disruption?")
-
-
-# def custom_export(players: Iterable[Player]):
-#     """See https://otree.readthedocs.io/en/self/admin.html#custom-data-exports"""
-
-#     # p: Player = players[0]
-#     # pp: Participant = p.participant
-#     # pp._current_app_name
-
-#     player_fields = [
-#         "starttime",
-#         "endtime",
-#         "treatment",
-#         "is_planner",
-#         "years_as_planner",
-#         "does_consent",
-#         "prolific_id",
-#         "game_number",
-#         "period_number",
-#         "su",
-#         "ou",
-#         "du",
-#         "ooq",
-#         "rcpu",
-#         "wcpu",
-#         "scpu",
-#         "revenue",
-#         "cost",
-#         "profit",
-#         "payoff_round",
-#         "payoff",
-#     ]
-#     yield ["id", "participant_code", *player_fields]
-
-#     records = []
-#     for p in players:
-#         records.append([p.id, p.participant.code, *[getattr(p, name) for name in player_fields]])
-#     records = sorted(records)
-#     for r in records:
-#         yield r

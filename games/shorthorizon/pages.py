@@ -47,15 +47,8 @@ if len(list(SMOKEY_IMAGES_DIR.glob("*.jpg"))) < 5:
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
 def validate_is_planner(is_planner: bool) -> Optional[str]:
-    # if is_planner is False:
-    #     return f"""Must be True."""
-    return
-
-
-@register_form_field_validator(form_field="years_as_planner", expect_type=int)
-def validate_years_as_planner(years_as_planner: int) -> Optional[str]:
-    if years_as_planner < 0:
-        return f"""Years in role must be >= 0."""
+    # This field really indicates whether the participant carries the desired role for the experiment.
+    # Allow anyone to participate - which has no consequence because authorization of the participants participation payoff is dictated by logic defined elsewhere
     return
 
 
@@ -63,8 +56,9 @@ def validate_years_as_planner(years_as_planner: int) -> Optional[str]:
 def validate_prolific_id(prolific_id: str) -> Optional[str]:
     import re
 
-    if not re.findall(r"[a-zA-Z]", str(prolific_id)):
-        return f"""Prolific ID must include at least 1 alphabetic character (e.g., a-z or A-Z)."""
+    chars = 24
+    if not re.findall(f"[a-zA-Z0-9]{ {chars} }", str(prolific_id)):
+        return f"""Prolific IDs must have exactly {chars} alphanumeric characters (only a-z, A-Z, or 0-9 are allowed). Special characters such as those in !@#$%^&*)(-=][/\\|,`~<>.?;:'"}}{{ are not allowed."""
     return
 
 
@@ -136,9 +130,6 @@ class ShortHorizonPage(Page):
             starttime=player.field_maybe_none("starttime"),
             endtime=player.field_maybe_none("endtime"),
             is_planner=player.field_maybe_none("is_planner"),
-            years_as_planner=player.field_maybe_none("years_as_planner"),
-            does_consent=player.field_maybe_none("does_consent"),
-            prolific_id=player.field_maybe_none("prolific_id"),
             su=player.field_maybe_none("su"),
             ou=player.field_maybe_none("ou"),
             du=player.field_maybe_none("du"),
@@ -190,9 +181,6 @@ class HydratePlayer(ShortHorizonPage):
         player.endtime = None
         player.treatment = player.participant.treatment.idx
         player.is_planner = player.participant.is_planner
-        player.years_as_planner = player.participant.years_as_planner
-        player.does_consent = player.participant.does_consent
-        player.prolific_id = player.participant.prolific_id
         player.game_number = get_game_number(player.round_number)
         player.period_number = get_round_in_game(player.round_number)
         player.su = None
@@ -215,7 +203,7 @@ class HydratePlayer(ShortHorizonPage):
 
 class Welcome(ShortHorizonPage):
     form_model = "player"
-    form_fields = ["is_planner", "years_as_planner", "does_consent", "prolific_id"]
+    form_fields = ["is_planner"]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -224,9 +212,6 @@ class Welcome(ShortHorizonPage):
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
         player.participant.is_planner = player.is_planner
-        player.participant.years_as_planner = player.years_as_planner
-        player.participant.does_consent = player.does_consent
-        player.participant.prolific_id = player.prolific_id
 
 
 class Decide(ShortHorizonPage):
@@ -287,7 +272,9 @@ class Decide(ShortHorizonPage):
         player.participant.history[idx] = hist
 
         if player.round_number == player.participant.payoff_round:
-            player.payoff = Currency(min(1750, max(750, player.profit * 0.05)))  # TODO
+            # player.payoff = Currency(min(1750, max(750, player.profit * 0.05)))
+            # TODO(mm): update to the shorthorizon game calculation; this is copy/pasted from the disruption game
+            player.payoff = Currency(player.profit * 0.00075)
         else:
             player.payoff = Currency(0)
 
