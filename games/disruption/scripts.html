@@ -759,7 +759,8 @@
         }
         for (var i=0; i < js_vars.game_results.length; i++) {
             var tableId = `results-table-${i}`;
-            var cardTitle = js_vars.game_results.length > 1? `Game ${i+1} Results`: `Game Results`;
+            //var cardTitle = js_vars.game_results.length > 1? `Game ${i+1} Results`: `Game Results`;
+            var cardTitle = `Game ${i+1} Results`;
             var cardCode = $(`<div class="col-auto"><div class="card"><div class="card-body"><h5 class="card-title text-center">${cardTitle}</h5><table id="${tableId}"></table></div></div></div>`);
             finalResultsContainer.append(cardCode);
             var table = $(`#${tableId}`);

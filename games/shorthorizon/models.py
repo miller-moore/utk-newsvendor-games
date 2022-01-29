@@ -61,6 +61,8 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         unit_costs: UnitCosts = treatment.get_unit_costs()
         _ = treatment.get_demand_rvs()  # initializes treatment._demand_rvs
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
+        gender_identity = player.participant.vars.get("gender_identity", player.field_maybe_none("gender_identity"))
+        does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
         game_number = get_game_number(player.round_number)
         round_in_game = get_round_in_game(player.round_number)
         game_rounds = get_game_rounds(player.round_number)
@@ -68,6 +70,8 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         player.participant.uuid = uuid
         player.participant.starttime = get_time()
         player.participant.is_planner = is_planner
+        player.participant.gender_identity = gender_identity
+        player.participant.does_consent = does_consent
         player.participant.unit_costs = unit_costs
         player.participant.stock_units = 0
         player.participant.treatment = treatment
@@ -117,10 +121,17 @@ class Player(BasePlayer):
     endtime = models.FloatField(min=get_time())
     treatment = models.IntegerField(min=1)
 
-    # Welcome.html form fields
+    # Consent.html form fields
     is_planner = models.BooleanField(
         widget=widgets.RadioSelectHorizontal(),
         label="""Are you presently either a Junior or Senior undergraduate or graduate student studying Supply Chain Management or another related field?""",
+    )
+    gender_identity = models.StringField(
+        max_length=1000, label="If willing, please type your Gender Identity in the box below."
+    )
+    does_consent = models.BooleanField(
+        widget=widgets.CheckboxInput(),
+        label="""By checking the box to the left you agree to participate in this experiment.""",
     )
 
     # player data
@@ -146,7 +157,3 @@ class Player(BasePlayer):
     profit = models.CurrencyField(initial=0)
 
     payoff_round = models.IntegerField()
-
-    # final questions
-    q1 = models.LongStringField(label="How did your decisions change between the two games?")
-    q2 = models.LongStringField(label="How did your decisions change after the disruption?")

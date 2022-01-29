@@ -5,8 +5,7 @@ from enum import Enum, Flag
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
-                    Tuple, Union)
+from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as stats
@@ -17,8 +16,7 @@ from pydantic.main import Extra
 from pydantic.types import conint
 
 from .constants import C
-from .util import (get_round_in_game, lognormalize_normal_samples,
-                   normalize_lognormal_samples)
+from .util import get_round_in_game, lognormalize_normal_samples, normalize_lognormal_samples
 
 from common.pydanticmodel import PydanticModel  # isort:skip
 from common.colors import COLORS  # isort:skip
@@ -175,7 +173,23 @@ class Treatment(PydanticModel):
 
         return png_file.exists()  # and (datetime.now().timestamp() - png_file.stat().st_mtime) < 86400
 
-    def get_distribution_plot(self) -> Tuple[Path, Path]:
+    def get_instructions_pdf(self) -> Path:
+        """
+        Return the fully resolved file path (`Path`) of the appropriate instructions manual based on runtime-dependent conditions
+        or configuration settings.
+
+        Game instructions depend on the participant's treatment attributes; hence, the file path can only be determined after the
+        participant's treatment group is fully constructed. and makes the most sense that the file path be produced by very
+        same object which contains participant treatment properties (which is this class, `Treatment`)
+
+        Returns
+        -------
+        Path
+
+        """
+        return Path(C.STATIC_DIR).joinpath(f"{C.APP_NAME.capitalize()}-Game-Instructions-v2.pdf")
+
+    def get_distribution_png(self) -> Tuple[Path, Path]:
         """Plot & save the player's current demand distribution data to a png and return the png file path."""
 
         import matplotlib.pyplot as plt
@@ -211,11 +225,11 @@ class Treatment(PydanticModel):
         xmin, xmax = 0, 1000
         # ymax = 0.012 if self.variance_choice == "low" else 0.003
 
-        # make pdf(x)
+        # make distribution curve
         x = np.linspace(xmin, xmax, 200)
         p = stats.norm.pdf(x, mu, sigma)
 
-        # plot pdf(x)
+        # plot distribution curve
         figsize = (5, 4)  # (width, height)
         # figsize = None  # (width, height)
         fig, ax = plt.subplots(figsize=figsize)

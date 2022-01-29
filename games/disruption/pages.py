@@ -17,25 +17,15 @@ from otree.models import Participant
 from otree.session import Session
 
 from .constants import C
-from .formvalidation import default_error_message, register_form_field_validator
+from .formvalidation import (default_error_message,
+                             register_form_field_validator)
 from .models import Player, initialize_game_history
 from .treatment import Distribution, Treatment
-from .util import (
-    as_static_path,
-    get_app_name,
-    get_game_number,
-    get_game_rounds,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_room_display_name,
-    get_room_name,
-    get_round_in_game,
-    get_time,
-    is_absolute_final_round,
-    is_disruption_next_round,
-    is_disruption_this_round,
-    is_game_over,
-)
+from .util import (as_static_path, get_app_name, get_game_number,
+                   get_game_rounds, get_optimal_order_quantity, get_page_name,
+                   get_room_display_name, get_room_name, get_round_in_game,
+                   get_time, is_absolute_final_round, is_disruption_next_round,
+                   is_disruption_this_round, is_game_over)
 
 from common.colors import COLORS  # isort:skip
 from common.utils import serialize  # isort:skip
@@ -77,7 +67,7 @@ def validate_does_consent(does_consent: bool) -> Optional[str]:
 def validate_prolific_id(prolific_id: str) -> Optional[str]:
 
     if not re.findall(r"[a-zA-Z0-9]{24}", str(prolific_id)):
-        return f"""The value entered is invalid. Prolific IDs are alphanumeric strings exactly 24 characters in length, e.g., 5b96601D3400a939Db45dAc9, 92Ee40aBAFcfa96f49E798c5, etc. You entered: {serialize(prolific_id)!r}."""
+        return f"""The value entered is invalid. Prolific IDs are alphanumeric strings of exactly 24 characters in length, e.g., 5b96601D3400a939Db45dAc9, 92Ee40aBAFcfa96f49E798c5, etc. You entered <strong>{str(prolific_id)}</strong>."""
     return
 
 
@@ -88,12 +78,9 @@ class DisruptionPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (
-            LANGUAGE_CODE,
-            LANGUAGE_CODE_ISO,
-            REAL_WORLD_CURRENCY_CODE,
-            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
-        )
+        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                    REAL_WORLD_CURRENCY_CODE,
+                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
         # import importlib
         # from . import treatment as disruption_treatment
@@ -128,13 +115,12 @@ class DisruptionPage(Page):
             disruption_round=C.DISRUPTION_ROUND_IN_GAMES.get(player.game_number, None)
             if treatment.disruption_choice and player.game_number == 1
             else None,
-            distribution_png=as_static_path(treatment.get_distribution_plot()),
-            # NOTE: snapshot_disruption_1 is displayed on Page 'disruption/Disruption.html'
-            snapshot_disruption_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-disruption-1.png")),
-            # NOTE: snapshot_instructions_1, snapshot_instructions_2, & snapshot_instructions_3 are all displayed on Page 'disruption/Instructions3.html'
-            snapshot_instructions_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")),
-            snapshot_instructions_2=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")),
-            snapshot_instructions_3=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")),
+            distribution_png=as_static_path(treatment.get_distribution_png()),
+            instructions_pdf=as_static_path(treatment.get_instructions_pdf()),
+            snapshot_disruption_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-disruption-1.png")),# Disruption.html
+            snapshot_instructions_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")),# Instructions3.html
+            snapshot_instructions_2=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")),# Instructions3.html
+            snapshot_instructions_3=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")),# Instructions3.html
             is_pilot_test=player.session.config.get("is_pilot_test", False),
             is_disrupted=treatment.is_disrupted(),
             is_disruption_this_round=is_disruption_this_round(player),
@@ -217,7 +203,7 @@ class HydratePlayer(DisruptionPage):
         )
 
 
-class Welcome(DisruptionPage):
+class Consent(DisruptionPage):
     form_model = "player"
     form_fields = ["is_planner", "years_as_planner", "does_consent", "prolific_id"]
 
@@ -379,7 +365,7 @@ class Prolific(DisruptionPage):
 # entire sequence is traversed every round
 page_sequence = [
     HydratePlayer,
-    Welcome,
+    Consent,
     Instructions1,
     Instructions2,
     Instructions3,

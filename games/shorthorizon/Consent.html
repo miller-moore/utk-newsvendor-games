@@ -8,6 +8,12 @@
     {{ include C.SECTIONS_TEMPLATE }}
     {{ include C.SCRIPTS_TEMPLATE }}
 
+    <!--
+        @note If needed, a tab system can be used as a hack to recover "back button" functionality to the user in a way that does
+        @note not interfere without interfering with oTree's strict adherence to the order of Page objects in `app_sequence`.
+        @note Source code demonstrating the tab system for this effect is located at https://www.otreehub.com/projects/otree-snippets/.
+    -->
+
     <div class="row border mb-4" id="disclaimer-container">
         <div class="card border">
             <div class="card-body">
@@ -36,12 +42,18 @@
         </div>
     </div>
 
-    <div class="row border mb-4" id="welcome-questions-container">
+    <div class="row border mb-4" id="consent-container">
         <div class="card border">
             <div class="card-body">
                 {# <h5 class="card-title">Some Title</h5> #}
                 <p>
                     {{ formfield 'is_planner' }}
+                </p>
+                <p>
+                    {{ formfield 'gender_identity' }}
+                </p>
+                <p>
+                    {{ formfield 'does_consent' }}
                 </p>
             </div>
         </div>

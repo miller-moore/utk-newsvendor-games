@@ -121,7 +121,7 @@ class Player(BasePlayer):
     endtime = models.FloatField(min=get_time())
     treatment = models.IntegerField(min=1)
 
-    # Welcome.html form fields
+    # Consent.html form fields
     is_planner = models.BooleanField(
         widget=widgets.RadioSelectHorizontal(),
         label="Are you presently employed in a manufacturing and/or operations management role?",
@@ -131,7 +131,7 @@ class Player(BasePlayer):
     )
     does_consent = models.BooleanField(
         widget=widgets.CheckboxInput(),
-        label="""By checking the box to the left you agree to participate in this survey.""",
+        label="""By checking the box to the left you agree to participate in this experiment.""",
     )
     prolific_id = models.StringField(
         label="""Please enter your Prolific ID below (e.g., 5b96601D3400a939Db45dAc9):""",

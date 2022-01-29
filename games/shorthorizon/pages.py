@@ -12,23 +12,14 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
 from .constants import C
-from .formvalidation import default_error_message, register_form_field_validator
+from .formvalidation import (default_error_message,
+                             register_form_field_validator)
 from .models import Player, initialize_game_history
 from .treatment import Distribution, Treatment
-from .util import (
-    as_static_path,
-    get_app_name,
-    get_game_number,
-    get_game_rounds,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_room_display_name,
-    get_room_name,
-    get_round_in_game,
-    get_time,
-    is_absolute_final_round,
-    is_game_over,
-)
+from .util import (as_static_path, get_app_name, get_game_number,
+                   get_game_rounds, get_optimal_order_quantity, get_page_name,
+                   get_room_display_name, get_room_name, get_round_in_game,
+                   get_time, is_absolute_final_round, is_game_over)
 
 from common.colors import COLORS  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
@@ -47,8 +38,22 @@ if len(list(SMOKEY_IMAGES_DIR.glob("*.jpg"))) < 5:
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
 def validate_is_planner(is_planner: bool) -> Optional[str]:
-    # This field really indicates whether the participant carries the desired role for the experiment.
-    # Allow anyone to participate - which has no consequence because authorization of the participants participation payoff is dictated by logic defined elsewhere
+    # This field really indicates whether the participant (or student) carries the desired role/field-of-study for the experiment.
+    # But allow anyone to participate because why not (ie., do nothing).
+    return
+
+
+@register_form_field_validator(form_field="gender_identity", expect_type=str)
+def validate_does_consent(gender_identity: str) -> Optional[str]:
+    # totally optional field provided at the user's will
+    # hence, any value is valid (ie., do nothing)
+    return
+
+
+@register_form_field_validator(form_field="does_consent", expect_type=bool)
+def validate_does_consent(does_consent: bool) -> Optional[str]:
+    if does_consent is False:
+        return f"""Must consent."""
     return
 
 
@@ -59,12 +64,9 @@ class ShortHorizonPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (
-            LANGUAGE_CODE,
-            LANGUAGE_CODE_ISO,
-            REAL_WORLD_CURRENCY_CODE,
-            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
-        )
+        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                    REAL_WORLD_CURRENCY_CODE,
+                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
         # import importlib
         # from . import treatment as shorthorizon_treatment
@@ -96,13 +98,17 @@ class ShortHorizonPage(Page):
             variance_choice=None,
             disruption_choice=None,
             disruption_round=None,
-            distribution_png=as_static_path(treatment.get_distribution_plot()),
-            # # NOTE: snapshot_disruption_1 is displayed on Page 'disruption/Disruption.html'
-            # snapshot_disruption_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-disruption-1.png")),
-            # # NOTE: snapshot_instructions_1, snapshot_instructions_2, & snapshot_instructions_3 are all displayed on Page 'disruption/Instructions3.html'
-            # snapshot_instructions_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")),
-            # snapshot_instructions_2=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")),
-            # snapshot_instructions_3=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")),
+            distribution_png=as_static_path(treatment.get_distribution_png()),
+            instructions_pdf=as_static_path(treatment.get_instructions_pdf()),
+            snapshot_instructions_1=as_static_path(
+                Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")
+            ),  # Instructions3.html
+            snapshot_instructions_2=as_static_path(
+                Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")
+            ),  # Instructions3.html
+            snapshot_instructions_3=as_static_path(
+                Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")
+            ),  # Instructions3.html
             is_pilot_test=player.session.config.get("is_pilot_test", False),
             is_disrupted=treatment.is_disrupted(),
             is_disruption_this_round=False,
@@ -112,7 +118,9 @@ class ShortHorizonPage(Page):
             uuid=player.field_maybe_none("uuid"),
             starttime=player.field_maybe_none("starttime"),
             endtime=player.field_maybe_none("endtime"),
-            is_planner=player.field_maybe_none("is_planner"),
+            is_planner=player.field_maybe_none("is_planner"),  # NOTE: demographic feature
+            gender_identity=player.field_maybe_none("gender_identity"),  # NOTE: demographic feature
+            does_consent=player.field_maybe_none("does_consent"),  # NOTE: demographic feature
             su=player.field_maybe_none("su"),
             ou=player.field_maybe_none("ou"),
             du=player.field_maybe_none("du"),
@@ -147,11 +155,6 @@ class ShortHorizonPage(Page):
         return _vars
 
 
-# Page.error_message = staticmethod(default_error_messagef)
-# Page.vars_for_template = staticmethod(vars_for_template)
-# Page.js_vars = staticmethod(js_vars)
-
-
 class HydratePlayer(ShortHorizonPage):
 
     timeout_seconds = 0
@@ -163,7 +166,9 @@ class HydratePlayer(ShortHorizonPage):
         player.starttime = get_time()
         player.endtime = None
         player.treatment = player.participant.treatment.idx
-        player.is_planner = player.participant.is_planner
+        player.is_planner = player.participant.is_planner  # Consent.html
+        player.gender_identity = player.participant.gender_identity  # Consent.html
+        player.does_consent = player.participant.does_consent  # Consent.html
         player.game_number = get_game_number(player.round_number)
         player.period_number = get_round_in_game(player.round_number)
         player.su = None
@@ -184,9 +189,9 @@ class HydratePlayer(ShortHorizonPage):
         )
 
 
-class Welcome(ShortHorizonPage):
+class Consent(ShortHorizonPage):
     form_model = "player"
-    form_fields = ["is_planner"]
+    form_fields = ["is_planner", "gender_identity", "does_consent"]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -195,6 +200,26 @@ class Welcome(ShortHorizonPage):
     @staticmethod
     def before_next_page(player: Player, timeout_happened):
         player.participant.is_planner = player.is_planner
+        player.participant.gender_identity = player.gender_identity
+        player.participant.does_consent = player.does_consent
+
+
+class Instructions1(ShortHorizonPage):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == 1
+
+
+class Instructions2(ShortHorizonPage):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == 1
+
+
+class Instructions3(ShortHorizonPage):
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number == 1
 
 
 class Decide(ShortHorizonPage):
@@ -277,24 +302,7 @@ class FinalResults(ShortHorizonPage):
     def is_displayed(player: Player):
         return is_game_over(player.round_number)
 
-
-class FinalQuestions(ShortHorizonPage):
-
-    form_model = "player"
-    form_fields = ["q1", "q2"]
-
-    @staticmethod
-    def is_displayed(player: Player):
-        return is_absolute_final_round(player.round_number)
-
-    @staticmethod
-    def before_next_page(player: Player, timeout_happened):
-        if is_absolute_final_round(player.round_number):
-            player.participant.q1 = player.q1
-            player.participant.q2 = player.q2
-
-
-class Prolific(ShortHorizonPage):
+class Payoff(ShortHorizonPage):
     @staticmethod
     def is_displayed(player: Player):
         return is_absolute_final_round(player.round_number)
@@ -302,4 +310,4 @@ class Prolific(ShortHorizonPage):
 
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [HydratePlayer, Welcome, Decide, Results, FinalResults, FinalQuestions, Prolific]
+page_sequence = [HydratePlayer, Consent, Decide, Results, FinalResults, Payoff]

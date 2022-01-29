@@ -1,5 +1,6 @@
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except:
     pass
@@ -15,6 +16,7 @@ PARTICIPANT_FIELDS = [
     "uuid",
     "starttime",
     "is_planner",
+    "gender_identity",
     "years_as_planner",
     "does_consent",
     "prolific_id",
@@ -32,10 +34,9 @@ PARTICIPANT_FIELDS = [
 # NOTE: session fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#session-fields
 SESSION_FIELDS = []
 
-# if you set a property in SESSION_CONFIG_DEFAULTS, it will be inherited by all configs
-# in SESSION_CONFIGS, except those that explicitly override it.
-# the session config can be accessed from methods in your apps as self.session.config,
-# e.g. self.session.config['participation_fee']
+# Global session configs that apply when not defined in the app-specific session config dictionary,
+# As a reminder, exact config settings at runtime are accessible in Page methods from the player argument - that is, `player.session.config.get(..., )`.
+# For more details, see pages.py (specifically lines that contain "player.session.config").
 SESSION_CONFIG_DEFAULTS = dict(
     doc="",
     use_secure_urls=False,
@@ -60,6 +61,13 @@ SESSION_CONFIGS = [
         num_demo_participants=1,
         app_sequence=["shorthorizon"],
     ),
+    # dict(
+    #     name="back_button",
+    #     display_name="Back button for multiple instructions pages",
+    #     num_demo_participants=1,
+    #     app_sequence=["back_button"],
+    #     references=["https://www.otreehub.com/projects/otree-snippets/"]
+    # ),
 ]
 
 # Rooms

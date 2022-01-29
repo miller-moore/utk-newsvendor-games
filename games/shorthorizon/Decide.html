@@ -4,6 +4,19 @@
 
 {{ block content }}
 
+    <div class="d-inline-flex row border mb-4" id="instructions-pdf-container">
+        <div class="card border">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <a onclick='window.open("{{ static instructions_pdf }}","_blank")'>
+                        <i class="mr-2 far fa-file-pdf fa-2x" style="color:darkred;"></i>
+                        Game Instructions
+                    </a>
+                </h6>
+            </div>
+        </div>
+    </div>
+
     {{ include C.STYLE_TEMPLATE }}
     {{ include C.SECTIONS_TEMPLATE }}
     {{ include C.SCRIPTS_TEMPLATE }}
@@ -13,7 +26,6 @@
             <div class="card-body">
                 <h5 class="card-title">Decision</h5>
                 <p>
-                    {# Note: according to commercial forecasting software, the optimal order quantity for this period is <strong id="optimal-order-quantity"></strong>. #}
                     {{ formfield 'ou' }}
                 </p>
             </div>

@@ -9,40 +9,36 @@
     {{ include C.SCRIPTS_TEMPLATE }}
 
     <p>
-        Two examples of calculating the CF in a period follow below:
+        Here are 2 examples of calculating the profit of a round:
         <ol>
             <li>
                 Example 1:
                 <ul>
                     <li>selling price = {{ 20 | cu }} / unit</li>
                     <li>purchasing price = {{ 7.5 | cu }} / unit</li>
-                    <li>inventory holding costs = {{ 5 | cu }} / unit</li>
-                    <li>starting inventory 10 units</li>
+                    <li>salvage fee = {{ 5 | cu }} / unit</li>
                     <li>your order quantity = 50 units</li>
-                    <li>available inventory = 60 units (10 units in inventory + 50 units ordered)</li>
                     <li>demand = 20 units</li>
                 </ul>
                 <br>
-                <code>Profit = {{ 20 | cu }} * 20 units [units sold = Minimum of demand and available inventory]</code>
+                <code>Profit = {{ 20 | cu }} * 20 units [units sold = Minimum of demand and order quantity]</code>
                 <br><code class="ml-5">&nbsp;&nbsp;- {{ 7.5 | cu }} * 50 units [order quantity]</code>
-                <br><code class="ml-5">&nbsp;&nbsp;- {{ 5 | cu }} * 40 units [final inventory= available inventory - units sold]</code>
-                <br><code class="ml-5"><span style="color:red;">&nbsp;&nbsp;= - {{ 175 | cu }}</span></code>
+                <br><code class="ml-5">&nbsp;&nbsp;- {{ 5 | cu }} * 30 units [salvage inventory= order quantity - units sold]</code>
+                <br><code class="ml-5"><span style="color:red;">&nbsp;&nbsp;= - {{ 125 | cu }}</span></code>
             </li>
 
             <li class="mt-4">
                 Example 2:
                 <ul>
                     <li>Prices of Example 1 apply here.</li>
-                    <li>starting inventory = 10 units</li>
                     <li>your order quantity = 50 units</li>
-                    <li>available inventory = 60 units (10 units in inventory + 50 units ordered)</li>
                     <li>demand = 100 units</li>
                 </ul>
                 <br>
-                <code>Profit = {{ 20 | cu }} * 60 units [units sold = Minimum of demand and available inventory]</code>
+                <code>Profit = {{ 20 | cu }} * 50 units [units sold = Minimum of demand and order quantity]</code>
                 <br><code class="ml-5">&nbsp;&nbsp;- {{ 7.5 | cu }} * 50 units [order quantity]</code>
                 <br><code class="ml-5">&nbsp;&nbsp;- {{ 5 | cu }} * 0 units [final inventory= 0]</code>
-                <br><code class="ml-5"><span style="color:red;">&nbsp;&nbsp;= {{ 825 | cu }}</span></code>
+                <br><code class="ml-5"><span style="color:red;">&nbsp;&nbsp;= {{ 625 | cu }}</span></code>
             </li>
         </ol>
     </p>
