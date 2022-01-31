@@ -12,14 +12,23 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
 from .constants import C
-from .formvalidation import (default_error_message,
-                             register_form_field_validator)
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Player, initialize_game_history
 from .treatment import Distribution, Treatment
-from .util import (as_static_path, get_app_name, get_game_number,
-                   get_game_rounds, get_optimal_order_quantity, get_page_name,
-                   get_room_display_name, get_room_name, get_round_in_game,
-                   get_time, is_absolute_final_round, is_game_over)
+from .util import (
+    as_static_path,
+    get_app_name,
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_room_display_name,
+    get_room_name,
+    get_round_in_game,
+    get_time,
+    is_absolute_final_round,
+    is_game_over,
+)
 
 from common.colors import COLORS  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
@@ -64,9 +73,12 @@ class ShortHorizonPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                    REAL_WORLD_CURRENCY_CODE,
-                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+        from otree.settings import (
+            LANGUAGE_CODE,
+            LANGUAGE_CODE_ISO,
+            REAL_WORLD_CURRENCY_CODE,
+            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+        )
 
         # import importlib
         # from . import treatment as shorthorizon_treatment
@@ -302,6 +314,7 @@ class FinalResults(ShortHorizonPage):
     def is_displayed(player: Player):
         return is_game_over(player.round_number)
 
+
 class Payoff(ShortHorizonPage):
     @staticmethod
     def is_displayed(player: Player):
@@ -310,4 +323,4 @@ class Payoff(ShortHorizonPage):
 
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [HydratePlayer, Consent, Decide, Results, FinalResults, Payoff]
+page_sequence = [HydratePlayer, Consent, Instructions1, Instructions2, Instructions3, Decide, Results, FinalResults, Payoff]
