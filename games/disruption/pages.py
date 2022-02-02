@@ -117,10 +117,16 @@ class DisruptionPage(Page):
             else None,
             distribution_png=as_static_path(treatment.get_distribution_png()),
             instructions_pdf=as_static_path(treatment.get_instructions_pdf()),
-            snapshot_disruption_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-disruption-1.png")),# Disruption.html
-            snapshot_instructions_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")),# Instructions3.html
-            snapshot_instructions_2=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")),# Instructions3.html
-            snapshot_instructions_3=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")),# Instructions3.html
+            snapshot_disruption_1=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-disruption-1.png")),  # Disruption.html
+            snapshot_instructions_1=as_static_path(
+                Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")
+            ),  # Instructions3.html
+            snapshot_instructions_2=as_static_path(
+                Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")
+            ),  # Instructions3.html
+            snapshot_instructions_3=as_static_path(
+                Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")
+            ),  # Instructions3.html
             is_pilot_test=player.session.config.get("is_pilot_test", False),
             is_disrupted=treatment.is_disrupted(),
             is_disruption_this_round=is_disruption_this_round(player),
@@ -266,31 +272,26 @@ class Decide(DisruptionPage):
         # NOTE: not randomly means from pre-determined data
         du = player.participant.treatment.get_demand(randomly=False, player=player)
 
-        # units availaboe
+        # units available
         su = player.participant.stock_units
         ou = player.ou
 
         # compute revenue, cost, profit
-        if su + ou > du:
-            cost = ou * wcpu + su * hcpu
-            revenue = du * rcpu
-        else:
-            cost = ou * wcpu
-            revenue = (su + ou) * rcpu
+        su_after = max(0, ou + su - du)
+        sold_units = min(su + ou, du)
+        cost = ou * wcpu + su_after * hcpu
+        revenue = sold_units * rcpu
         profit = revenue - cost
 
+        # update player fields
         player.revenue = Currency(revenue)
         player.cost = Currency(cost)
         player.profit = Currency(profit)
-
-        su_new = max(0, ou + su - du)
-        player.su = su_new
+        player.su = su_after
         player.du = du
 
-        # update participant fields
-
-        # stock units
-        player.participant.stock_units = su_new
+        # update next round's stock units
+        player.participant.stock_units = su_after
 
         # cumulative profit
         first_round_in_game = get_game_rounds(player.round_number)[0]
@@ -305,7 +306,7 @@ class Decide(DisruptionPage):
             ou=ou,
             du=du,
             su_before=su,
-            su_after=su_new,
+            su_after=su_after,
             ooq=player.ooq,
             revenue=float(revenue),
             cost=float(cost),

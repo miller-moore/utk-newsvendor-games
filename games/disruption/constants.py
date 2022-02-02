@@ -11,7 +11,7 @@ APP_DIR = Path(__file__).resolve().parent
 APP_NAME = APP_DIR.name
 STATIC_DIR = (APP_DIR / ".." / "_static" / APP_NAME).resolve()
 INCLUDES_DIR = APP_DIR / "includes"
-USE_SMOKEY_IMAGES = True
+USE_SMOKEY_IMAGES = False
 
 # NOTE: disruption stuff
 # NOTE: a disruption only applies to the first game - everybody gets a disruption in the second game
