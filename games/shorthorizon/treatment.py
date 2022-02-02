@@ -174,8 +174,7 @@ class Treatment(PydanticModel):
         Path
 
         """
-
-        return Path(C.STATIC_DIR).joinpath(f"{C.APP_NAME.capitalize()}-Game-Instructions-v2.pdf")
+        return Path(C.STATIC_DIR).joinpath(f"Game Instructions.pdf")
 
     def get_distribution_png(self) -> Tuple[Path, Path]:
         """Plot & save the player's current demand distribution data to a png and return the png file path."""

@@ -9,13 +9,18 @@
     {{ include C.SCRIPTS_TEMPLATE }}
 
 
-    <h5>Your prolific code is: <code><strong>{{ session.config.prolific_code }}</strong>}</code></h5>
+    <h5>Your prolific code is: <code><strong>{{ session.config.prolific_code }}</strong></code></h5>
 
     <br>
     <h5>Please copy this code and paste it back into the prolific website to get paid!</h5>
 
     <br>
-    <h5>Thanks for playing! Your payoff for participating in this survey is {{ participant.payoff }}!</h5>
+    <h5>Your bonus for participating in this survey is {{ participant.payoff }}!</h5>
+
+    <br>
+    <h5>Once you have copied the code above, you may close your browser.</h5>
+    <h5>Thanks for playing!</h5>
+
 
     {# {{ if session.config.is_pilot_test }}
         <h5>Thanks for playing!</h5>

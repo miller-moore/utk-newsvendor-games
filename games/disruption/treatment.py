@@ -5,7 +5,8 @@ from enum import Enum, Flag
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
@@ -16,7 +17,8 @@ from pydantic.main import Extra
 from pydantic.types import conint
 
 from .constants import C
-from .util import get_round_in_game, lognormalize_normal_samples, normalize_lognormal_samples
+from .util import (get_round_in_game, lognormalize_normal_samples,
+                   normalize_lognormal_samples)
 
 from common.pydanticmodel import PydanticModel  # isort:skip
 from common.colors import COLORS  # isort:skip
@@ -187,7 +189,7 @@ class Treatment(PydanticModel):
         Path
 
         """
-        return Path(C.STATIC_DIR).joinpath(f"{C.APP_NAME.capitalize()}-Game-Instructions-v2.pdf")
+        return Path(C.STATIC_DIR).joinpath(f"Game Instructions.pdf")
 
     def get_distribution_png(self) -> Tuple[Path, Path]:
         """Plot & save the player's current demand distribution data to a png and return the png file path."""
