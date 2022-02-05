@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-PROJECT_ROOT=`cd "$(dirname ${0})"/../ && pwd`
+PROJECT_ROOT="$( cd "$(dirname "${0}")/.." >/dev/null 2>&1 ; pwd -P )"
+cd "${PROJECT_ROOT}"
 
 # add project directory to python sys.path - allows importing modules from the local project directory
 export PYTHONPATH=${PROJECT_ROOT}
-VIRTUALENV_DIR=${PROJECT_ROOT}/venv
 
 # setup virtualenv & basic package management dependencies
-if [ ! -d ${VIRTUALENV_DIR} ]; then
+if [ ! -d ${PROJECT_ROOT}/venv ]; then
     command -v pyenv &> /dev/null
     if [ $? -eq 0 ]; then
         py39="$(pyenv versions --bare | grep '3.9' | sort -nr | head -1 &> /dev/null)"
@@ -15,19 +15,22 @@ if [ ! -d ${VIRTUALENV_DIR} ]; then
             pyenv local "${py39}"
         fi
     fi
-    python3 -m venv ${VIRTUALENV_DIR}
+    python3 -m venv ${PROJECT_ROOT}/venv
 fi
 
 # activate virtualenv
-source ${VIRTUALENV_DIR}/bin/activate
+source ${PROJECT_ROOT}/venv/bin/activate
 
 ## configure git pull & merge options
 git config pull.rebase false
 git config merge.ff true
 
-# install dev dependencies are installed
-# TODO: convert all this to a poetry managed project with a pyproject.toml file
-pip install -U -r ${PROJECT_ROOT}/requirements-dev.txt
+# install dev dependencies
+if [ -f ${PROJECT_ROOT}/requirements-dev.txt ]; then
+    pip install -U -r ${PROJECT_ROOT}/requirements-dev.txt
+fi
 
-# install prod dependencies are installed
-pip install -U -r ${PROJECT_ROOT}/requirements-prod.txt
+# install prod dependencies (exact)
+if [ -f ${PROJECT_ROOT}/requirements-prod.txt ]; then
+    pip install -r ${PROJECT_ROOT}/requirements-prod.txt
+fi

@@ -171,7 +171,9 @@ class Treatment(PydanticModel):
     def check_png(png_file: Path) -> bool:
         from datetime import datetime
 
-        return png_file.exists()  # and (datetime.now().timestamp() - png_file.stat().st_mtime) < 86400
+        file_mtime_within_24hours = datetime.now().timestamp() - png_file.stat().st_mtime < 86400
+
+        return png_file.exists()  # and file_mtime_within_24hours
 
     def get_instructions_pdf(self) -> Path:
         """

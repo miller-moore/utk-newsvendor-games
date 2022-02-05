@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-source "$(dirname "${0}")/init"
-cd $PROJECT_ROOT
+PROJECT_ROOT="$( cd "$(dirname "${0}")/.." >/dev/null 2>&1 ; pwd -P )"
+cd "${PROJECT_ROOT}"
+
+die() {
+    printf 'ERROR: %s\n' "$1" >&2
+    exit 1
+}
 
 green() {
     echo -e "\e[0;32m${1}\e[m"
@@ -13,8 +18,8 @@ italic() {
 # defaults
 PATTERN=
 ROOT_PATH=""
-REGEXP="\(.*[.]\)\(js\|jsx\|ts\|tsx\|sh\|json\|sql\|html\|css\|scss\|ejs\|py\|pyx\|pxd\)"
-REGEXP_EXCLUSION="\([.]git\|[.]vscode\|[.]yarn\|[.]ipynb\|__pycache__\|dist\|images\|logs\|node_modules\).*"
+FILE_PATTERN="\(.*[.]\)\(js\|jsx\|ts\|tsx\|sh\|json\|sql\|html\|css\|scss\|ejs\|p[xy][xd]*\|sol\)"
+FILE_PATTERN_EXCLUSION="\([.]git\|[.]vscode\|[.]yarn\|[.]ipynb\|__pycache__\|dist\|images\|logs\|node_modules\).*"
 
 help() {
     cat << EOF
@@ -24,8 +29,8 @@ Return: records of form '<filename>:<lineno>:\t<line>' for lines that match $(gr
 
 Options:
     -p $(green path)                        Root directory containing files to include in the search for matching lines. Default $PROJECT_ROOT.
-    -f $(green file-pattern)                Include file lines if file name matches regular expression $(green file-pattern). The only other valid argument is $(italic ignore), which eliminates $(green file-pattern) from applying to file-based filters. Default '$REGEXP'.
-    -e $(green file-pattern-exclusion)      Exclude file lines if file name matches regular expression $(green file-exclusion-pattern). The only other valid argument is $(italic ignore), which eliminates $(green file-exclusion-pattern) from applying to file-based filters. Default '$REGEXP_EXCLUSION'.
+    -f $(green file-pattern)                Include file lines if file name matches regular expression $(green file-pattern). The only other valid argument is $(italic ignore), which eliminates $(green file-pattern) from applying to file-based filters. Default '$FILE_PATTERN'.
+    -e $(green file-pattern-exclusion)      Exclude file lines if file name matches regular expression $(green file-exclusion-pattern). The only other valid argument is $(italic ignore), which eliminates $(green file-exclusion-pattern) from applying to file-based filters. Default '$FILE_PATTERN_EXCLUSION'.
 
 Example:
     ${0##*/} uvicorn pyserver -f '.*\([.]py\)' -e '.*\(config[.]py\)'
@@ -34,7 +39,10 @@ EOF
 
     exit 0
 }
-HELP=$(eval "grep -E '[-]+(h|help)($|[ ].*$)' <<< '$*'")
+# HELP=$(eval "grep -E '[-]+(h|help)($|[ ].*$)' <<< '$*'")
+# [ "$HELP" ] && help
+
+HELP=`echo "${@}" | sed -n -E '/[-]+(h|help)($|[ ].*$)/p'`
 [ "$HELP" ] && help
 
 # PATTERN is first argument
@@ -53,12 +61,12 @@ while [ "$#" -gt 0 ]; do
         [ ! -d "${ROOT_PATH}" ] && die "ERROR: invalid argument provided for $(green path) (first position) - got ${patharg}." >&2
         ;;
     -f)
-        [[ ${1#*=} =~ "-" ]] && shift && REGEXP="${1}" || { REGEXP="${1#*=}"; }
-        [ "$REGEXP" = "ignore" ] && REGEXP=
+        [[ ${1#*=} =~ "-" ]] && shift && FILE_PATTERN="${1}" || { FILE_PATTERN="${1#*=}"; }
+        [ "$FILE_PATTERN" = "ignore" ] && FILE_PATTERN=
         ;;
     -e)
-        [[ ${1#*=} =~ "-" ]] && shift && REGEXP_EXCLUSION="${1}" || { REGEXP_EXCLUSION="${1#*=}"; }
-        [ "$REGEXP_EXCLUSION" = "ignore" ] && REGEXP_EXCLUSION=
+        [[ ${1#*=} =~ "-" ]] && shift && FILE_PATTERN_EXCLUSION="${1}" || { FILE_PATTERN_EXCLUSION="${1#*=}"; }
+        [ "$FILE_PATTERN_EXCLUSION" = "ignore" ] && FILE_PATTERN_EXCLUSION=
         ;;
     @(--)) # End of options. Break out of loop. NOTE: extglob pattern '@(--)' matches exactly one occurrence of '--'
         shift && break
@@ -96,12 +104,12 @@ shopt -u extglob
 # Prepare `find` command arguments
 BASE_PATH=$(basename ${ROOT_PATH})
 findrgxp=""
-if [ -n "$REGEXP" ] && [ -n "$REGEXP_EXCLUSION" ]; then
-    findrgxp="\( -regex '.*${REGEXP}' -a ! -regex '.*$REGEXP_EXCLUSION' \)"
-elif [ -n "$REGEXP" ]; then
-    findrgxp="-regex '.*$REGEXP'"
-elif [ -n "$REGEXP_EXCLUSION" ]; then
-    findrgxp="\( ! -regex '.*$REGEXP_EXCLUSION' \)"
+if [ -n "$FILE_PATTERN" ] && [ -n "$FILE_PATTERN_EXCLUSION" ]; then
+    findrgxp="\( -regex '.*${FILE_PATTERN}' -a ! -regex '.*$FILE_PATTERN_EXCLUSION' \)"
+elif [ -n "$FILE_PATTERN" ]; then
+    findrgxp="-regex '.*$FILE_PATTERN'"
+elif [ -n "$FILE_PATTERN_EXCLUSION" ]; then
+    findrgxp="\( ! -regex '.*$FILE_PATTERN_EXCLUSION' \)"
 fi
 
 FINDEXE="$(which find)"
@@ -120,3 +128,4 @@ eval "$cmd"
 
 # find "$DIR" -type f \( ! -regex "$EXCLUSION_RGXP" -a -regex "$INCLUSION_RGXP" \) -print0 | \
 #     xargs -0 -I"{}" -P 0 sh -c "grep -H -n -E '$PATTERN' {}" 2>&1
+

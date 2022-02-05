@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
 
-PROJECT_ROOT=`cd "$(dirname ${0})"/../ && pwd`
-
-
 if [ ! "$(hostname)" = "scmotree" ]; then
   echo Host is not scmotree. Exiting.
   exit 1
 fi
 
+PROJECT_ROOT="$( cd "$(dirname "${0}")/.." >/dev/null 2>&1 ; pwd -P )"
+cd "${PROJECT_ROOT}"
+
+# Ensure environment is setup, virtual env is created, deps installed, etc
+${PROJECT_ROOT}/scripts/setup
+
 # activate virtualenv
-[ -z "$VIRTUAL_ENV" ] && source ${PROJECT_ROOT}/venv/bin/activate
+[ -z "$VIRTUAL_ENV" ] && source ./venv/bin/activate
 
-[ -f "$PROJECT_ROOT/requirements-prod.txt" ] && pip install -r "$PROJECT_ROOT/requirements-prod.txt"
+[ -f "requirements-prod.txt" ] && pip install -r "requirements-prod.txt"
 
-pushd $PROJECT_ROOT/games >/dev/null
+cd games
 
 mkdir -p ./logs
 
@@ -26,4 +29,3 @@ OTREE_PRODUCTION=1 \
   SERPAPI_KEY=${SERPAPI_KEY} \
   otree prodserver "$BROADCAST_IP:8000" > ./logs/prodserver.log 2>&1 & disown
 
-popd >/dev/null

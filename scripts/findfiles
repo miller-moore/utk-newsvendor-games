@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
-source "$(dirname "${0}")/init"
-cd $PROJECT_ROOT
+PROJECT_ROOT="$( cd "$(dirname "${0}")/.." >/dev/null 2>&1 ; pwd -P )"
+cd "${PROJECT_ROOT}"
+
+die() {
+    printf 'ERROR: %s\n' "$1" >&2
+    exit 1
+}
 
 green() {
     echo -e "\e[0;32m${1}\e[m"
@@ -31,7 +36,10 @@ EOF
 
     exit 0
 }
-HELP=$(eval "grep -E '[-]+(h|help)($|[ ].*$)' <<< '$*'")
+#HELP=$(eval "grep -E '[-]+(h|help)($|[ ].*$)' <<< '$*'")
+#[ "$HELP" ] && help
+
+HELP=`echo "${@}" | sed -n -E '/[-]+(h|help)($|[ ].*$)/p'`
 [ "$HELP" ] && help
 
 # PATTERN is first argument
