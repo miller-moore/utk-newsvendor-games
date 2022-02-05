@@ -12,9 +12,8 @@ import numpy as np
 import scipy.stats as stats
 from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
-from pydantic import BaseModel, Field, StrBytes, typing, validator
+from pydantic import BaseModel, Field, StrBytes, confloat, conint, constr, typing, validator
 from pydantic.main import Extra
-from pydantic.types import confloat, conint
 
 from .constants import C
 from .util import get_round_in_game
@@ -47,10 +46,16 @@ class Distribution(PydanticModel):
         return TREATMENT_MAP[treatment.idx][0]
 
 
+class CostCategory(str, Enum):
+    low = "low"
+    high = "high"
+
+
 class UnitCosts(PydanticModel):
     rcpu: Currency  # retail cost per unit
     wcpu: Currency  # wholesale cost per unit
     scpu: Currency  # salvage cost per unit
+    category: CostCategory  # 'low' or 'high', no other
 
     class Config:
         json_encoders = dict(Currency=_CurrencyEncoder)
@@ -62,15 +67,15 @@ class UnitCosts(PydanticModel):
 
 
 TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts]] = {
-    idx + 1: (Distribution.from_args(mu=mu, sigma=sigma), UnitCosts.from_args(**costs))
-    for idx, (mu, sigma, costs) in enumerate(
+    idx + 1: (Distribution.from_args(mu=mu, sigma=sigma), UnitCosts.from_args(**unit_costs_kwargs))
+    for idx, (mu, sigma, unit_costs_kwargs) in enumerate(
         [
-            (MEANS[0], SIGMAS[1], UNIT_COSTS[0]),  # 1: low mean, high var, low CF
-            (MEANS[0], SIGMAS[0], UNIT_COSTS[0]),  # 2: low mean, low var, low CF
-            (MEANS[0], SIGMAS[0], UNIT_COSTS[1]),  # 3: low mean, low var, high CF
-            (MEANS[0], SIGMAS[1], UNIT_COSTS[1]),  # 4: low mean, high var, high CF
-            (MEANS[1], SIGMAS[0], UNIT_COSTS[1]),  # 5: high mean, low var, high CF
-            (MEANS[1], SIGMAS[1], UNIT_COSTS[0]),  # 6: high mean, high var, low CF
+            (MEANS[0], SIGMAS[1], {**UNIT_COSTS[0], "category": "low"}),  # 1: low mean, high var, low CF
+            (MEANS[0], SIGMAS[0], {**UNIT_COSTS[0], "category": "low"}),  # 2: low mean, low var, low CF
+            (MEANS[0], SIGMAS[0], {**UNIT_COSTS[1], "category": "high"}),  # 3: low mean, low var, high CF
+            (MEANS[0], SIGMAS[1], {**UNIT_COSTS[1], "category": "high"}),  # 4: low mean, high var, high CF
+            (MEANS[1], SIGMAS[0], {**UNIT_COSTS[1], "category": "high"}),  # 5: high mean, low var, high CF
+            (MEANS[1], SIGMAS[1], {**UNIT_COSTS[0], "category": "low"}),  # 6: high mean, high var, low CF
         ]
     )
 }
@@ -175,6 +180,15 @@ class Treatment(PydanticModel):
 
         """
         return Path(C.STATIC_DIR).joinpath(f"Game Instructions.pdf")
+
+    def get_snapshot_instruction_png(self, n: int) -> Path:
+        """
+        Returns
+        -------
+        Path
+
+        """
+        return Path(C.STATIC_DIR).joinpath(f"snapshot-instructions-{n:d}.png")
 
     def get_distribution_png(self) -> Tuple[Path, Path]:
         """Plot & save the player's current demand distribution data to a png and return the png file path."""

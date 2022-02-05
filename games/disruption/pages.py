@@ -116,18 +116,14 @@ class DisruptionPage(Page):
             if treatment.disruption_choice and player.game_number == 1
             else None,
             distribution_png=as_static_path(treatment.get_distribution_png()),
-            consent_pdf=as_static_path(Path(C.STATIC_DIR).joinpath("Planner Biases Consent Form- Game.pdf")),  # Consent.html
+            consent_form_pdf=as_static_path(Path(C.STATIC_DIR).joinpath("Planner Biases Consent Form- Game.pdf")),  # Consent.html
             instructions_pdf=as_static_path(treatment.get_instructions_pdf()),
-            snapshot_disrupted_distribution=as_static_path(Path(C.STATIC_DIR).joinpath("snapshot-disrupted-distribution.png")),  # Disruption.html
-            snapshot_instructions_1=as_static_path(
-                Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")
-            ),  # Instructions3.html
-            snapshot_instructions_2=as_static_path(
-                Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")
-            ),  # Instructions3.html
-            snapshot_instructions_3=as_static_path(
-                Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")
-            ),  # Instructions3.html
+            snapshot_instructions_1_png=as_static_path(treatment.get_snapshot_instruction_png(n=1)),  # Instructions3.html
+            snapshot_instructions_2_png=as_static_path(treatment.get_snapshot_instruction_png(n=2)),  # Instructions3.html
+            snapshot_instructions_3_png=as_static_path(treatment.get_snapshot_instruction_png(n=3)),  # Instructions3.html
+            snapshot_disrupted_distribution_png=as_static_path(
+                treatment.get_snapshot_disrupted_distribution_png()
+            ),  # Disruption.html
             is_pilot_test=player.session.config.get("is_pilot_test", False),
             is_disrupted=treatment.is_disrupted(),
             is_disruption_this_round=is_disruption_this_round(player),

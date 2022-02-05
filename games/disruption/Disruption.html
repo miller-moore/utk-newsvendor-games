@@ -8,20 +8,17 @@
     {{ include C.SECTIONS_TEMPLATE }}
     {{ include C.SCRIPTS_TEMPLATE }}
 
-    <p>
+    {{ if C.ALLOW_DISRUPTION }}
         <center>
             <div class="row border mb-4">
                 <div class="card border">
                     <div class="card-body">
-                        <img src="{{ static snapshot_disrupted_distribution }}" width="1000" height="602" />  <!-- raw height/width 0.602 -->
+                        <img src="{{ static snapshot_disrupted_distribution_png }}" width="1000" height="auto" />  <!-- raw height/width 0.602 -->
                     </div>
                 </div>
             </div>
         </center>
-    </p>
-
-
-    {{ if not C.ALLOW_DISRUPTION }}
+    {{ else }}
         <br>
         <p>
             <b>THIS IS JUST A TEST.</b>
@@ -38,6 +35,10 @@
     </center>
 
     <script>
+        // On Disruption page, render none of the pdf containers
+        // renderPdfConsentFormContainer();
+        // renderPdfInstructionsContainer();
+
         allowClickNextOnEnter();
     </script>
 

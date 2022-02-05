@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+source "$(dirname "${0}")/init"
+cd $PROJECT_ROOT
+
+green() {
+    echo -e "\e[0;32m${1}\e[m"
+}
+italic() {
+    echo -e "\e[3m${1}\e[m"
+}
+
+# defaults
+PATTERN=
+ROOT_PATH=""
+
+help() {
+    cat << EOF
+Usage: ${0##*/} [PATTERN] [[path] | [-p path]]
+
+Return: records of form '<filename>:<lineno>:\t<line>' for lines that match $(green pattern) from files contained in $(green path).
+
+Options:
+    -p $(green path)        Root directory containing files to include in the search for matching lines. Default $PROJECT_ROOT.
+    -e $(green exclude)     Pattern passed to grep -v -E for filename exclusion. Default is no exclusion.
+
+Example:
+    ${0##*/} '.*thesefiles[/].*' -e '.*notthese[/].*' ./src/ 
+
+EOF
+
+    exit 0
+}
+HELP=$(eval "grep -E '[-]+(h|help)($|[ ].*$)' <<< '$*'")
+[ "$HELP" ] && help
+
+# PATTERN is first argument
+PATTERN="${1}"
+shift
+
+# Handle other options
+shopt -s extglob
+while [ "$#" -gt 0 ]; do
+    case $1 in
+    -h | --help) help ;;
+    -p)
+        [[ ${1#*=} =~ "-" ]] && shift && ROOT_PATH="${1}" || { ROOT_PATH="${1#*=}"; }
+        patharg=$ROOT_PATH
+        ROOT_PATH=$(realpath ${ROOT_PATH} 2> /dev/null >&1)
+        [ ! -d "${ROOT_PATH}" ] && die "ERROR: invalid argument provided for $(green path) (first position) - got ${patharg}." >&2
+        ;;
+    -e)
+        [[ ${1#*=} =~ "-" ]] && shift && PATTERN_EXCLUSION="${1}" || { PATTERN_EXCLUSION="${1#*=}"; }
+        [ "$PATTERN_EXCLUSION" = "ignore" ] && PATTERN_EXCLUSION=
+        ;;
+    @(--)) # End of options. Break out of loop. NOTE: extglob pattern '@(--)' matches exactly one occurrence of '--'
+        shift && break
+        ;;
+    -?(-)!(-)*) # Warn for unknown options. NOTE: extglob pattern '-?(-)!(-)*' matches one or two consecutive '-' but no more and anything following
+        [[ ${1#*=} =~ "-" ]] \
+            && printf 'WARN: Unknown option (ignored): %s\n' "$1=$2" >&2 && shift \
+            || printf "WARN: Unknown option '%s' (ignoring)\n" "$1" >&2
+        ;;
+    *) # Default case. Break out of loop.
+        break
+        ;;
+    esac
+    shift
+done
+
+# If ROOT_PATH is empty, there should be a trailing argument that is the root path
+while [ "$#" -gt 0 ]; do
+    case $1 in
+    *) # Value-only arguments
+        if [ -d "${1}" ]; then
+            ROOT_PATH="${1}"
+            break
+        fi
+        printf "WARN: Unknown option '%s' (expected directory)\n" "$1" >&2
+        ;;
+    esac
+    shift
+done
+shopt -u extglob
+
+# verify ROOT_PATH
+[ ! -d "${ROOT_PATH}" ] && die "Root directory search path was invalid or not provided."
+
+# Prepare `find` command arguments
+BASE_PATH=$(basename ${ROOT_PATH})
+MAYBE_EXCLUSION_PIPE=""
+if [ -n "$PATTERN_EXCLUSION" ]; then
+    MAYBE_EXCLUSION_PIPE="| grep -E -v '$PATTERN_EXCLUSION'"
+fi
+
+FINDEXE="$(which find)"
+[ -x /usr/local/opt/findutils/libexec/gnubin/find ] && FINDEXE="/usr/local/opt/findutils/libexec/gnubin/find"
+
+# find "$ROOT_PATH" -type f "$RGXP" -print0 | xargs -0 -I"{}" -P 0 sh -c "grep -H -n -E '$PATTERN' {}" 2>&1
+
+cmd="$(
+    cat << EOF
+$FINDEXE ${ROOT_PATH} -type f $MAYBE_EXCLUSION_PIPE | grep -E '$PATTERN' 2>&1
+EOF
+)"
+
+eval "$cmd"
+

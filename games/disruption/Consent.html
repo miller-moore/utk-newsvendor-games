@@ -4,19 +4,6 @@
 
 {{ block content }}
 
-    <div class="d-inline-flex row border mb-4" id="consent-pdf-container">
-        <div class="card border">
-            <div class="card-body">
-                <h6 class="card-title">
-                    <a onclick='window.open("{{ static consent_pdf }}","_blank")'>
-                        <i class="mr-2 far fa-file-pdf fa-2x" style="color:darkred;"></i>
-                        Consent Form
-                    </a>
-                </h6>
-            </div>
-        </div>
-    </div>
-
     {{ include C.STYLE_TEMPLATE }}
     {{ include C.SECTIONS_TEMPLATE }}
     {{ include C.SCRIPTS_TEMPLATE }}
@@ -75,6 +62,11 @@
     </center>
 
     <script>
+
+        // On Consent page, render the pdf consent form container
+        renderPdfConsentFormContainer();
+        // renderPdfInstructionsContainer();
+
         function onClickWrapped(event) {
             console.log(`btnNext clicked`);
             var target = event.target;

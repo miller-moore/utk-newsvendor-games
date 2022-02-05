@@ -112,15 +112,9 @@ class ShortHorizonPage(Page):
             disruption_round=None,
             distribution_png=as_static_path(treatment.get_distribution_png()),
             instructions_pdf=as_static_path(treatment.get_instructions_pdf()),
-            snapshot_instructions_1=as_static_path(
-                Path(C.STATIC_DIR).joinpath("snapshot-instructions-1.png")
-            ),  # Instructions3.html
-            snapshot_instructions_2=as_static_path(
-                Path(C.STATIC_DIR).joinpath("snapshot-instructions-2.png")
-            ),  # Instructions3.html
-            snapshot_instructions_3=as_static_path(
-                Path(C.STATIC_DIR).joinpath("snapshot-instructions-3.png")
-            ),  # Instructions3.html
+            snapshot_instructions_1_png=as_static_path(treatment.get_snapshot_instruction_png(n=1)),  # Instructions3.html
+            snapshot_instructions_2_png=as_static_path(treatment.get_snapshot_instruction_png(n=2)),  # Instructions3.html
+            snapshot_instructions_3_png=as_static_path(treatment.get_snapshot_instruction_png(n=3)),  # Instructions3.html
             is_pilot_test=player.session.config.get("is_pilot_test", False),
             is_disrupted=treatment.is_disrupted(),
             is_disruption_this_round=False,
@@ -291,12 +285,7 @@ class Decide(ShortHorizonPage):
         )
         player.participant.history[idx] = hist
 
-        if player.round_number == player.participant.payoff_round:
-            # player.payoff = Currency(min(1750, max(750, player.profit * 0.05)))
-            # TODO(mm): update to the shorthorizon game calculation; this is copy/pasted from the disruption game
-            player.payoff = Currency(player.profit * 0.00075)
-        else:
-            player.payoff = Currency(0)
+        player.payoff = player.participant.treatment.compute_payoff(player)
 
 
 class Results(ShortHorizonPage):
