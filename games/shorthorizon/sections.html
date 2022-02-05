@@ -1,5 +1,25 @@
-<br>
-<br>
+<div class="d-inline-flex row mb-4" id="pdf-container">
+    <div id="pdf-consent-form-container" class="col-auto">
+        <div class="card border">
+            <h6 class="card-title pr-4">
+                <a onclick='window.open("{{ static consent_form_pdf }}","_blank")'>
+                    <i class="far fa-file-pdf fa-2x p-2" style="color:darkred;"></i>
+                    Consent Form
+                </a>
+            </h6>
+        </div>
+    </div>
+    <div id="pdf-instructions-container" class="col-auto">
+        <div class="card border">
+            <h6 class="card-title pr-4">
+                <a onclick='window.open("{{ static instructions_pdf }}","_blank")'>
+                    <i class="far fa-file-pdf fa-2x p-2" style="color:darkred;"></i>
+                    Game Instructions
+                </a>
+            </h6>
+        </div>
+    </div>
+</div>
 
 <!-- results-container -->
 <div class="row border mb-4" id="results-container">

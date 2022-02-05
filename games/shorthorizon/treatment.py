@@ -16,7 +16,7 @@ from pydantic import BaseModel, Field, StrBytes, confloat, conint, constr, typin
 from pydantic.main import Extra
 
 from .constants import C
-from .util import get_round_in_game
+from .util import assert_concrete_player, get_round_in_game
 
 from common.pydanticmodel import PydanticModel  # isort:skip
 from common.colors import COLORS  # isort:skip
@@ -128,6 +128,21 @@ class Treatment(PydanticModel):
 
         return self._payoff_round
 
+    def get_payoff(self, player: BasePlayer) -> Currency:
+        assert_concrete_player(player)
+        if player.round_number == player.participant.payoff_round:
+            unit_costs = self.get_unit_costs()
+            if unit_costs.category == "high":
+                factor = 0.0002
+            elif unit_costs.category == "low":
+                factor = 0.0005
+            else:
+                raise RuntimeError(
+                    f"expected unit_costs.category to be in {list(CostCategory.__members__)!r} - got {unit_costs.category!r}"
+                )
+            return Currency(player.profit * factor)
+        return Currency(0)
+
     def get_demand(self, randomly: bool = True, player: Optional[BasePlayer] = None) -> int:
         if randomly:
             return round(random.choice(self._demand_rvs))
@@ -167,6 +182,9 @@ class Treatment(PydanticModel):
 
         return png_file.exists()  # and file_mtime_within_24hours
 
+    def get_consent_form_pdf(self) -> Path:
+        return Path(C.STATIC_DIR).joinpath("Planner Biases Consent Form- Student Game.pdf")
+
     def get_instructions_pdf(self) -> Path:
         """
         Return the fully resolved file path (`Path`) of the appropriate instructions manual based on runtime-dependent conditions
@@ -181,7 +199,9 @@ class Treatment(PydanticModel):
         Path
 
         """
-        return Path(C.STATIC_DIR).joinpath(f"Game Instructions.pdf")
+        if self.get_unit_costs().category == "low":
+            return Path(C.STATIC_DIR).joinpath(f"GameInstructionsL.pdf")
+        return Path(C.STATIC_DIR).joinpath(f"GameInstructionsH.pdf")
 
     def get_snapshot_instruction_png(self, n: int) -> Path:
         """

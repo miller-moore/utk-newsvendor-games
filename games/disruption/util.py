@@ -21,6 +21,14 @@ from scipy import stats
 from .constants import APP_NAME, DISRUPTION_ROUND_IN_GAMES, STATIC_DIR, C
 
 
+def assert_concrete_player(player: BasePlayer) -> bool:
+    from .models import Player
+
+    assert isinstance(
+        player, Player
+    ), f"`player` must be an instance of the concrete `models.Player` class because its custom fields are needed (additional fields beyond those defined in `otree.api.BasePlayer`)"
+
+
 def as_static_path(path: Path):
     if str(STATIC_DIR) + "/" in str(path):
         return str(path).replace(str(STATIC_DIR) + "/", APP_NAME + "/")

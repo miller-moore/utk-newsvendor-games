@@ -867,4 +867,15 @@
 
         updateFinalResultsTables();
     }
+
+    // By default, hide all pdf-containers the instructions pdf container (id='consent-form-pdf')
+    hide($('#pdf-consent-form-container'));
+    hide($('#pdf-instructions-container'));
+
+    function renderPdfConsentFormContainer() {
+        show($('#pdf-consent-form-container'));
+    }
+    function renderPdfInstructionsContainer() {
+        show($('#pdf-instructions-container'));
+    }
 </script>

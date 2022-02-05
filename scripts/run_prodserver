@@ -16,9 +16,13 @@ ${PROJECT_ROOT}/scripts/setup
 
 [ -f "requirements-prod.txt" ] && pip install -r "requirements-prod.txt"
 
+
 cd games
 
-mkdir -p ./logs
+mkdir -p "${PWD}/logs"
+
+# Well, we should kill any prodserver jobs that currently exist... there can only be one prodserver (unless we're in the cloud & have distributed databases with all the fancy bells & whistles)
+[ -x ${PROJECT_ROOT}/scripts/kill_prodserver ] && ${PROJECT_ROOT}/scripts/kill_prodserver
 
 BROADCAST_IP=$(ifconfig | grep broadcast | grep -Po 'inet \K[\d.]+')
 
@@ -27,5 +31,5 @@ OTREE_PRODUCTION=1 \
   OTREE_ADMIN_USERNAME=${OTREE_ADMIN_USERNAME} \
   OTREE_ADMIN_PASSWORD=${OTREE_ADMIN_PASSWORD} \
   SERPAPI_KEY=${SERPAPI_KEY} \
-  otree prodserver "$BROADCAST_IP:8000" > ./logs/prodserver.log 2>&1 & disown
+  otree prodserver "$BROADCAST_IP:8000" > "${PWD}/logs/prodserver.log" 2>&1 & disown
 

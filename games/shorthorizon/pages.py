@@ -12,23 +12,14 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
 from .constants import C
-from .formvalidation import default_error_message, register_form_field_validator
+from .formvalidation import (default_error_message,
+                             register_form_field_validator)
 from .models import Player, initialize_game_history
 from .treatment import Distribution, Treatment
-from .util import (
-    as_static_path,
-    get_app_name,
-    get_game_number,
-    get_game_rounds,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_room_display_name,
-    get_room_name,
-    get_round_in_game,
-    get_time,
-    is_absolute_final_round,
-    is_game_over,
-)
+from .util import (as_static_path, get_app_name, get_game_number,
+                   get_game_rounds, get_optimal_order_quantity, get_page_name,
+                   get_room_display_name, get_room_name, get_round_in_game,
+                   get_time, is_absolute_final_round, is_game_over)
 
 from common.colors import COLORS  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
@@ -73,12 +64,9 @@ class ShortHorizonPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (
-            LANGUAGE_CODE,
-            LANGUAGE_CODE_ISO,
-            REAL_WORLD_CURRENCY_CODE,
-            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
-        )
+        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                    REAL_WORLD_CURRENCY_CODE,
+                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
         # import importlib
         # from . import treatment as shorthorizon_treatment
@@ -110,8 +98,9 @@ class ShortHorizonPage(Page):
             variance_choice=None,
             disruption_choice=None,
             disruption_round=None,
-            distribution_png=as_static_path(treatment.get_distribution_png()),
-            instructions_pdf=as_static_path(treatment.get_instructions_pdf()),
+            distribution_png=as_static_path(treatment.get_distribution_png()),  # Decide.html
+            consent_form_pdf=as_static_path(treatment.get_consent_form_pdf()),  # Consent.html
+            instructions_pdf=as_static_path(treatment.get_instructions_pdf()),  # various
             snapshot_instructions_1_png=as_static_path(treatment.get_snapshot_instruction_png(n=1)),  # Instructions3.html
             snapshot_instructions_2_png=as_static_path(treatment.get_snapshot_instruction_png(n=2)),  # Instructions3.html
             snapshot_instructions_3_png=as_static_path(treatment.get_snapshot_instruction_png(n=3)),  # Instructions3.html
@@ -285,7 +274,8 @@ class Decide(ShortHorizonPage):
         )
         player.participant.history[idx] = hist
 
-        player.payoff = player.participant.treatment.compute_payoff(player)
+        treatment: Treatment = player.participant.treatment
+        player.payoff = treatment.get_payoff(player)
 
 
 class Results(ShortHorizonPage):

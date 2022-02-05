@@ -17,15 +17,25 @@ from otree.models import Participant
 from otree.session import Session
 
 from .constants import C
-from .formvalidation import (default_error_message,
-                             register_form_field_validator)
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Player, initialize_game_history
 from .treatment import Distribution, Treatment
-from .util import (as_static_path, get_app_name, get_game_number,
-                   get_game_rounds, get_optimal_order_quantity, get_page_name,
-                   get_room_display_name, get_room_name, get_round_in_game,
-                   get_time, is_absolute_final_round, is_disruption_next_round,
-                   is_disruption_this_round, is_game_over)
+from .util import (
+    as_static_path,
+    get_app_name,
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_room_display_name,
+    get_room_name,
+    get_round_in_game,
+    get_time,
+    is_absolute_final_round,
+    is_disruption_next_round,
+    is_disruption_this_round,
+    is_game_over,
+)
 
 from common.colors import COLORS  # isort:skip
 from common.utils import serialize  # isort:skip
@@ -78,9 +88,12 @@ class DisruptionPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                    REAL_WORLD_CURRENCY_CODE,
-                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+        from otree.settings import (
+            LANGUAGE_CODE,
+            LANGUAGE_CODE_ISO,
+            REAL_WORLD_CURRENCY_CODE,
+            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+        )
 
         # import importlib
         # from . import treatment as disruption_treatment
@@ -115,9 +128,9 @@ class DisruptionPage(Page):
             disruption_round=C.DISRUPTION_ROUND_IN_GAMES.get(player.game_number, None)
             if treatment.disruption_choice and player.game_number == 1
             else None,
-            distribution_png=as_static_path(treatment.get_distribution_png()),
-            consent_form_pdf=as_static_path(Path(C.STATIC_DIR).joinpath("Planner Biases Consent Form- Game.pdf")),  # Consent.html
-            instructions_pdf=as_static_path(treatment.get_instructions_pdf()),
+            distribution_png=as_static_path(treatment.get_distribution_png()),  # Decide.html
+            consent_form_pdf=as_static_path(treatment.get_consent_form_pdf()),  # Consent.html
+            instructions_pdf=as_static_path(treatment.get_instructions_pdf()),  # various
             snapshot_instructions_1_png=as_static_path(treatment.get_snapshot_instruction_png(n=1)),  # Instructions3.html
             snapshot_instructions_2_png=as_static_path(treatment.get_snapshot_instruction_png(n=2)),  # Instructions3.html
             snapshot_instructions_3_png=as_static_path(treatment.get_snapshot_instruction_png(n=3)),  # Instructions3.html
@@ -312,11 +325,8 @@ class Decide(DisruptionPage):
         )
         player.participant.history[idx] = hist
 
-        if player.round_number == player.participant.payoff_round:
-            # player.payoff = Currency(min(1750, max(750, player.profit * 0.00075)))
-            player.payoff = Currency(player.profit * 0.00075)
-        else:
-            player.payoff = Currency(0)
+        treatment: Treatment = player.participant.treatment
+        player.payoff = treatment.get_payoff(player)
 
 
 class Results(DisruptionPage):

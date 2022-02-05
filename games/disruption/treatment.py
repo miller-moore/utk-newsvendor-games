@@ -16,7 +16,7 @@ from pydantic.main import Extra
 from pydantic.types import conint
 
 from .constants import C
-from .util import get_round_in_game, lognormalize_normal_samples, normalize_lognormal_samples
+from .util import assert_concrete_player, get_round_in_game, lognormalize_normal_samples, normalize_lognormal_samples
 
 from common.pydanticmodel import PydanticModel  # isort:skip
 from common.colors import COLORS  # isort:skip
@@ -130,15 +130,18 @@ class Treatment(PydanticModel):
             self._payoff_round = random.choice(range(1, C.NUM_ROUNDS + 1))
         return self._payoff_round
 
+    def get_payoff(self, player: BasePlayer) -> Currency:
+        assert_concrete_player(player)
+        if player.round_number == player.participant.payoff_round:
+            # player.payoff = Currency(min(1750, max(750, player.profit * 0.00075)))
+            return Currency(player.profit * 0.00075)
+        return Currency(0)
+
     def get_demand(self, randomly: bool = True, player: Optional[BasePlayer] = None) -> int:
         if randomly:
             return round(random.choice(self._demand_rvs))
         else:
-            from .models import Player
-
-            assert isinstance(
-                player, Player
-            ), f"currently, demand can only be obtained directly from pre-determined, which depends on Player game_number & round_number and game_number is particular to `models.Player` (not a default field of BasePlayer)"
+            assert_concrete_player(player)
 
             game_idx = player.game_number - 1
             round_idx = get_round_in_game(player.round_number) - 1
@@ -175,6 +178,9 @@ class Treatment(PydanticModel):
 
         return png_file.exists()  # and file_mtime_within_24hours
 
+    def get_consent_form_pdf(self) -> Path:
+        return Path(C.STATIC_DIR).joinpath("Planner Biases Consent Form- Game.pdf")
+
     def get_instructions_pdf(self) -> Path:
         """
         Return the fully resolved file path (`Path`) of the appropriate instructions manual based on runtime-dependent conditions
@@ -189,7 +195,7 @@ class Treatment(PydanticModel):
         Path
 
         """
-        return Path(C.STATIC_DIR).joinpath(f"Game Instructions.pdf")
+        return Path(C.STATIC_DIR).joinpath(f"GameInstructions.pdf")
 
     def get_snapshot_instruction_png(self, n: int) -> Path:
         """
