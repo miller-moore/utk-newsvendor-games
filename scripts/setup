@@ -27,7 +27,7 @@ git config merge.ff true
 
 # install dev dependencies
 if [ -f ${PROJECT_ROOT}/requirements-dev.txt ]; then
-    pip install -U -r ${PROJECT_ROOT}/requirements-dev.txt
+    pip install -r ${PROJECT_ROOT}/requirements-dev.txt
 fi
 
 # install prod dependencies (exact)
