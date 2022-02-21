@@ -17,29 +17,39 @@ from otree.models import Participant
 from otree.session import Session
 
 from .constants import C
-from .formvalidation import (default_error_message,
-                             register_form_field_validator)
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Player, initialize_game_history
 from .treatment import Distribution, Treatment
-from .util import (as_static_path, get_app_name, get_game_number,
-                   get_game_rounds, get_optimal_order_quantity, get_page_name,
-                   get_room_display_name, get_room_name, get_round_in_game,
-                   get_time, is_absolute_final_round, is_disruption_next_round,
-                   is_disruption_this_round, is_game_over)
+from .util import (
+    as_static_path,
+    get_app_name,
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_room_display_name,
+    get_room_name,
+    get_round_in_game,
+    get_time,
+    is_absolute_final_round,
+    is_disruption_next_round,
+    is_disruption_this_round,
+    is_game_over,
+)
 
 from common.colors import COLORS  # isort:skip
 from common.utils import serialize  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
 
-# fetch images of Smokey the dog to display in an otherwise blank canvas region in the browser page
+# # fetch images of Smokey the dog to display in an otherwise blank canvas region in the browser page
 SMOKEY_IMAGES_DIR = (C.STATIC_DIR / ".." / "smokey_images").resolve()
 SMOKEY_IMAGES_DIR.mkdir(exist_ok=True)
-if len(list(SMOKEY_IMAGES_DIR.glob("*.jpg"))) < 5:
+# if len(list(SMOKEY_IMAGES_DIR.glob("*.jpg"))) < 5:
 
-    smokey_the_dog_image_fetcher = GoogleImageDownloader(
-        query="utk-smokey-the-dog", api_key=os.getenv("SERPAPI_KEY", None), download_directory=SMOKEY_IMAGES_DIR, max_count=10
-    )
-    smokey_the_dog_image_fetcher.start()
+#     smokey_the_dog_image_fetcher = GoogleImageDownloader(
+#         query="utk-smokey-the-dog", api_key=os.getenv("SERPAPI_KEY", None), download_directory=SMOKEY_IMAGES_DIR, max_count=10
+#     )
+#     smokey_the_dog_image_fetcher.start()
 
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)
@@ -78,9 +88,12 @@ class DisruptionPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                    REAL_WORLD_CURRENCY_CODE,
-                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+        from otree.settings import (
+            LANGUAGE_CODE,
+            LANGUAGE_CODE_ISO,
+            REAL_WORLD_CURRENCY_CODE,
+            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+        )
 
         # import importlib
         # from . import treatment as disruption_treatment
@@ -342,7 +355,7 @@ class FinalResults(DisruptionPage):
 class FinalQuestions(DisruptionPage):
 
     form_model = "player"
-    form_fields = ["q1", "q2"]
+    form_fields = ["q1", "q2", "donation_fund"]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -353,9 +366,21 @@ class FinalQuestions(DisruptionPage):
         if is_absolute_final_round(player.round_number):
             player.participant.q1 = player.q1
             player.participant.q2 = player.q2
+            player.participant.donation_fund = player.donation_fund
+
+    @staticmethod
+    def vars_for_template(player: Player) -> dict:
+        _vars = DisruptionPage.vars_for_template(player)
+        _vars.update(
+            dict(
+                # donation_fund_label=f"""You earned a bonus of {player.payoff} during the survey. To which of the following funds would you like to donate your earnings to:"""
+                donation_fund_label=f"""To which of the following funds would you like to donate your earnings to:"""
+            )
+        )
+        return _vars
 
 
-class Prolific(DisruptionPage):
+class ZZZ(DisruptionPage):
     @staticmethod
     def is_displayed(player: Player):
         return is_absolute_final_round(player.round_number)
@@ -374,5 +399,5 @@ page_sequence = [
     Results,
     FinalResults,
     FinalQuestions,
-    Prolific,
+    ZZZ,
 ]

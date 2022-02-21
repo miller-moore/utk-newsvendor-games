@@ -173,6 +173,24 @@ class Player(BasePlayer):
     # final questions
     q1 = models.LongStringField(label="How did your decisions change between the two games?")
     q2 = models.LongStringField(label="How did your decisions change after the disruption?")
+    donation_fund = models.StringField(
+        widget=widgets.RadioSelect(),
+        # label="""To which of the following funds would you like to donate your earnings to:""",
+        choices=[
+            [
+                "Dr. Mary C. Holcomb Scholarship Endowment",
+                "Dr. Mary C. Holcomb Scholarship Endowment: used to support women in SCM",
+            ],
+            [
+                "Dr. Tom Mentzer Supply Chain Fund",
+                "Dr. Tom Mentzer Supply Chain Fund: used to support department excellence in logistics",
+            ],
+            [
+                "Supply Chain Management Excellence Fund",
+                "Supply Chain Management Excellence Fund: used to support impactful initiatives in SCM department",
+            ],
+        ],
+    )
 
 
 # def custom_export(players: Iterable[Player]):

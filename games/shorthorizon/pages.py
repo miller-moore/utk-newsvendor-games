@@ -25,15 +25,15 @@ from common.colors import COLORS  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
 
 
-# fetch images of Smokey the dog to display in an otherwise blank canvas region in the browser page
+# # fetch images of Smokey the dog to display in an otherwise blank canvas region in the browser page
 SMOKEY_IMAGES_DIR = (C.STATIC_DIR / ".." / "smokey_images").resolve()
 SMOKEY_IMAGES_DIR.mkdir(exist_ok=True)
-if len(list(SMOKEY_IMAGES_DIR.glob("*.jpg"))) < 5:
+# if len(list(SMOKEY_IMAGES_DIR.glob("*.jpg"))) < 5:
 
-    smokey_the_dog_image_fetcher = GoogleImageDownloader(
-        query="utk-smokey-the-dog", api_key=os.getenv("SERPAPI_KEY", None), download_directory=SMOKEY_IMAGES_DIR, max_count=10
-    )
-    smokey_the_dog_image_fetcher.start()
+#     smokey_the_dog_image_fetcher = GoogleImageDownloader(
+#         query="utk-smokey-the-dog", api_key=os.getenv("SERPAPI_KEY", None), download_directory=SMOKEY_IMAGES_DIR, max_count=10
+#     )
+#     smokey_the_dog_image_fetcher.start()
 
 
 @register_form_field_validator(form_field="is_planner", expect_type=bool)

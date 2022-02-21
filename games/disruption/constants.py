@@ -4,7 +4,7 @@ from otree.api import BaseConstants, Currency
 from otree.constants import BaseConstantsMeta
 
 NUM_GAMES = 2
-ROUNDS_PER_GAME = 12
+ROUNDS_PER_GAME = 2
 RVS_SIZE = int(1e5)
 
 APP_DIR = Path(__file__).resolve().parent

@@ -31,6 +31,7 @@ PARTICIPANT_FIELDS = [
     "payoff_round",
     "q1",
     "q2",
+    "donation_fund",
 ]
 
 # NOTE: session fields docs: https://otree.readthedocs.io/en/latest/rounds.html?#session-fields
