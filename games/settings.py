@@ -20,6 +20,8 @@ PARTICIPANT_FIELDS = [
     "years_as_planner",
     "does_consent",
     "prolific_id",
+    "company_name",
+    "work_country",
     "unit_costs",
     "stock_units",
     "treatment",

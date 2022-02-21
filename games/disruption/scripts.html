@@ -59,6 +59,26 @@
             }
         });
     }
+    function allowClickNextOnEnterIfCompanyNameInput() {
+        if (!$("#id_company_name").length) {
+            return
+        }
+        $("#id_company_name").keyup(function(event) {
+            if (event.keyCode === 13) {
+                $('[class*="otree-btn-next"]').click();
+            }
+        });
+    }
+    function allowClickNextOnEnterIfWorkCountryInput() {
+        if (!$("#id_work_country").length) {
+            return
+        }
+        $("#id_work_country").keyup(function(event) {
+            if (event.keyCode === 13) {
+                $('[class*="otree-btn-next"]').click();
+            }
+        });
+    }
     function sort(array, reverse = false) {
         var acopy = Array.from(array);
         acopy.sort((a,b) => reverse === true? b - a: a - b);

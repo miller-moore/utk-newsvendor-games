@@ -60,7 +60,9 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
         years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
         does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
-        prolific_id = player.participant.vars.get("prolific_id", player.field_maybe_none("prolific_id"))
+        # prolific_id = player.participant.vars.get("prolific_id", player.field_maybe_none("prolific_id"))
+        company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
+        work_country = player.participant.vars.get("work_country", player.field_maybe_none("work_country"))
         game_number = get_game_number(player.round_number)
         round_in_game = get_round_in_game(player.round_number)
         game_rounds = get_game_rounds(player.round_number)
@@ -70,7 +72,9 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         player.participant.is_planner = is_planner
         player.participant.years_as_planner = years_as_planner
         player.participant.does_consent = does_consent
-        player.participant.prolific_id = prolific_id
+        # player.participant.prolific_id = prolific_id
+        player.participant.company_name = company_name
+        player.participant.work_country = work_country
         player.participant.unit_costs = unit_costs
         player.participant.stock_units = 0
         player.participant.treatment = treatment
@@ -129,12 +133,14 @@ class Player(BasePlayer):
     years_as_planner = models.IntegerField(
         label="How many years experience do you have in a manufacturing/ operations management role?", min=0, max=70
     )
+    # prolific_id = models.StringField(
+    #     label="""Please enter your Prolific ID below (e.g., 5b96601D3400a939Db45dAc9):""",
+    # )
+    company_name = models.StringField(label="""What company do you currently work for?""")
+    work_country = models.StringField(label="""In what country do you work?""")
     does_consent = models.BooleanField(
         widget=widgets.CheckboxInput(),
         label="""By checking the box to the left you agree to participate in this experiment. The full consent form is available for download at the top of this page.""",
-    )
-    prolific_id = models.StringField(
-        label="""Please enter your Prolific ID below (e.g., 5b96601D3400a939Db45dAc9):""",
     )
 
     # player data
@@ -179,6 +185,7 @@ class Player(BasePlayer):
 #         "years_as_planner",
 #         "does_consent",
 #         "prolific_id",
+#         "company_name",
 #         "game_number",
 #         "period_number",
 #         "su",

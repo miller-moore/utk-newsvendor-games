@@ -9,24 +9,16 @@
     {{ include C.SCRIPTS_TEMPLATE }}
 
     <p>
-        In this experiment, you have the role of an inventory manager. You must decide how many units of a
-        product you want to order and stock to sell to your customers.
+        In this experiment, you have the role of an inventory manager. You must decide how many units of a product you want to order and stock to sell to your customers.
     </p>
     <p>
-        You are making these decisions over multiple rounds. In each round, you are deciding on an
-        order quantity.
+        You are making these decisions over multiple rounds. In every round, you are deciding on an order quantity. There will be 24 total rounds, split across 2 games. After the first 12 rounds (the first game), the data will reset, and you will continue through another set of 12 rounds (the second game).
     </p>
     <p>
-        You are making your decision under uncertainty. This means at the time of the order decision
-        you do not know the exact demand of the period. However, you do know the probability
-        distribution of the demand. The demand for your product will be shown by a distribution curve,
-        shown on the decision-making page. Demand is independent between rounds.
+        You are making your decision under uncertainty. This means at the time of the order decision you do not know the exact demand of the period. However, you do know the probability distribution of the demand. The demand for your product will be shown by a distribution curve, shown on the decision-making page. Demand is independent between rounds.
     </p>
     <p>
-        You have no starting inventory in your warehouse at the beginning of the game. You will order
-        an amount of units between 0 and 1,000 which then get delivered before demand is realized. Any leftover inventory after demand is
-        realized will be carried over to the next round, which becomes starting inventory for the next
-        period. The starting inventory and order quantity sum up to the available inventory as follows:
+        You have no starting inventory in your warehouse at the beginning of the game. You will order units which then will be delivered before demand is realized. Any leftover inventory after demand is realized will be carried over to the next round, which becomes starting inventory for the next period. The starting inventory and order quantity sum up to the available inventory.
     </p>
     <p>
         {# &nbsp;&nbsp;&nbsp;&nbsp; #}

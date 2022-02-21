@@ -807,21 +807,34 @@
                 }],
                 data: [{
                     id: 1,
-                    name: '<strong>Total profit</strong>',
-                    value: formatCurrency(cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 } )
-                }, {
-                    id: 2,
                     name: '<strong>Total ordered</strong>',
                     value: formatNumber(total_ordered, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }, {
-                    id: 3,
+                    id: 2,
                     name: '<strong>Total demanded</strong>',
                     value: formatNumber(total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }, {
-                    id: 4,
+                    id: 3,
                     name: '<strong>Total leftover inventory</strong>',
                     value: formatNumber(final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }]
+                //data: [{
+                //    id: 1,
+                //    name: '<strong>Total profit</strong>',
+                //    value: formatCurrency(cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 } )
+                //}, {
+                //    id: 2,
+                //    name: '<strong>Total ordered</strong>',
+                //    value: formatNumber(total_ordered, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                //}, {
+                //    id: 3,
+                //    name: '<strong>Total demanded</strong>',
+                //    value: formatNumber(total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                //}, {
+                //    id: 4,
+                //    name: '<strong>Total leftover inventory</strong>',
+                //    value: formatNumber(final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                //}]
             })
             table.find('thead').empty();
         }
@@ -842,21 +855,34 @@
                 }],
                 data: [{
                     id: 1,
-                    name: '<strong>Total profit</strong>',
-                    value: formatCurrency(overallResults.cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                }, {
-                    id: 2,
                     name: '<strong>Total ordered</strong>',
                     value: formatNumber(overallResults.total_ordered, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }, {
-                    id: 3,
+                    id: 2,
                     name: '<strong>Total demanded</strong>',
                     value: formatNumber(overallResults.total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }, {
-                    id: 4,
+                    id: 3,
                     name: '<strong>Leftover inventory</strong>',
                     value: formatNumber(overallResults.final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }]
+                // data: [{
+                //     id: 1,
+                //     name: '<strong>Total profit</strong>',
+                //     value: formatCurrency(overallResults.cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                // }, {
+                //     id: 2,
+                //     name: '<strong>Total ordered</strong>',
+                //     value: formatNumber(overallResults.total_ordered, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                // }, {
+                //     id: 3,
+                //     name: '<strong>Total demanded</strong>',
+                //     value: formatNumber(overallResults.total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                // }, {
+                //     id: 4,
+                //     name: '<strong>Leftover inventory</strong>',
+                //     value: formatNumber(overallResults.final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                // }]
             })
             table.find('thead').empty();
         }
