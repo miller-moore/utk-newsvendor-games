@@ -59,6 +59,7 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         _ = treatment.get_demand_rvs()  # initializes treatment._demand_rvs
         is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
         years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
+        job_title = player.participant.vars.get("job_title", player.field_maybe_none("job_title"))
         does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
         # prolific_id = player.participant.vars.get("prolific_id", player.field_maybe_none("prolific_id"))
         company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
@@ -71,6 +72,7 @@ def hydrate_participant(player: "Player", **kwargs) -> None:
         player.participant.starttime = get_time()
         player.participant.is_planner = is_planner
         player.participant.years_as_planner = years_as_planner
+        player.participant.job_title = job_title
         player.participant.does_consent = does_consent
         # player.participant.prolific_id = prolific_id
         player.participant.company_name = company_name
@@ -128,11 +130,13 @@ class Player(BasePlayer):
     # Consent.html form fields
     is_planner = models.BooleanField(
         widget=widgets.RadioSelectHorizontal(),
-        label="Are you presently employed in a manufacturing and/or operations management role?",
+        label="Are you presently employed in a demand or supply planning role?",
     )
     years_as_planner = models.IntegerField(
-        label="How many years experience do you have in a manufacturing/ operations management role?", min=0, max=70
+        label="How many years experience do you have in a demand or supply planning role?", min=0, max=70
     )
+    job_title = models.StringField(label="What is your job title?")
+
     # prolific_id = models.StringField(
     #     label="""Please enter your Prolific ID below (e.g., 5b96601D3400a939Db45dAc9):""",
     # )
@@ -201,6 +205,7 @@ class Player(BasePlayer):
 #         "treatment",
 #         "is_planner",
 #         "years_as_planner",
+#         "job_title",
 #         "does_consent",
 #         "prolific_id",
 #         "company_name",

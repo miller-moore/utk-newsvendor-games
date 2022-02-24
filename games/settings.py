@@ -18,6 +18,7 @@ PARTICIPANT_FIELDS = [
     "is_planner",
     "gender_identity",
     "years_as_planner",
+    "job_title",
     "does_consent",
     "prolific_id",
     "company_name",

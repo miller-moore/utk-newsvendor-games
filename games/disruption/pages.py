@@ -17,25 +17,15 @@ from otree.models import Participant
 from otree.session import Session
 
 from .constants import C
-from .formvalidation import default_error_message, register_form_field_validator
+from .formvalidation import (default_error_message,
+                             register_form_field_validator)
 from .models import Player, initialize_game_history
 from .treatment import Distribution, Treatment
-from .util import (
-    as_static_path,
-    get_app_name,
-    get_game_number,
-    get_game_rounds,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_room_display_name,
-    get_room_name,
-    get_round_in_game,
-    get_time,
-    is_absolute_final_round,
-    is_disruption_next_round,
-    is_disruption_this_round,
-    is_game_over,
-)
+from .util import (as_static_path, get_app_name, get_game_number,
+                   get_game_rounds, get_optimal_order_quantity, get_page_name,
+                   get_room_display_name, get_room_name, get_round_in_game,
+                   get_time, is_absolute_final_round, is_disruption_next_round,
+                   is_disruption_this_round, is_game_over)
 
 from common.colors import COLORS  # isort:skip
 from common.utils import serialize  # isort:skip
@@ -88,12 +78,9 @@ class DisruptionPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (
-            LANGUAGE_CODE,
-            LANGUAGE_CODE_ISO,
-            REAL_WORLD_CURRENCY_CODE,
-            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
-        )
+        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                    REAL_WORLD_CURRENCY_CODE,
+                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
         # import importlib
         # from . import treatment as disruption_treatment
@@ -148,6 +135,7 @@ class DisruptionPage(Page):
             endtime=player.field_maybe_none("endtime"),
             is_planner=player.field_maybe_none("is_planner"),
             years_as_planner=player.field_maybe_none("years_as_planner"),
+            job_title=player.field_maybe_none("job_title"),
             does_consent=player.field_maybe_none("does_consent"),
             # prolific_id=player.field_maybe_none("prolific_id"),
             company_name=player.field_maybe_none("company_name"),
@@ -199,6 +187,7 @@ class HydratePlayer(DisruptionPage):
         player.treatment = player.participant.treatment.idx
         player.is_planner = player.participant.is_planner
         player.years_as_planner = player.participant.years_as_planner
+        player.job_title = player.participant.job_title
         player.does_consent = player.participant.does_consent
         # player.prolific_id = player.participant.prolific_id
         player.company_name = player.participant.company_name
@@ -225,7 +214,7 @@ class HydratePlayer(DisruptionPage):
 
 class Consent(DisruptionPage):
     form_model = "player"
-    form_fields = ["is_planner", "years_as_planner", "company_name", "work_country", "does_consent"]
+    form_fields = ["is_planner", "years_as_planner", "job_title", "company_name", "work_country", "does_consent"]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -235,6 +224,7 @@ class Consent(DisruptionPage):
     def before_next_page(player: Player, timeout_happened):
         player.participant.is_planner = player.is_planner
         player.participant.years_as_planner = player.years_as_planner
+        player.participant.job_title = player.job_title
         player.participant.company_name = player.company_name
         player.participant.work_country = player.work_country
         player.participant.does_consent = player.does_consent
