@@ -31,16 +31,19 @@
             <div class="card border">
                 <div class="card-body">
                     <img src="{{ static snapshot_instructions_3_png }}" width="100%" height="auto"/>
-                    <p class="text-left font-family-times-new-roman" style="margin-left:4rem;margin-right:4rem;font-size:1.35rem;">
-                        Bonus pay will be calculated by multiplying profit from one round by {{ multiplier|mul(100.0)|to(2) }}%. For example, a single round profit of {{ profitex|cu }} would lead to a bonus pay of <br>{{ profitex|cu }} * {{ multiplier }}= {{ profitex_multiplied|cu }}. This pay will be given to you immediately after completing the game: let the instructor at the front of the room know when you are done.
-                        <br>
-                        <br>
-                        Please click the “Next” button below to start the game and thank you!
-                    </p>
                 </div>
             </div>
         </div>
     </center>
+
+    <p class="text-left font-family-times-new-roman">
+    {# <p class="text-left font-family-times-new-roman" style="margin-left:4rem;margin-right:4rem;"> #}
+    {# <p class="text-left font-family-times-new-roman" style="margin-left:4rem;margin-right:4rem;font-size:1.35rem;"> #}
+        Bonus pay will be calculated by multiplying profit from one round by {{ multiplier|mul(100.0)|to(2) }}%. For example, a single round profit of {{ profitex|cu }} would lead to a bonus pay of {{ profitex|cu }} * {{ multiplier }}= {{ profitex_multiplied|cu }}. This pay will be given to you immediately after completing the game: let the instructor at the front of the room know when you are done.
+        <br>
+        <br>
+        Please click the “Next” button below to start the game and thank you!
+    </p>
 
     <center class="w-100 m-4">
         {{ next_button }}
