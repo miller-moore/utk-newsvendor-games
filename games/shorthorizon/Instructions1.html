@@ -34,42 +34,43 @@
         <ul>
             <code>
                 <li>
-                    Units ordered: 90 units
+                    Available inventory: 90 units
                 </li>
                 <li>
-                    Units demanded: 80 units
+                    Demand: 80 units
                 </li>
                 <li>
-                    Units leftover: 90 - 80 = 10 units
+                    Leftover inventory: 90-80=10 units
                 </li>
             </code>
         </ul>
     </p>
     <p>
-        Salvage fees are charged for the 10 units leftover in surplus inventory.
+        Salvage fees are charged for the resulting leftover 10 units that are stocked in inventory.
     </p>
     <p>
-        If you ordered too few units in a period to fulfill this period’s demand, the unfulfilled demand is lost.
-        You cannot reorder within a period or shift demand to later periods. For example:
-        <ul>
-            <code>
+        If you purchased too few units in a period to fulfill this period’s demand, the unfulfilled demand is
+        lost. You cannot reorder within a period or shift demand to later periods. For example:
+
+        <code>
+            <ul>
                 <li>
-                    Units ordered: 30 units
+                    Purchased inventory: 30 units
                 </li>
                 <li>
-                    Units demanded: 80 units
+                    Demand: 80 units
                 </li>
                 <li>
-                    Units sold: 30 units (our purchase amount was 50 units short of demand)
+                    Units sold: 30 units
                 </li>
-            </code>
-        </ul>
+            </ul>
+        </code>
     </p>
     <p>
-        You are trying to maximize your Profits in this experiment. Profit per round is calculated as follows:
+        You are trying to maximize your profits in this experiment. Profit per round is calculated as follows:
     </p>
     <p>
-        <code class="ml-4">Profit = sell price x units sold - purchase price x units ordered - salvage fee x units leftover</code>
+        <code class="font-italic">Profit per round = selling price x units sold - purchasing price x order quantity - salvage fee * leftover inventory</code>
     </p>
     <p>
         Therefore, profit = revenue - purchase costs - salvage costs.

@@ -2,6 +2,7 @@ import itertools
 import json
 import random
 import traceback
+from decimal import Decimal
 from enum import Enum
 from functools import lru_cache
 from itertools import product
@@ -12,7 +13,7 @@ import numpy as np
 import scipy.stats as stats
 from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
-from pydantic import BaseModel, Field, StrBytes, confloat, conint, constr, typing, validator
+from pydantic import BaseModel, Field, StrBytes, confloat, conint, constr, root_validator, typing, validator
 from pydantic.main import Extra
 
 from .constants import C
@@ -21,9 +22,6 @@ from .util import assert_concrete_player, get_round_in_game
 from common.pydanticmodel import PydanticModel  # isort:skip
 from common.colors import COLORS  # isort:skip
 
-MEANS = [500, 597]
-SIGMAS = [50, 100]
-UNIT_COSTS = [dict(rcpu=20, wcpu=7.5, scpu=5), dict(rcpu=43, wcpu=6, scpu=5)]
 
 # NOTE: use lru cache to save time when making repeated calls because drawing large samples is slow
 @lru_cache(maxsize=10)
@@ -31,9 +29,25 @@ def sample_normal_rvs(mu: float, sigma: float, size: int = int(1e4)) -> List[flo
     return np.random.normal(loc=mu, scale=sigma, size=size).tolist()
 
 
+MEANS = [500.0, 597.0]
+SIGMAS = [50.0, 100.0]
+
+
 class Distribution(PydanticModel):
     mu: float
     sigma: float
+
+    @validator("mu")
+    def validate_mu(cls, v: Any) -> Any:
+        if v not in MEANS:
+            raise ValueError(f"value for mu ({v!r}) is not a member of MEANS ({MEANS!r})")
+        return v
+
+    @validator("sigma")
+    def validate_sigma(cls, v: Any) -> Any:
+        if v not in SIGMAS:
+            raise ValueError(f"value for sigma ({v!r}) is not a member of SIGMAS ({SIGMAS!r})")
+        return v
 
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "Distribution":
@@ -46,38 +60,88 @@ class Distribution(PydanticModel):
         return TREATMENT_MAP[treatment.idx][0]
 
 
-class CostCategory(str, Enum):
-    low = "low"
-    high = "high"
+UNIT_COSTS = [
+    dict(rcpu=20, wcpu=7.5, scpu=5, category="low"),
+    dict(rcpu=43, wcpu=6, scpu=5, category="high"),
+]
 
 
 class UnitCosts(PydanticModel):
     rcpu: Currency  # retail cost per unit
     wcpu: Currency  # wholesale cost per unit
     scpu: Currency  # salvage cost per unit
-    category: CostCategory  # 'low' or 'high', no other
+    category: str  # 'low' or 'high'
 
     class Config:
         json_encoders = dict(Currency=_CurrencyEncoder)
         arbitrary_types_allowed = True
+
+    @root_validator
+    def validate_(cls, values: Any) -> Any:
+        if values not in UNIT_COSTS:
+            raise ValueError(f"unit costs dictionary ({values!r}) is not a member of UNIT_COSTS ({UNIT_COSTS!r})")
+        return values
 
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "UnitCosts":
         return TREATMENT_MAP[treatment.idx][1]
 
 
-TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts]] = {
-    idx + 1: (Distribution.from_args(mu=mu, sigma=sigma), UnitCosts.from_args(**unit_costs_kwargs))
-    for idx, (mu, sigma, unit_costs_kwargs) in enumerate(
-        [
-            (MEANS[0], SIGMAS[1], {**UNIT_COSTS[0], "category": "low"}),  # 1: low mean, high var, low CF
-            (MEANS[0], SIGMAS[0], {**UNIT_COSTS[0], "category": "low"}),  # 2: low mean, low var, low CF
-            (MEANS[0], SIGMAS[0], {**UNIT_COSTS[1], "category": "high"}),  # 3: low mean, low var, high CF
-            (MEANS[0], SIGMAS[1], {**UNIT_COSTS[1], "category": "high"}),  # 4: low mean, high var, high CF
-            (MEANS[1], SIGMAS[0], {**UNIT_COSTS[1], "category": "high"}),  # 5: high mean, low var, high CF
-            (MEANS[1], SIGMAS[1], {**UNIT_COSTS[0], "category": "low"}),  # 6: high mean, high var, low CF
-        ]
-    )
+class Multiplier(Decimal):
+    @classmethod
+    def from_treatment(cls, treatment: "Treatment") -> "Multiplier":
+        return TREATMENT_MAP[treatment.idx][2]
+
+
+class Profitex(Currency):
+    @classmethod
+    def from_treatment(cls, treatment: "Treatment") -> "Profitex":
+        return TREATMENT_MAP[treatment.idx][3]
+
+
+TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] = {
+    # 1: (low mean, high var, low costs, multiplier_i, profitex_i)
+    1: (
+        Distribution.from_args(mu=MEANS[0], sigma=SIGMAS[1]),
+        UnitCosts.from_args(**UNIT_COSTS[0]),
+        Multiplier("0.0013"),
+        Profitex(5_000),
+    ),
+    # 2: (low mean, low var, low costs, multiplier_i, profitex_i)
+    2: (
+        Distribution.from_args(mu=MEANS[0], sigma=SIGMAS[0]),
+        UnitCosts.from_args(**UNIT_COSTS[0]),
+        Multiplier("0.0008"),
+        Profitex(7_000),
+    ),
+    # 3: (low mean, low var, high costs, multiplier_i, profitex_i)
+    3: (
+        Distribution.from_args(mu=MEANS[0], sigma=SIGMAS[0]),
+        UnitCosts.from_args(**UNIT_COSTS[1]),
+        Multiplier("0.0003"),
+        Profitex(19_000),
+    ),
+    # 4: (low mean, high var, high costs, multiplier_i, profitex_i)
+    4: (
+        Distribution.from_args(mu=MEANS[0], sigma=SIGMAS[1]),
+        UnitCosts.from_args(**UNIT_COSTS[1]),
+        Multiplier("0.0003"),
+        Profitex(19_000),
+    ),
+    # 5: (high mean, low var, high costs, multiplier_i, profitex_i)
+    5: (
+        Distribution.from_args(mu=MEANS[1], sigma=SIGMAS[0]),
+        UnitCosts.from_args(**UNIT_COSTS[1]),
+        Multiplier("0.00025"),
+        Profitex(24_000),
+    ),
+    # 6: (high mean, high var, low costs, multiplier_i, profitex_i)
+    6: (
+        Distribution.from_args(mu=MEANS[1], sigma=SIGMAS[1]),
+        UnitCosts.from_args(**UNIT_COSTS[0]),
+        Multiplier("0.0007"),
+        Profitex(8_000),
+    ),
 }
 
 
@@ -122,6 +186,12 @@ class Treatment(PydanticModel):
     def get_distribution(self) -> Distribution:
         return Distribution.from_treatment(self)
 
+    def get_multiplier(self) -> Multiplier:
+        return Multiplier.from_treatment(self)
+
+    def get_profitex(self) -> Profitex:
+        return Profitex.from_treatment(self)
+
     def get_payoff_round(self):
         if self._payoff_round is None:
             self._payoff_round = random.choice(range(1, C.NUM_ROUNDS + 1))
@@ -129,19 +199,51 @@ class Treatment(PydanticModel):
         return self._payoff_round
 
     def get_payoff(self, player: BasePlayer) -> Currency:
+        """
+        If the player's current round is equal to their treatment's payoff round,
+        then the value returned is the player's payoff, i.e., the result of the calculation:
+        >>> Currency(self.get_profitex() * self.get_multiplier())
+
+        Otherwise, Currency(0) is returned.
+
+        Parameters
+        ----------
+        player : Player
+            The player instance is needed to determine whether the player's current round is
+            their treatment's originally selected payoff round.
+
+        Returns
+        -------
+        Currency
+
+        """
         assert_concrete_player(player)
         if player.round_number == player.participant.payoff_round:
-            unit_costs = self.get_unit_costs()
-            if unit_costs.category == "high":
-                factor = 0.0002
-            elif unit_costs.category == "low":
-                factor = 0.0005
-            else:
-                raise RuntimeError(
-                    f"expected unit_costs.category to be in {list(CostCategory.__members__)!r} - got {unit_costs.category!r}"
-                )
-            return Currency(player.profit * factor)
+            return Currency(self.get_profitex() * self.get_multiplier())
         return Currency(0)
+
+    # def get_payoff(self, player: BasePlayer) -> Currency:
+    #     """
+    #     If the player's current round is equal to their treatment's payoff round,
+    #     then the value returned is the player's payoff, i.e., the result of the calculation:
+    #     >>> Currency(player.profit * self.get_unit_costs().payoff_factor)
+
+    #     Otherwise, Currency(0) is returned.
+
+    #     Parameters
+    #     ----------
+    #     player : BasePlayer
+    #         The player instance.
+
+    #     Returns
+    #     -------
+    #     Currency
+
+    #     """
+    #     assert_concrete_player(player)
+    #     if player.round_number == player.participant.payoff_round:
+    #         return Currency(player.profit * self.get_unit_costs().payoff_factor)
+    #     return Currency(0)
 
     def get_demand(self, randomly: bool = True, player: Optional[BasePlayer] = None) -> int:
         if randomly:
@@ -199,9 +301,10 @@ class Treatment(PydanticModel):
         Path
 
         """
-        if self.get_unit_costs().category == "low":
-            return Path(C.STATIC_DIR).joinpath(f"GameInstructionsL.pdf")
-        return Path(C.STATIC_DIR).joinpath(f"GameInstructionsH.pdf")
+        # if self.get_unit_costs().category == "low":
+        #     return Path(C.STATIC_DIR).joinpath(f"GameInstructionsL.pdf")
+        # return Path(C.STATIC_DIR).joinpath(f"GameInstructionsH.pdf")
+        return Path(C.STATIC_DIR).joinpath(f"GameInstructions.pdf")
 
     def get_snapshot_instruction_png(self, n: int) -> Path:
         """

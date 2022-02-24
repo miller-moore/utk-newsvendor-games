@@ -6,51 +6,12 @@ from uuid import uuid4
 from otree.api import BaseGroup, BasePlayer, BaseSubsession, models, widgets
 from otree.currency import Currency
 from otree.models.participant import Participant
-from otree.templating import filters
 
 from .constants import C
 from .treatment import Treatment, UnitCosts
 from .util import get_game_number, get_game_rounds, get_round_in_game, get_time
 
-# https://stackoverflow.com/a/12028864
-# from django import template
-# register = template.Library()
-
-
-@filters.register("type")
-def _type(value):
-    return type(value)
-
-
-@filters.register("len")
-def _len(value):
-    try:
-        return len(value)
-    except:
-        return 0 if not value else 1
-
-
-@filters.register
-def isiterable(value):
-    return isinstance(value, Iterable)
-
-
-@filters.register
-def add(value, other=0):
-    try:
-        if int(value) == value and int(other) == other:
-            return int(value + other)
-    except:
-        pass
-    try:
-        return float(value) + float(other)
-    except:
-        pass
-    try:
-        return value + other
-    except:
-        pass
-    return ""
+from common.template_filters import filters  # isort:skip
 
 
 def hydrate_participant(player: "Player", **kwargs) -> None:

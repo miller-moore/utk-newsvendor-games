@@ -72,8 +72,7 @@ class ShortHorizonPage(Page):
         # from . import treatment as shorthorizon_treatment
         # treatment_module = importlib.reload(shorthorizon_treatment)
 
-        treatment: Treatment = player.participant.vars.get("treatment", None)
-        distribution: Distribution = treatment.get_distribution()
+        treatment: Treatment = player.participant.treatment
 
         _vars = dict(
             language_code=LANGUAGE_CODE,
@@ -131,14 +130,17 @@ class ShortHorizonPage(Page):
             payoff_round=player.participant.vars.get("payoff_round", None),
             payoff=player.participant.vars.get("payoff", None),
             treatment=treatment.idx,
-            mu=distribution.mu,
-            sigma=distribution.sigma,
+            profitex=treatment.get_profitex(),
+            multiplier=treatment.get_multiplier(),
+            profitex_multiplied=treatment.get_profitex() * treatment.get_multiplier(),
+            mu=treatment.get_distribution().mu,
+            sigma=treatment.get_distribution().sigma,
         )
 
-        # make Currency (Decimal) objects json serializable
-        for ckey in ["rcpu", "wcpu", "scpu", "revenue", "cost", "profit"]:
-            val = _vars.get(ckey)
-            _vars.update({ckey: float(val) if val else None})
+        # make objects of type Decimal json serializable
+        for ckey in _vars:
+            if isinstance(_vars[ckey], Decimal):
+                _vars[ckey] = float(_vars[ckey])
 
         return _vars
 
@@ -246,20 +248,15 @@ class Decide(ShortHorizonPage):
         cost = wcpu * ou + scpu * su
         profit = revenue - cost
 
-        # update player su, du, revenue, cost, & profit
+        # update player su, du, revenue, cost, profit, & payoff
         player.su = su
         player.du = du
         player.revenue = Currency(revenue)
         player.cost = Currency(cost)
         player.profit = Currency(profit)
+        player.payoff = player.participant.treatment.get_payoff(player)
 
-        # cumulative profit
-        first_round_in_game = get_game_rounds(player.round_number)[0]
-        cumulative_profit = (
-            sum(p.profit for p in player.in_rounds(first_round_in_game, player.round_number - 1)) + player.profit
-        )
-
-        # history
+        # update participant's history store corresponding to the current round in the current game
         idx = get_round_in_game(player.round_number) - 1
         hist = player.participant.history[idx]
         hist.update(
@@ -270,12 +267,12 @@ class Decide(ShortHorizonPage):
             revenue=float(revenue),
             cost=float(cost),
             profit=float(profit),
-            cumulative_profit=float(cumulative_profit),
+            cumulative_profit=float(
+                sum(p.profit for p in player.in_rounds(get_game_rounds(player.round_number)[0], player.round_number - 1))
+                + player.profit
+            ),
         )
         player.participant.history[idx] = hist
-
-        treatment: Treatment = player.participant.treatment
-        player.payoff = treatment.get_payoff(player)
 
 
 class Results(ShortHorizonPage):
