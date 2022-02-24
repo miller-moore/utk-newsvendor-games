@@ -131,9 +131,26 @@ class Treatment(PydanticModel):
         return self._payoff_round
 
     def get_payoff(self, player: BasePlayer) -> Currency:
+        """
+        If the player's current round is equal to their treatment's payoff round,
+        then the value returned is the player's payoff, i.e., the result of the calculation:
+        >>> Currency(player.profit * 0.00075)
+
+        Otherwise, Currency(0) is returned.
+
+        Parameters
+        ----------
+        player : Player
+            The player instance is needed to determine whether the player's current round is
+            their treatment's originally selected payoff round.
+
+        Returns
+        -------
+        Currency
+
+        """
         assert_concrete_player(player)
         if player.round_number == player.participant.payoff_round:
-            # player.payoff = Currency(min(1750, max(750, player.profit * 0.00075)))
             return Currency(player.profit * 0.00075)
         return Currency(0)
 
