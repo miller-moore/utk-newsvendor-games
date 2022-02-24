@@ -22,10 +22,10 @@
     </p>
     <p>
         {# &nbsp;&nbsp;&nbsp;&nbsp; #}
-        <code class="ml-4">Available inventory = starting inventory + order quantity</code>
+        <code class="font-italic">Available inventory= starting inventory + order quantity</code>
     </p>
     <p>
-        Holding costs occur for holding inventory which is carried over between rounds. For example:
+        Holding costs occur for leftover inventory which is carried over between rounds. For example:
         <ul>
             <code>
                 <li>
@@ -35,17 +35,17 @@
                     Demand: 80 units
                 </li>
                 <li>
-                    Leftover inventory: 90 - 80 = 10 units
+                    Leftover inventory: 90-80=10 units
                 </li>
             </code>
         </ul>
     </p>
     <p>
-        Holding costs are charged for the 10 units leftover in inventory.
+        Holding costs are charged for the resulting leftover 10 units that are stocked in inventory.
     </p>
     <p>
-        If you purchased too few units in a period to fulfill this period’s demand, the unfulfilled demand is lost.
-        You cannot reorder within a period or shift demand to later periods. For example:
+        If you purchased too few units in a period to fulfill this period’s demand, the unfulfilled demand is
+        lost. You cannot reorder within a period or shift demand to later periods. For example:
         <ul>
             <code>
                 <li>
@@ -61,15 +61,13 @@
         </ul>
     </p>
     <p>
-        You are trying to maximize your Profits in this experiment. Profit per round is calculated as follows:
+        You are trying to maximize your profits in this experiment. Profit per round is calculated as follows:
     </p>
     <p>
-        <code class="ml-4">Profit = sell price x units sold - purchase price x units ordered - holding cost x units leftover</code>
-        {# <br><code>&nbsp;&nbsp;&nbsp;&nbsp;- purchasing price x units ordered</code> #}
-        {# <br><code>&nbsp;&nbsp;&nbsp;&nbsp;- holding costs x units leftover</code> #}
+        <code class="font-italic">Profit per round = selling price x units sold - purchasing price x order quantity - holding costs x leftover inventory</code>
     </p>
     <p>
-        Therefore, profit = revenue - purchase costs - holding costs.
+        Therefore, profit = revenue - purchasing costs - holding costs.
     </p>
     <p>
         In this experiment, your costs will be displayed on the decision page.
