@@ -56,3 +56,8 @@ def mul(value, other=0):
     except:
         pass
     return ""
+
+
+@filters.register
+def to(val, places):
+    return filters.to_places(val, places)
