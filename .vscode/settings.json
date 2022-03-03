@@ -3,7 +3,7 @@
     "titleBar.activeForeground": "#000",
     "titleBar.inactiveForeground": "#000000CC",
     "titleBar.activeBackground": "#005eff",
-    "titleBar.inactiveBackground": "#005eff"
+    "titleBar.inactiveBackground": "#58595B"
   },
   "[html]": {
     "editor.formatOnSave": false
@@ -21,7 +21,7 @@
     }
   },
   "python.languageServer": "Pylance",
-  "python.pythonPath": "./venv/bin/python",
+  "python.pythonPath": "~/gitrepos/my-private/Projects/utk-newsvendor-games/games/venv/bin/python",
   "python.formatting.provider": "black",
   "python.formatting.blackPath": "black",
   "python.formatting.blackArgs": [
@@ -39,5 +39,6 @@
     "**/node_modules/*/**": true,
     "**/.hg/store/**": true,
     "**/venv/*/**": true
-  }
+  },
+  "cSpell.enabled": false
 }
