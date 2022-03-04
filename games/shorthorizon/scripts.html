@@ -687,6 +687,69 @@
 
     }
 
+    function updatePracticeMetricsTable() {
+        $('#hist-metrics-table').remove("td");
+        $('#hist-metrics-table').remove(".period-label");
+
+        var metricsTable = $("#hist-metrics-table")
+        var metricsTheadTr = $("#hist-metrics-table thead tr");
+        var metricsTableStockRow = $("#hist-metrics-table #row-stock");
+        var metricsTableOrderRow = $("#hist-metrics-table #row-order");
+        var metricsTableDemandRow = $("#hist-metrics-table #row-demand");
+        var metricsTableProfitRow = $("#hist-metrics-table #row-profit");
+        //var metricsTableCProfitRow = $("#hist-metrics-table #row-cprofit");
+        for (var i=0; i < js_vars.history.length; i++) {
+            var h = js_vars.history[i];
+            var period = h.period;
+            var su = formatNumber(h.su? h.su: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            var ou = formatNumber(h.ou? h.ou: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            var du = formatNumber(h.du? h.du: 0, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            var profit = formatCurrency(h.profit? h.profit: 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
+            var cumulative_profit = formatCurrency(h.cumulative_profit? h.cumulative_profit: 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 } );
+
+            // @notice: these conditionals allow each period column to be built in the table even if the game isn't done yet
+            if (js_vars.page_name.startsWith('PracticeResults')) {
+                if (i + 1 > js_vars.period_number) {
+                    ou = '';
+                    du = '';
+                    //su = i + 1 > js_vars.period_number + 1? '': formatNumber(js_vars.history[i-1].su, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                    su = '';
+                    profit = '';
+                    cumulative_profit = '';
+                }
+            } else if (js_vars.page_name.startsWith('PracticeDecide')) {
+                if (i + 1 >= js_vars.period_number) {
+                    ou = '';
+                    du = '';
+                    //su = i < 1 || js_vars.history.length <= 1? su: formatNumber(js_vars.history[i-1].su, {minimumFractionDigits: 0, maximumFractionDigits: 0})
+                    su = '';
+                    profit = '';
+                    cumulative_profit = '';
+                }
+            }
+
+
+            metricsTheadTr.append(`<th class="period-label" scope="col" data-halign="center" data-align="center" >${period}</th>`);
+            metricsTableStockRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${su}</td>`);
+            metricsTableOrderRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${ou}</td>`);
+            metricsTableDemandRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${du}</td>`);
+            metricsTableProfitRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${profit}</td>`);
+            //metricsTableCProfitRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${cumulative_profit}</td>`);
+        }
+
+        try {
+            metricsTable.bootstrapTable({
+                pagination: false,
+                //showColumns: true,
+                advancedSearch: true,
+            });
+        } catch(e) {
+            console.error(e);
+        }
+        $('#hist-metrics-table').find(".period-label").css({ "white-space": "nowrap", "min-width": "80px" })
+
+    }
+
     function resizeGameHistoryContainerItems() {
 
         var width = $("#distribution-curve").width();
@@ -712,6 +775,14 @@
 
         plotQuantitiesBarchart();
         updateMetricsTable();
+        resizeGameHistoryContainerItems();
+    }
+
+    function renderPracticeHistoryContainer() {
+        show($("#game-history-container"))
+
+        plotQuantitiesBarchart();
+        updatePracticeMetricsTable();
         resizeGameHistoryContainerItems();
     }
 </script>
@@ -761,41 +832,35 @@
         finalResultsContainer.empty();
         var overallResults = {
             cumulative_profit: 0,
-            final_inventory: 0,
             total_ordered: 0,
             total_demanded: 0,
+            total_salvaged: 0,
         }
-        for (var i=0; i < js_vars.game_results.length; i++) {
+        var results = js_vars.is_practice_round? js_vars.practice_results: js_vars.game_results;
+
+        // Each game's results (sub-tables)
+        for (var i=0; i < results.length; i++) {
             var tableId = `results-table-${i}`;
-            //var cardTitle = js_vars.game_results.length > 1? `Game ${i+1} Results`: `Game Results`;
-            var cardTitle = `Game ${i+1} Results`;
+            var cardTitle = js_vars.is_practice_round? `Practice Results`: `Game ${i+1} Results`;
             var cardCode = $(`<div class="col-auto"><div class="card"><div class="card-body"><h5 class="card-title text-center">${cardTitle}</h5><table id="${tableId}"></table></div></div></div>`);
             finalResultsContainer.append(cardCode);
             var table = $(`#${tableId}`);
 
-            //table.addClass("table")
-            //table.addClass("table-hover")
-
-            //var theadCode = $(`<thead><tr><th scope="row"></th><th scope="col">Result</th></tr></thead>`);
-            // var theadCode = $(`<thead><tr><th scope="row"></th><th scope="col"></th></tr></thead>`);
-            // var theadCode = $(`<thead></thead>`);
-            // table.append(theadCode);
-
-            var results = js_vars.game_results[i];
-            var LENGTH = results.length - 1;
-            var cumulative_profit = results[LENGTH].cumulative_profit? results[LENGTH].cumulative_profit: 0;
-            var final_inventory = results[LENGTH].su_after? results[LENGTH].su_after: 0;
+            var LENGTH = results[i].length - 1;
+            var cumulative_profit = results[i][LENGTH].cumulative_profit? results[i][LENGTH].cumulative_profit: 0;
             var total_ordered = 0;
             var total_demanded = 0;
-            for (var j=0; j < results.length; j++) {
-                total_ordered += results[j].ou? results[j].ou: 0;
-                total_demanded += results[j].du? results[j].du: 0;
+            var total_salvaged = 0;
+            for (var j=0; j < results[i].length; j++) {
+                total_ordered += results[i][j].ou? results[i][j].ou: 0;
+                total_demanded += results[i][j].du? results[i][j].du: 0;
+                total_salvaged += results[i][j].su? results[i][j].su: 0;
             }
 
             overallResults.cumulative_profit += cumulative_profit;
-            overallResults.final_inventory += final_inventory;
             overallResults.total_ordered += total_ordered;
             overallResults.total_demanded += total_demanded;
+            overallResults.total_salvaged += total_salvaged;
 
             table.bootstrapTable({
                 columns: [{
@@ -815,30 +880,14 @@
                     value: formatNumber(total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }, {
                     id: 3,
-                    name: '<strong>Total leftover inventory</strong>',
-                    value: formatNumber(final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                    name: '<strong>Total salvaged</strong>',
+                    value: formatNumber(total_salvaged, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }]
-                //data: [{
-                //    id: 1,
-                //    name: '<strong>Total profit</strong>',
-                //    value: formatCurrency(cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 } )
-                //}, {
-                //    id: 2,
-                //    name: '<strong>Total ordered</strong>',
-                //    value: formatNumber(total_ordered, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                //}, {
-                //    id: 3,
-                //    name: '<strong>Total demanded</strong>',
-                //    value: formatNumber(total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                //}, {
-                //    id: 4,
-                //    name: '<strong>Total leftover inventory</strong>',
-                //    value: formatNumber(final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                //}]
             })
             table.find('thead').empty();
         }
 
+        // Aggregate game results (if results are available for multiple games)
         if (js_vars.game_results.length > 1) {
             var tableId = `overall-table`;
             var cardTitle = `Survey Totals`;
@@ -863,26 +912,9 @@
                     value: formatNumber(overallResults.total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }, {
                     id: 3,
-                    name: '<strong>Leftover inventory</strong>',
-                    value: formatNumber(overallResults.final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
+                    name: '<strong>Total salvaged</strong>',
+                    value: formatNumber(overallResults.total_salvaged, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
                 }]
-                // data: [{
-                //     id: 1,
-                //     name: '<strong>Total profit</strong>',
-                //     value: formatCurrency(overallResults.cumulative_profit, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                // }, {
-                //     id: 2,
-                //     name: '<strong>Total ordered</strong>',
-                //     value: formatNumber(overallResults.total_ordered, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                // }, {
-                //     id: 3,
-                //     name: '<strong>Total demanded</strong>',
-                //     value: formatNumber(overallResults.total_demanded, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                // }, {
-                //     id: 4,
-                //     name: '<strong>Leftover inventory</strong>',
-                //     value: formatNumber(overallResults.final_inventory, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                // }]
             })
             table.find('thead').empty();
         }

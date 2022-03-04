@@ -30,6 +30,7 @@ PARTICIPANT_FIELDS = [
     # "demand_rvs",
     "history",
     "game_results",
+    "practice_results",
     "payoff_round",
     "q1",
     "q2",

@@ -6,6 +6,7 @@ from otree.constants import BaseConstantsMeta
 from common.utils import get_includable_template_path  # isort:skip
 
 NUM_GAMES = 1
+PRACTICE_ROUNDS = 3
 ROUNDS_PER_GAME = 12
 RVS_SIZE = int(1e4)
 
@@ -36,13 +37,14 @@ class ConstantsBase(BaseConstants, metaclass=BaseConstantsMeta):
 class C(ConstantsBase):
     # otree constants
     NAME_IN_URL = APP_NAME
-    NUM_ROUNDS = NUM_GAMES * ROUNDS_PER_GAME
+    NUM_ROUNDS = PRACTICE_ROUNDS + NUM_GAMES * ROUNDS_PER_GAME
     PLAYERS_PER_GROUP = None
     ENDOWMENT = Currency(0)
     INSTRUCTIONS_TEMPLATE = None
 
     # custom constants
     NUM_GAMES = NUM_GAMES
+    PRACTICE_ROUNDS = PRACTICE_ROUNDS
     ROUNDS_PER_GAME = ROUNDS_PER_GAME
     APP_NAME = APP_NAME
     RVS_SIZE = RVS_SIZE

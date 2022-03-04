@@ -11,15 +11,17 @@ from otree.api import Currency, Page
 from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
-from .constants import C
+from .constants import PRACTICE_ROUNDS, C
 from .formvalidation import (default_error_message,
                              register_form_field_validator)
-from .models import Player, initialize_game_history
+from .models import Player
 from .treatment import Distribution, Treatment
-from .util import (as_static_path, get_app_name, get_game_number,
+from .util import (as_static_path, call_safe, get_app_name, get_game_number,
                    get_game_rounds, get_optimal_order_quantity, get_page_name,
-                   get_room_display_name, get_room_name, get_round_in_game,
-                   get_time, is_absolute_final_round, is_game_over)
+                   get_real_round_number, get_room_display_name, get_room_name,
+                   get_round_in_game, get_time, initialize_game_history,
+                   is_absolute_final_round, is_game_over_round,
+                   is_practice_over_round, is_practice_round)
 
 from common.colors import COLORS  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
@@ -73,6 +75,11 @@ class ShortHorizonPage(Page):
         # treatment_module = importlib.reload(shorthorizon_treatment)
 
         treatment: Treatment = player.participant.treatment
+        distribution: Distribution
+        if is_practice_round(player.round_number):
+            distribution = treatment.get_practice_distribution()
+        else:
+            distribution = treatment.get_distribution()
 
         _vars = dict(
             language_code=LANGUAGE_CODE,
@@ -89,9 +96,10 @@ class ShortHorizonPage(Page):
             page_name=get_page_name(player),
             app_name=get_app_name(player),
             round_number=player.round_number,
+            real_round_number=get_real_round_number(player.round_number),
             game_number=player.game_number,  # game_number,
-            game_round=player.period_number,  # game_round,
-            period_number=player.period_number,  # game_round,
+            game_rounds=get_game_rounds(get_real_round_number(player.round_number)),
+            period_number=player.period_number,  # starts at 1 and updated via get_round_in_game in page HydratePlayer (below)
             session_code=player.session.code,
             participant_code=player.participant.code,
             variance_choice=None,
@@ -103,11 +111,13 @@ class ShortHorizonPage(Page):
             snapshot_instructions_1_png=as_static_path(treatment.get_snapshot_instruction_png(n=1)),  # Instructions3.html
             snapshot_instructions_2_png=as_static_path(treatment.get_snapshot_instruction_png(n=2)),  # Instructions3.html
             snapshot_instructions_3_png=as_static_path(treatment.get_snapshot_instruction_png(n=3)),  # Instructions3.html
+            is_practice_round=is_practice_round(player.round_number),
+            is_practice_over_round=is_practice_over_round(player.round_number),
             is_pilot_test=player.session.config.get("is_pilot_test", False),
             is_disrupted=treatment.is_disrupted(),
             is_disruption_this_round=False,
             is_disruption_next_round=False,
-            is_game_over=is_game_over(player.round_number),
+            is_game_over_round=is_game_over_round(player.round_number),
             is_absolute_final_round=is_absolute_final_round(player.round_number),
             uuid=player.field_maybe_none("uuid"),
             starttime=player.field_maybe_none("starttime"),
@@ -127,14 +137,16 @@ class ShortHorizonPage(Page):
             profit=player.field_maybe_none("profit"),
             history=player.participant.vars.get("history", None),
             game_results=player.participant.vars.get("game_results", None),
+            practice_results=player.participant.vars.get("practice_results", None),
             payoff_round=player.participant.vars.get("payoff_round", None),
             payoff=player.participant.vars.get("payoff", None),
-            treatment=treatment.idx,
+            treatment_id=treatment.id,
+            practice_treatment_id=treatment.practice_treatment_id,
             profitex=treatment.get_profitex(),
             multiplier=treatment.get_multiplier(),
             profitex_multiplied=treatment.get_profitex() * treatment.get_multiplier(),
-            mu=treatment.get_distribution().mu,
-            sigma=treatment.get_distribution().sigma,
+            mu=distribution.mu,
+            sigma=distribution.sigma,
         )
 
         # make objects of type Decimal json serializable
@@ -159,15 +171,20 @@ class HydratePlayer(ShortHorizonPage):
     @staticmethod
     def before_next_page(player: Player, **kwargs):
         """Hydrates player from participant. The participant is hydrated in `creating_subsession` (in models.py)."""
+        print(f"Round {player.round_number}: {get_page_name(player)} Page")
+
         player.uuid = player.participant.uuid
         player.starttime = get_time()
         player.endtime = None
-        player.treatment = player.participant.treatment.idx
+        player.treatment_id = player.participant.treatment.id
+        player.practice_treatment_id = player.participant.treatment.practice_treatment_id
         player.is_planner = player.participant.is_planner  # Consent.html
         player.gender_identity = player.participant.gender_identity  # Consent.html
         player.does_consent = player.participant.does_consent  # Consent.html
-        player.game_number = get_game_number(player.round_number)
-        player.period_number = get_round_in_game(player.round_number)
+        player.game_number = (
+            0 if is_practice_round(player.round_number) else get_game_number(get_real_round_number(player.round_number))
+        )
+        player.period_number = get_real_round_number(player.round_number)
         player.su = None
         player.ou = None
         player.du = None
@@ -179,11 +196,6 @@ class HydratePlayer(ShortHorizonPage):
         player.cost = 0
         player.profit = 0
         player.payoff_round = player.participant.payoff_round
-
-        extras = dict(ooq=player.ooq, is_planner=player.field_maybe_none("is_planner"))
-        print(
-            f"Round {player.round_number}: {get_page_name(player)} Page, Game {player.game_number} (ends on round {get_game_rounds(player.round_number)[-1]}), Period number: {player.period_number}, player extras: {extras}"
-        )
 
 
 class Consent(ShortHorizonPage):
@@ -219,16 +231,21 @@ class Instructions3(ShortHorizonPage):
         return player.round_number == 1
 
 
-class Decide(ShortHorizonPage):
+class PracticeDecide(ShortHorizonPage):
 
     form_model = "player"
     form_fields = ["ou"]
 
     @staticmethod
+    def is_displayed(player: Player):
+        return is_practice_round(player.round_number)
+
+    @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
 
         # unit costs
-        unit_costs = player.participant.unit_costs
+        # unit_costs = player.participant.unit_costs
+        unit_costs = player.participant.treatment.get_practice_unit_costs()
         rcpu = float(unit_costs.rcpu)
         wcpu = float(unit_costs.wcpu)
         scpu = float(unit_costs.scpu)
@@ -257,8 +274,9 @@ class Decide(ShortHorizonPage):
         player.payoff = player.participant.treatment.get_payoff(player)
 
         # update participant's history store corresponding to the current round in the current game
-        idx = get_round_in_game(player.round_number) - 1
+        idx = player.round_number - 1
         hist = player.participant.history[idx]
+
         hist.update(
             ou=ou,
             du=du,
@@ -267,36 +285,131 @@ class Decide(ShortHorizonPage):
             revenue=float(revenue),
             cost=float(cost),
             profit=float(profit),
-            cumulative_profit=float(
-                sum(p.profit for p in player.in_rounds(get_game_rounds(player.round_number)[0], player.round_number - 1))
-                + player.profit
-            ),
+            cumulative_profit=float(sum(p.profit for p in player.in_rounds(1, player.round_number))),
+        )
+        player.participant.history[idx] = hist
+
+
+class PracticeResults(ShortHorizonPage):
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_practice_round(player.round_number)
+
+    @staticmethod
+    def before_next_page(player: Player, **kwargs) -> None:
+        player.endtime = get_time()
+        if is_practice_over_round(player.round_number):
+            # store game history & flush game state
+            # player.participant.game_results.append(player.participant.history)
+            player.participant.practice_results.append(player.participant.history)
+            player.participant.history = initialize_game_history()
+
+
+class PracticeResultsFinal(ShortHorizonPage):
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_practice_over_round(player.round_number)
+
+
+class Decide(ShortHorizonPage):
+
+    form_model = "player"
+    form_fields = ["ou"]
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number > C.PRACTICE_ROUNDS
+
+    @staticmethod
+    def before_next_page(player: Player, **kwargs) -> None:
+
+        # unit costs
+        # unit_costs = player.participant.unit_costs
+        unit_costs = player.participant.treatment.get_unit_costs()
+        rcpu = float(unit_costs.rcpu)
+        wcpu = float(unit_costs.wcpu)
+        scpu = float(unit_costs.scpu)
+
+        # Get demand units!
+        # NOTE: not randomly means from pre-determined data
+        du = player.participant.treatment.get_demand(randomly=False, player=player)
+        # order units
+        ou = player.ou
+        # stock units
+        su = max(0, ou - du)
+
+        # revenue = rcpu * min(du, ou)
+        # cost = wcpu * ou + scpu * su
+        # profit = revenue - cost
+        revenue = rcpu * min(du, ou)
+        cost = wcpu * ou + scpu * su
+        profit = revenue - cost
+
+        # update player su, du, revenue, cost, profit, & payoff
+        player.su = su
+        player.du = du
+        player.revenue = Currency(revenue)
+        player.cost = Currency(cost)
+        player.profit = Currency(profit)
+        player.payoff = player.participant.treatment.get_payoff(player)
+
+        # update participant's history store corresponding to the current round in the current game
+        real_round_number = get_real_round_number(player.round_number)
+        idx = get_round_in_game(real_round_number) - 1
+        hist = player.participant.history[idx]
+        round_range = get_game_rounds(real_round_number)[0], player.round_number
+        hist.update(
+            ou=ou,
+            du=du,
+            su=su,
+            ooq=player.ooq,
+            revenue=float(revenue),
+            cost=float(cost),
+            profit=float(profit),
+            cumulative_profit=float(sum(p.profit for p in player.in_rounds(*round_range))),
         )
         player.participant.history[idx] = hist
 
 
 class Results(ShortHorizonPage):
     @staticmethod
+    def is_displayed(player: Player):
+        return player.round_number > C.PRACTICE_ROUNDS
+
+    @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
         player.endtime = get_time()
-        if is_game_over(player.round_number):
+        if player.round_number > C.PRACTICE_ROUNDS and is_game_over_round(player.round_number):
             # store game history & flush game state
             player.participant.game_results.append(player.participant.history)
             player.participant.history = initialize_game_history()
 
 
-class FinalResults(ShortHorizonPage):
+class ResultsFinal(ShortHorizonPage):
     @staticmethod
     def is_displayed(player: Player):
-        return is_game_over(player.round_number)
+        return player.round_number > C.PRACTICE_ROUNDS and is_game_over_round(player.round_number)
 
 
 class Payoff(ShortHorizonPage):
     @staticmethod
     def is_displayed(player: Player):
-        return is_absolute_final_round(player.round_number)
+        return player.round_number > C.PRACTICE_ROUNDS and is_absolute_final_round(player.round_number)
 
 
 # main sequence of pages for this otree app
 # entire sequence is traversed every round
-page_sequence = [HydratePlayer, Consent, Instructions1, Instructions2, Instructions3, Decide, Results, FinalResults, Payoff]
+page_sequence = [
+    HydratePlayer,
+    Consent,
+    Instructions1,
+    Instructions2,
+    Instructions3,
+    PracticeDecide,
+    PracticeResults,
+    PracticeResultsFinal,
+    Decide,
+    Results,
+    ResultsFinal,
+    Payoff,
+]

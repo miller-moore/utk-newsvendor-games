@@ -5,7 +5,7 @@ from collections import namedtuple
 from datetime import datetime
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -20,12 +20,21 @@ from scipy import stats
 from .constants import C
 
 
-def assert_concrete_player(player: BasePlayer) -> bool:
-    from .models import Player
-
-    assert isinstance(
-        player, Player
-    ), f"`player` must be an instance of the concrete `models.Player` class because its custom fields are needed (additional fields beyond those defined in `otree.api.BasePlayer`)"
+def initialize_game_history(is_practice: bool = False) -> List[Dict[str, Any]]:
+    return [
+        dict(
+            period=i + 1,
+            ou=None,
+            du=None,
+            su=None,
+            ooq=None,
+            revenue=None,
+            cost=None,
+            profit=None,
+            cumulative_profit=None,
+        )
+        for i in range(C.PRACTICE_ROUNDS if is_practice else C.ROUNDS_PER_GAME)
+    ]
 
 
 def as_static_path(path: Path):
@@ -34,20 +43,62 @@ def as_static_path(path: Path):
     raise ValueError(f"path must begin with {str(C.STATIC_DIR) +'/'!r} - got {path!r}")
 
 
-def get_game_number(round_number: int) -> int:
-    return ((round_number - 1) - (round_number - 1) % C.ROUNDS_PER_GAME) // C.ROUNDS_PER_GAME + 1
+def call_safe(func: Callable, *args, **kwargs) -> Union[Any, None]:
+    result = None
+    try:
+        result = func(*args, **kwargs)
+    except:
+        pass
+    return result
 
 
-def get_game_rounds(round_number: int) -> List[int]:
-    game_number = get_game_number(round_number)
-    last_round = C.ROUNDS_PER_GAME * game_number + 1
+def get_real_round_number(round_number: int) -> int:
+    if round_number <= C.PRACTICE_ROUNDS:
+        return round_number
+    else:
+        return round_number - C.PRACTICE_ROUNDS
+
+
+def get_game_number(real_round_number: int) -> int:
+    return ((real_round_number - 1) - (real_round_number - 1) % C.ROUNDS_PER_GAME) // C.ROUNDS_PER_GAME + 1
+
+
+def get_game_rounds(real_round_number: int) -> List[int]:
+    game_number = get_game_number(real_round_number)
+    last_round = C.PRACTICE_ROUNDS + C.ROUNDS_PER_GAME * game_number + 1
     first_round = last_round - C.ROUNDS_PER_GAME
     return list(range(first_round, last_round))
 
 
-def get_round_in_game(round_number: int) -> int:
-    game_number = get_game_number(round_number)
-    return round_number - (game_number - 1) * C.ROUNDS_PER_GAME
+def get_round_in_game(real_round_number: int) -> int:
+    game_number = get_game_number(real_round_number)
+    return real_round_number - (game_number - 1) * C.ROUNDS_PER_GAME
+
+
+def is_practice_round(round_number: int) -> bool:
+    return round_number <= C.PRACTICE_ROUNDS
+
+
+def is_practice_over_round(round_number: int) -> bool:
+    return round_number == C.PRACTICE_ROUNDS
+
+
+def is_game_over_round(round_number: int) -> bool:
+    real_round_number = get_real_round_number(round_number)
+    game_number = get_game_number(real_round_number)
+    return real_round_number == game_number * C.ROUNDS_PER_GAME
+
+
+def is_absolute_final_round(round_number: int):
+    return round_number == C.NUM_ROUNDS
+
+
+def assert_concrete_player(player: BasePlayer) -> bool:
+    from .models import Player
+
+    assert isinstance(
+        player, Player
+    ), f"`player` must be an instance of the concrete `models.Player` class because its custom fields are needed (additional fields beyond those defined in `otree.api.BasePlayer`)"
 
 
 def get_app_name(player: BasePlayer) -> str:
@@ -88,15 +139,6 @@ def get_optimal_order_quantity(player: BasePlayer) -> int:
         return 0
     ooq = player.participant.treatment.get_optimal_order_quantity()
     return max(0, round(ooq - player.participant.stock_units))
-
-
-def is_game_over(round_number: int) -> bool:
-    game_number = get_game_number(round_number)
-    return round_number == game_number * C.ROUNDS_PER_GAME
-
-
-def is_absolute_final_round(round_number: int):
-    return round_number == C.ROUNDS_PER_GAME * C.NUM_GAMES
 
 
 def frontend_format_currency(currency: Currency, as_integer: bool = False) -> str:

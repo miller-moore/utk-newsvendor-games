@@ -1,6 +1,6 @@
 {{ block title }}
-    Game {{ game_number }}<br><br>
-    Results: Period {{ period_number }}/{{ C.ROUNDS_PER_GAME }}
+    Practice<br><br>
+    Results: Period {{ round_number }}/{{ C.PRACTICE_ROUNDS }}
 {{ endblock }}
 
 {{ block content }}
@@ -21,7 +21,8 @@
 
         renderResultsContainer();
 
-        renderGameHistoryContainer();
+        //renderGameHistoryContainer();
+        renderPracticeHistoryContainer();
     </script>
 
 {{ endblock }}

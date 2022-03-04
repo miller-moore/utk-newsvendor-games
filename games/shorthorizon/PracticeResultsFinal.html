@@ -1,6 +1,5 @@
 {{ block title }}
-    Game {{ game_number }}<br><br>
-    Results: Period {{ period_number }}/{{ C.ROUNDS_PER_GAME }}
+    Practice Complete!
 {{ endblock }}
 
 {{ block content }}
@@ -9,21 +8,15 @@
     {{ include C.SECTIONS_TEMPLATE }}
     {{ include C.SCRIPTS_TEMPLATE }}
 
+    <h5>Please click next to proceed to the game.</h5>
+
     <center class="w-100 m-4">
         {{ next_button }}
     </center>
 
     <script>
-        // Results page, only render the pdf-instructions-container
-        renderPdfInstructionsContainer();
-
         allowClickNextOnEnter();
-
-        renderResultsContainer();
-
-        renderGameHistoryContainer();
+        renderFinalResultsContainer();
     </script>
 
 {{ endblock }}
-
-

@@ -3,21 +3,23 @@ import json
 import random
 import traceback
 from decimal import Decimal
-from enum import Enum
+from enum import Enum, IntEnum
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
 from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
-from pydantic import BaseModel, Field, StrBytes, confloat, conint, constr, root_validator, typing, validator
+from pydantic import (BaseModel, Field, StrBytes, confloat, conint, constr,
+                      root_validator, typing, validator)
 from pydantic.main import Extra
 
 from .constants import C
-from .util import assert_concrete_player, get_round_in_game
+from .util import assert_concrete_player, get_round_in_game, is_practice_round
 
 from common.pydanticmodel import PydanticModel  # isort:skip
 from common.colors import COLORS  # isort:skip
@@ -29,8 +31,16 @@ def sample_normal_rvs(mu: float, sigma: float, size: int = int(1e4)) -> List[flo
     return np.random.normal(loc=mu, scale=sigma, size=size).tolist()
 
 
+class PracticeTreatmentId(IntEnum):
+    TWO = 2  # low costs
+    FOUR = 4  # high costs
+
+
 MEANS = [500.0, 597.0]
 SIGMAS = [50.0, 100.0]
+
+PRACTICE_MEANS = [100]
+PRACTICE_SIGMAS = [10]
 
 
 class Distribution(PydanticModel):
@@ -39,25 +49,31 @@ class Distribution(PydanticModel):
 
     @validator("mu")
     def validate_mu(cls, v: Any) -> Any:
-        if v not in MEANS:
+        if v not in MEANS + PRACTICE_MEANS:
             raise ValueError(f"value for mu ({v!r}) is not a member of MEANS ({MEANS!r})")
         return v
 
     @validator("sigma")
     def validate_sigma(cls, v: Any) -> Any:
-        if v not in SIGMAS:
+        if v not in SIGMAS + PRACTICE_SIGMAS:
             raise ValueError(f"value for sigma ({v!r}) is not a member of SIGMAS ({SIGMAS!r})")
         return v
 
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "Distribution":
         ## NOTE: to convert normal mu/sigma to lognormal mu/sigma, use method of moments: https://en.wikipedia.org/wiki/Log-normal_distribution
-        # mu_norm, sigma_norm = TREATMENT_MAP[treatment.idx ][0].tuple()
+        # mu_norm, sigma_norm = TREATMENT_MAP[treatment.id ][0].tuple()
         # mu = np.log(mu_norm ** 2 / np.sqrt(natural_sigma ** 2 + mu_norm ** 2))
         # sigma = np.sqrt(np.log(natural_sigma ** 2 / (mu_norm ** 2) + 1))
         # return Distribution(mu=mu, sigma=sigma)
 
-        return TREATMENT_MAP[treatment.idx][0]
+        return TREATMENT_MAP[treatment.id][0]
+
+    @staticmethod
+    def from_practice_treatment_id(cls, practice_treatment_id: PracticeTreatmentId = None) -> "Distribution":
+        # return TREATMENT_MAP[practice_treatment_id][0]
+        # Note the distribution for practice is a constant (mean: 100, var: 10):
+        return Distribution(mu=100, sigma=10)
 
 
 UNIT_COSTS = [
@@ -84,60 +100,64 @@ class UnitCosts(PydanticModel):
 
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "UnitCosts":
-        return TREATMENT_MAP[treatment.idx][1]
+        return TREATMENT_MAP[treatment.id][1]
+
+    @classmethod
+    def from_practice_treatment_id(cls, practice_treatment_id: PracticeTreatmentId) -> "UnitCosts":
+        return TREATMENT_MAP[practice_treatment_id][1]
 
 
 class Multiplier(Decimal):
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "Multiplier":
-        return TREATMENT_MAP[treatment.idx][2]
+        return TREATMENT_MAP[treatment.id][2]
 
 
 class Profitex(Currency):
     @classmethod
     def from_treatment(cls, treatment: "Treatment") -> "Profitex":
-        return TREATMENT_MAP[treatment.idx][3]
+        return TREATMENT_MAP[treatment.id][3]
 
 
 TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] = {
     # 1: (low mean, high var, low costs, multiplier_i, profitex_i)
     1: (
-        Distribution.from_args(mu=MEANS[0], sigma=SIGMAS[1]),
+        Distribution(mu=MEANS[0], sigma=SIGMAS[1]),
         UnitCosts.from_args(**UNIT_COSTS[0]),
         Multiplier("0.0013"),
         Profitex(5_000),
     ),
     # 2: (low mean, low var, low costs, multiplier_i, profitex_i)
     2: (
-        Distribution.from_args(mu=MEANS[0], sigma=SIGMAS[0]),
+        Distribution(mu=MEANS[0], sigma=SIGMAS[0]),
         UnitCosts.from_args(**UNIT_COSTS[0]),
         Multiplier("0.0008"),
         Profitex(7_000),
     ),
     # 3: (low mean, low var, high costs, multiplier_i, profitex_i)
     3: (
-        Distribution.from_args(mu=MEANS[0], sigma=SIGMAS[0]),
+        Distribution(mu=MEANS[0], sigma=SIGMAS[0]),
         UnitCosts.from_args(**UNIT_COSTS[1]),
         Multiplier("0.0003"),
         Profitex(19_000),
     ),
     # 4: (low mean, high var, high costs, multiplier_i, profitex_i)
     4: (
-        Distribution.from_args(mu=MEANS[0], sigma=SIGMAS[1]),
+        Distribution(mu=MEANS[0], sigma=SIGMAS[1]),
         UnitCosts.from_args(**UNIT_COSTS[1]),
         Multiplier("0.0003"),
         Profitex(19_000),
     ),
     # 5: (high mean, low var, high costs, multiplier_i, profitex_i)
     5: (
-        Distribution.from_args(mu=MEANS[1], sigma=SIGMAS[0]),
+        Distribution(mu=MEANS[1], sigma=SIGMAS[0]),
         UnitCosts.from_args(**UNIT_COSTS[1]),
         Multiplier("0.00025"),
         Profitex(24_000),
     ),
     # 6: (high mean, high var, low costs, multiplier_i, profitex_i)
     6: (
-        Distribution.from_args(mu=MEANS[1], sigma=SIGMAS[1]),
+        Distribution(mu=MEANS[1], sigma=SIGMAS[1]),
         UnitCosts.from_args(**UNIT_COSTS[0]),
         Multiplier("0.0007"),
         Profitex(8_000),
@@ -146,7 +166,8 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
 
 
 class Treatment(PydanticModel):
-    idx: conint(strict=True, ge=1, le=len(TREATMENT_MAP))
+    id: conint(strict=True, ge=1, le=len(TREATMENT_MAP))
+    practice_treatment_id: PracticeTreatmentId
     _demand_rvs: List[float] = []
     _disrupted: bool = False
     _distribution: Distribution = None
@@ -155,6 +176,7 @@ class Treatment(PydanticModel):
 
     class Config:
         extra = Extra.allow
+        arbitrary_types_allowed = True
 
     def reset(self):
         size = len(self._demand_rvs) if self._demand_rvs else C.RVS_SIZE
@@ -171,7 +193,7 @@ class Treatment(PydanticModel):
 
     @classmethod
     def choose(cls) -> "Treatment":
-        return Treatment(idx=random.choice(list(TREATMENT_MAP)))
+        return Treatment(id=random.choice(list(TREATMENT_MAP)), practice_treatment_id=random.choice(list(PracticeTreatmentId)))
 
     def disrupt(self) -> None:
         # shorthorizon game has no disruptions
@@ -183,8 +205,14 @@ class Treatment(PydanticModel):
     def get_unit_costs(self) -> UnitCosts:
         return UnitCosts.from_treatment(self)
 
+    def get_practice_unit_costs(self) -> UnitCosts:
+        return UnitCosts.from_practice_treatment_id(self.practice_treatment_id)
+
     def get_distribution(self) -> Distribution:
         return Distribution.from_treatment(self)
+
+    def get_practice_distribution(self):
+        return Distribution.from_practice_treatment_id(self.practice_treatment_id)
 
     def get_multiplier(self) -> Multiplier:
         return Multiplier.from_treatment(self)
@@ -194,7 +222,7 @@ class Treatment(PydanticModel):
 
     def get_payoff_round(self):
         if self._payoff_round is None:
-            self._payoff_round = random.choice(range(1, C.NUM_ROUNDS + 1))
+            self._payoff_round = random.choice(range(C.PRACTICE_ROUNDS + 1, C.NUM_ROUNDS + 1))
 
         return self._payoff_round
 
@@ -247,7 +275,16 @@ class Treatment(PydanticModel):
 
     def get_demand(self, randomly: bool = True, player: Optional[BasePlayer] = None) -> int:
         if randomly:
+            # random selection
             return round(random.choice(self._demand_rvs))
+        elif is_practice_round(player.round_number):
+            # each practice round has a pre-defined # of demand units
+            if player.round_number == 1:
+                return 98
+            elif player.round_number == 2:
+                return 86
+            else:
+                return 112
         else:
             from .models import Player
 
@@ -255,9 +292,9 @@ class Treatment(PydanticModel):
                 player, Player
             ), f"currently, demand can only be obtained directly from pre-determined, which depends on Player game_number & round_number and game_number is particular to `models.Player` (not a default field of BasePlayer)"
 
-            game_idx = player.game_number - 1
-            round_idx = get_round_in_game(player.round_number) - 1
-            return int(TREATMENT_DEMAND_DATA_MAP[self.idx][game_idx][round_idx])
+            game_id = player.game_number - 1
+            round_id = get_round_in_game(player.round_number) - 1
+            return int(TREATMENT_DEMAND_DATA_MAP[self.id][game_id][round_id])
 
     def get_demand_rvs(self, size: int = C.RVS_SIZE) -> List[float]:
         """Return samples from the treatment's distribution"""
@@ -372,18 +409,16 @@ class Treatment(PydanticModel):
         return png_file
 
 
-def generate_treatment_demand_data_map() -> Dict[int, Tuple[List[float], ...]]:
-    return {
-        treatment_idx: tuple(
-            [
-                sample_normal_rvs(mu=distribution.mu, sigma=distribution.sigma, size=C.ROUNDS_PER_GAME)
-                for _ in range(C.NUM_GAMES)
-            ]
-        )
-        for treatment_idx, (distribution, unit_costs) in TREATMENT_MAP.items()
-    }
-
-
+# def generate_treatment_demand_data_map() -> Dict[int, Tuple[List[float], ...]]:
+#     return {
+#         treatment_id: tuple(
+#             [
+#                 sample_normal_rvs(mu=distribution.mu, sigma=distribution.sigma, size=C.ROUNDS_PER_GAME)
+#                 for _ in range(C.NUM_GAMES)
+#             ]
+#         )
+#         for treatment_id, (distribution, unit_costs) in TREATMENT_MAP.items()
+#     }
 # TREATMENT_DEMAND_DATA_MAP: Dict[int, Tuple[List[float], ...]] = generate_treatment_demand_data_map()
 
 

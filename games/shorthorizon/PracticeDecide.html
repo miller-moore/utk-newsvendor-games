@@ -1,6 +1,6 @@
 {{ block title }}
-    Game {{ game_number }}<br><br>
-    Order Quantity: Period {{ period_number }}/{{ C.ROUNDS_PER_GAME }}
+    Practice<br><br>
+    Order Quantity: Round {{ round_number }}/{{ C.PRACTICE_ROUNDS }}
 {{ endblock }}
 
 {{ block content }}
@@ -29,7 +29,8 @@
 
         allowClickNextOnEnterIfOrderUnitsInput();
 
-        renderGameHistoryContainer();
+        // renderGameHistoryContainer();
+        renderPracticeHistoryContainer();
 
         renderDecisionFormContainer();
         renderSituationalInfoContainer();
