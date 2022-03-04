@@ -1,5 +1,6 @@
 {{ block title }}
-    Order Quantity: Game {{ game_number }}, Period {{ game_round }}
+    Game {{ game_number }}<br><br>
+    Order Quantity: Period {{ game_round }}/{{ C.ROUNDS_PER_GAME }}
 {{ endblock }}
 
 {{ block content }}
@@ -8,8 +9,7 @@
     {{ include C.SECTIONS_TEMPLATE }}
     {{ include C.SCRIPTS_TEMPLATE }}
 
-
-    <div class="row border mb-4" id="decision-form-container">
+    <div class="row mb-4" id="decision-form-container">
         <div class="card border">
             <div class="card-body">
                 <h5 class="card-title">Decision</h5>

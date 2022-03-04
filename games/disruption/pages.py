@@ -119,7 +119,7 @@ class DisruptionPage(Page):
             app_name=get_app_name(player),
             round_number=player.round_number,
             game_number=player.game_number,  # game_number,
-            game_round=player.period_number,  # game_round,
+            game_round=player.game_round,  # game_round,
             period_number=player.period_number,  # game_round,
             session_code=player.session.code,
             participant_code=player.participant.code,
@@ -350,13 +350,13 @@ class Results(DisruptionPage):
             player.participant.treatment.reset()
 
 
-class FinalResults(DisruptionPage):
+class ResultsFinal(DisruptionPage):
     @staticmethod
     def is_displayed(player: Player):
         return is_game_over(player.round_number)
 
 
-class FinalQuestions(DisruptionPage):
+class Questions(DisruptionPage):
 
     form_model = "player"
     form_fields = ["q1", "q2", "donation_fund"]
@@ -401,7 +401,7 @@ page_sequence = [
     Disruption,
     Decide,
     Results,
-    FinalResults,
-    FinalQuestions,
+    ResultsFinal,
+    Questions,
     ZZZ,
 ]

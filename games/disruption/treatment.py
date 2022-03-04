@@ -5,7 +5,8 @@ from enum import Enum, Flag
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
@@ -16,7 +17,8 @@ from pydantic.main import Extra
 from pydantic.types import conint
 
 from .constants import C
-from .util import assert_concrete_player, get_round_in_game, lognormalize_normal_samples, normalize_lognormal_samples
+from .util import (assert_concrete_player, get_round_in_game,
+                   lognormalize_normal_samples, normalize_lognormal_samples)
 
 from common.pydanticmodel import PydanticModel  # isort:skip
 from common.colors import COLORS  # isort:skip
@@ -297,18 +299,16 @@ class Treatment(PydanticModel):
         return png_file
 
 
-def generate_treatment_demand_data_map() -> Dict[int, Tuple[List[float], ...]]:
-    return {
-        treatment_idx: tuple(
-            [
-                sample_normal_rvs(mu=distribution.mu, sigma=distribution.sigma, size=C.ROUNDS_PER_GAME)
-                for _ in range(C.NUM_GAMES)
-            ]
-        )
-        for treatment_idx, (distribution, unit_costs) in TREATMENT_MAP.items()
-    }
-
-
+# def generate_treatment_demand_data_map() -> Dict[int, Tuple[List[float], ...]]:
+#     return {
+#         treatment_idx: tuple(
+#             [
+#                 sample_normal_rvs(mu=distribution.mu, sigma=distribution.sigma, size=C.ROUNDS_PER_GAME)
+#                 for _ in range(C.NUM_GAMES)
+#             ]
+#         )
+#         for treatment_idx, (distribution, unit_costs) in TREATMENT_MAP.items()
+#     }
 # TREATMENT_DEMAND_DATA_MAP: Dict[int, Tuple[List[float], ...]] = generate_treatment_demand_data_map()
 
 ## NOTE: hardcoded demand data map: keys are treatment indexes, values are Tuple[List[float], ...], where the tuple has length C.NUM_GAMES & each list has length C.ROUNDS_PER_GAME
