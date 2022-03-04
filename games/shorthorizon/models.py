@@ -1,4 +1,5 @@
 import random
+import types
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 from uuid import uuid4
@@ -59,10 +60,8 @@ def initialize_game_history() -> List[Dict[str, Any]]:
 
 
 class Subsession(BaseSubsession):
-    @staticmethod
-    def creating_session(subsession: BaseSubsession):
-        for player in subsession.get_players():
-            hydrate_participant(player)
+    is_practice_round = models.BooleanField()
+    real_round_number = models.IntegerField()
 
     # def vars_for_admin_report(self):
     #     """See https://otree.readthedocs.io/en/self/admin.html#customizing-the-admin-interface-admin-reports"""
@@ -80,7 +79,7 @@ class Player(BasePlayer):
     uuid = models.StringField()
     starttime = models.FloatField(min=get_time())
     endtime = models.FloatField(min=get_time())
-    treatment = models.IntegerField(min=1)
+    treatment_id = models.IntegerField(min=1)
 
     # Consent.html form fields
     is_planner = models.BooleanField(
