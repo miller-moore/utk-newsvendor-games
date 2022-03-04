@@ -17,15 +17,25 @@ from otree.models import Participant
 from otree.session import Session
 
 from .constants import C
-from .formvalidation import (default_error_message,
-                             register_form_field_validator)
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Player, initialize_game_history
 from .treatment import Distribution, Treatment
-from .util import (as_static_path, get_app_name, get_game_number,
-                   get_game_rounds, get_optimal_order_quantity, get_page_name,
-                   get_room_display_name, get_room_name, get_round_in_game,
-                   get_time, is_absolute_final_round, is_disruption_next_round,
-                   is_disruption_this_round, is_game_over)
+from .util import (
+    as_static_path,
+    get_app_name,
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_room_display_name,
+    get_room_name,
+    get_round_in_game,
+    get_time,
+    is_absolute_final_round,
+    is_disruption_next_round,
+    is_disruption_this_round,
+    is_game_over,
+)
 
 from common.colors import COLORS  # isort:skip
 from common.utils import serialize  # isort:skip
@@ -78,9 +88,12 @@ class DisruptionPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                    REAL_WORLD_CURRENCY_CODE,
-                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+        from otree.settings import (
+            LANGUAGE_CODE,
+            LANGUAGE_CODE_ISO,
+            REAL_WORLD_CURRENCY_CODE,
+            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+        )
 
         # import importlib
         # from . import treatment as disruption_treatment
@@ -214,7 +227,7 @@ class HydratePlayer(DisruptionPage):
 
 class Consent(DisruptionPage):
     form_model = "player"
-    form_fields = ["is_planner", "years_as_planner", "job_title", "company_name", "work_country", "does_consent"]
+    form_fields = ["is_planner", "years_as_planner", "job_title", "company_name", "work_country", "nationality", "does_consent"]
 
     @staticmethod
     def is_displayed(player: Player):
@@ -227,6 +240,7 @@ class Consent(DisruptionPage):
         player.participant.job_title = player.job_title
         player.participant.company_name = player.company_name
         player.participant.work_country = player.work_country
+        player.participant.nationality = player.nationality
         player.participant.does_consent = player.does_consent
 
 

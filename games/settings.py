@@ -23,9 +23,10 @@ PARTICIPANT_FIELDS = [
     "prolific_id",
     "company_name",
     "work_country",
+    "nationality",
     "unit_costs",
     "stock_units",
-    "treatment",
+    "treatment",  # Treatment
     # "demand_rvs",
     "history",
     "game_results",

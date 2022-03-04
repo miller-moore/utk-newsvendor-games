@@ -15,31 +15,22 @@ from common.template_filters import filters  # isort:skip
 def hydrate_participant(player: "Player", **kwargs) -> None:
 
     if not "uuid" in player.participant.vars:
-        uuid = player.participant.vars.get("uuid", str(uuid4()))
         treatment: Treatment = player.participant.vars.get("treatment", Treatment.choose())
-        unit_costs: UnitCosts = treatment.get_unit_costs()
         _ = treatment.get_demand_rvs()  # initializes treatment._demand_rvs
-        is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
-        years_as_planner = player.participant.vars.get("years_as_planner", player.field_maybe_none("years_as_planner"))
-        job_title = player.participant.vars.get("job_title", player.field_maybe_none("job_title"))
-        does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
-        # prolific_id = player.participant.vars.get("prolific_id", player.field_maybe_none("prolific_id"))
-        company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
-        work_country = player.participant.vars.get("work_country", player.field_maybe_none("work_country"))
-        game_number = get_game_number(player.round_number)
-        round_in_game = get_round_in_game(player.round_number)
-        game_rounds = get_game_rounds(player.round_number)
 
-        player.participant.uuid = uuid
+        player.participant.uuid = player.participant.vars.get("uuid", str(uuid4()))
         player.participant.starttime = get_time()
-        player.participant.is_planner = is_planner
-        player.participant.years_as_planner = years_as_planner
-        player.participant.job_title = job_title
-        player.participant.does_consent = does_consent
-        # player.participant.prolific_id = prolific_id
-        player.participant.company_name = company_name
-        player.participant.work_country = work_country
-        player.participant.unit_costs = unit_costs
+        player.participant.is_planner = player.participant.vars.get("is_planner", player.field_maybe_none("is_planner"))
+        player.participant.years_as_planner = player.participant.vars.get(
+            "years_as_planner", player.field_maybe_none("years_as_planner")
+        )
+        player.participant.job_title = player.participant.vars.get("job_title", player.field_maybe_none("job_title"))
+        player.participant.does_consent = player.participant.vars.get("does_consent", player.field_maybe_none("does_consent"))
+        # player.participant.prolific_id = player.participant.vars.get("prolific_id", player.field_maybe_none("prolific_id"))
+        player.participant.company_name = player.participant.vars.get("company_name", player.field_maybe_none("company_name"))
+        player.participant.work_country = player.participant.vars.get("work_country", player.field_maybe_none("work_country"))
+        player.participant.nationality = player.participant.vars.get("nationality", player.field_maybe_none("nationality"))
+        player.participant.unit_costs = treatment.get_unit_costs()
         player.participant.stock_units = 0
         player.participant.treatment = treatment
         player.participant.history = initialize_game_history()
@@ -104,6 +95,7 @@ class Player(BasePlayer):
     # )
     company_name = models.StringField(label="""What company do you currently work for?""")
     work_country = models.StringField(label="""In what country do you work?""")
+    nationality = models.StringField(label="""What is your nationality?""")
     does_consent = models.BooleanField(
         widget=widgets.CheckboxInput(),
         label="""By checking the box to the left you agree to participate in this experiment. The full consent form is available for download at the top of this page.""",
