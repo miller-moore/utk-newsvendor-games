@@ -119,7 +119,7 @@ class DisruptionPage(Page):
             app_name=get_app_name(player),
             round_number=player.round_number,
             game_number=player.game_number,  # game_number,
-            game_round=player.game_round,  # game_round,
+            game_round=player.period_number,  # game_round,
             period_number=player.period_number,  # game_round,
             session_code=player.session.code,
             participant_code=player.participant.code,
