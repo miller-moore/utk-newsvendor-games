@@ -59,5 +59,10 @@ def mul(value, other=0):
 
 
 @filters.register
+def round_(val, places):
+    return filters.to_places(round(val, places), places)
+
+
+@filters.register
 def to(val, places):
     return filters.to_places(val, places)

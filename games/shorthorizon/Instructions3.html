@@ -39,7 +39,10 @@
     <p class="text-left font-family-times-new-roman">
     {# <p class="text-left font-family-times-new-roman" style="margin-left:4rem;margin-right:4rem;"> #}
     {# <p class="text-left font-family-times-new-roman" style="margin-left:4rem;margin-right:4rem;font-size:1.35rem;"> #}
-        Bonus pay will be calculated by multiplying profit from one round by {{ multiplier|mul(100.0)|to(2) }}%. For example, a single round profit of {{ profitex|cu }} would lead to a bonus pay of {{ profitex|cu }} * {{ multiplier }}= {{ profitex_multiplied|cu }}. This pay will be given to you immediately after completing the game: let the instructor at the front of the room know when you are done.
+        Bonus pay will be calculated by multiplying profit from one round by {{ multiplier|mul(100.0)|round_(3) }}%. For example, a single round profit of {{ profitex|cu }} would lead to a bonus pay of {{ profitex|cu }} * {{ multiplier }}= {{ profitex_multiplied|cu }}. This pay will be given to you immediately after completing the game: let the instructor at the front of the room know when you are done.
+        <br>
+        <br>
+        Before starting the experiment, you will go through a practice game that has 3 rounds. The cost variables will be the same as the actual experiment but the distribution will be different. Make sure you take note of these distributions.
         <br>
         <br>
         Please click the “Next” button below to start the game and thank you!

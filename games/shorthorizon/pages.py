@@ -189,9 +189,14 @@ class HydratePlayer(ShortHorizonPage):
         player.ou = None
         player.du = None
         player.ooq = get_optimal_order_quantity(player)
-        player.rcpu = player.participant.unit_costs.rcpu
-        player.wcpu = player.participant.unit_costs.wcpu
-        player.scpu = player.participant.unit_costs.scpu
+
+        treatment: Treatment = player.participant.treatment
+        unit_costs = (
+            treatment.get_practice_unit_costs() if is_practice_round(player.round_number) else treatment.get_unit_costs()
+        )
+        player.rcpu = unit_costs.rcpu
+        player.wcpu = unit_costs.wcpu
+        player.scpu = unit_costs.scpu
         player.revenue = 0
         player.cost = 0
         player.profit = 0

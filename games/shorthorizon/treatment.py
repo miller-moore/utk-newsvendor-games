@@ -7,15 +7,13 @@ from enum import Enum, IntEnum
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
-                    Tuple, Union)
+from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as stats
 from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
-from pydantic import (BaseModel, Field, StrBytes, confloat, conint, constr,
-                      root_validator, typing, validator)
+from pydantic import BaseModel, Field, StrBytes, confloat, conint, constr, root_validator, typing, validator
 from pydantic.main import Extra
 
 from .constants import C
@@ -124,28 +122,28 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
     1: (
         Distribution(mu=MEANS[0], sigma=SIGMAS[1]),
         UnitCosts.from_args(**UNIT_COSTS[0]),
-        Multiplier("0.0013"),
+        Multiplier("0.00130"),
         Profitex(5_000),
     ),
     # 2: (low mean, low var, low costs, multiplier_i, profitex_i)
     2: (
         Distribution(mu=MEANS[0], sigma=SIGMAS[0]),
         UnitCosts.from_args(**UNIT_COSTS[0]),
-        Multiplier("0.0008"),
+        Multiplier("0.00080"),
         Profitex(7_000),
     ),
     # 3: (low mean, low var, high costs, multiplier_i, profitex_i)
     3: (
         Distribution(mu=MEANS[0], sigma=SIGMAS[0]),
         UnitCosts.from_args(**UNIT_COSTS[1]),
-        Multiplier("0.0003"),
+        Multiplier("0.00030"),
         Profitex(19_000),
     ),
     # 4: (low mean, high var, high costs, multiplier_i, profitex_i)
     4: (
         Distribution(mu=MEANS[0], sigma=SIGMAS[1]),
         UnitCosts.from_args(**UNIT_COSTS[1]),
-        Multiplier("0.0003"),
+        Multiplier("0.00030"),
         Profitex(19_000),
     ),
     # 5: (high mean, low var, high costs, multiplier_i, profitex_i)
@@ -159,7 +157,7 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
     6: (
         Distribution(mu=MEANS[1], sigma=SIGMAS[1]),
         UnitCosts.from_args(**UNIT_COSTS[0]),
-        Multiplier("0.0007"),
+        Multiplier("0.00070"),
         Profitex(8_000),
     ),
 }
@@ -193,7 +191,10 @@ class Treatment(PydanticModel):
 
     @classmethod
     def choose(cls) -> "Treatment":
-        return Treatment(id=random.choice(list(TREATMENT_MAP)), practice_treatment_id=random.choice(list(PracticeTreatmentId)))
+        # TODO: restore after pilot test is complete
+        # return Treatment(id=random.choice(list(TREATMENT_MAP)), practice_treatment_id=random.choice(list(PracticeTreatmentId)))
+        _id = random.choice(list(PracticeTreatmentId))
+        return Treatment(id=_id, practice_treatment_id=_id)
 
     def disrupt(self) -> None:
         # shorthorizon game has no disruptions
