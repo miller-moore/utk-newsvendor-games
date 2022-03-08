@@ -12,16 +12,28 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
 from .constants import PRACTICE_ROUNDS, C
-from .formvalidation import (default_error_message,
-                             register_form_field_validator)
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Player
 from .treatment import Distribution, Treatment
-from .util import (as_static_path, call_safe, get_app_name, get_game_number,
-                   get_game_rounds, get_optimal_order_quantity, get_page_name,
-                   get_real_round_number, get_room_display_name, get_room_name,
-                   get_round_in_game, get_time, initialize_game_history,
-                   is_absolute_final_round, is_game_over_round,
-                   is_practice_over_round, is_practice_round)
+from .util import (
+    as_static_path,
+    call_safe,
+    get_app_name,
+    get_game_number,
+    get_game_rounds,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_real_round_number,
+    get_room_display_name,
+    get_room_name,
+    get_round_in_game,
+    get_time,
+    initialize_game_history,
+    is_absolute_final_round,
+    is_game_over_round,
+    is_practice_over_round,
+    is_practice_round,
+)
 
 from common.colors import COLORS  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
@@ -66,17 +78,21 @@ class ShortHorizonPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                    REAL_WORLD_CURRENCY_CODE,
-                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+        from otree.settings import (
+            LANGUAGE_CODE,
+            LANGUAGE_CODE_ISO,
+            REAL_WORLD_CURRENCY_CODE,
+            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+        )
 
         # import importlib
         # from . import treatment as shorthorizon_treatment
         # treatment_module = importlib.reload(shorthorizon_treatment)
 
         treatment: Treatment = player.participant.treatment
+        is_practice = is_practice_round(player.round_number)
         distribution: Distribution
-        if is_practice_round(player.round_number):
+        if is_practice:
             distribution = treatment.get_practice_distribution()
         else:
             distribution = treatment.get_distribution()
@@ -105,7 +121,7 @@ class ShortHorizonPage(Page):
             variance_choice=None,
             disruption_choice=None,
             disruption_round=None,
-            distribution_png=as_static_path(treatment.get_distribution_png()),  # Decide.html
+            distribution_png=as_static_path(treatment.get_distribution_png(is_practice)),  # Decide.html
             consent_form_pdf=as_static_path(treatment.get_consent_form_pdf()),  # Consent.html
             instructions_pdf=as_static_path(treatment.get_instructions_pdf()),  # various
             snapshot_instructions_1_png=as_static_path(treatment.get_snapshot_instruction_png(n=1)),  # Instructions3.html

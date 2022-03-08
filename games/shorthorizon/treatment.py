@@ -318,7 +318,7 @@ class Treatment(PydanticModel):
     def check_png(png_file: Path) -> bool:
         from datetime import datetime
 
-        file_mtime_within_24hours = datetime.now().timestamp() - png_file.stat().st_mtime < 86400
+        # file_mtime_within_24hours = datetime.now().timestamp() - png_file.stat().st_mtime < 86400
 
         return png_file.exists()  # and file_mtime_within_24hours
 
@@ -353,13 +353,16 @@ class Treatment(PydanticModel):
         """
         return Path(C.STATIC_DIR).joinpath(f"snapshot-instructions-{n:d}.png")
 
-    def get_distribution_png(self) -> Tuple[Path, Path]:
+    def get_distribution_png(self, practice: bool = False) -> Tuple[Path, Path]:
         """Plot & save the player's current demand distribution data to a png and return the png file path."""
 
+        import matplotlib
+
+        matplotlib.use("agg")
         import matplotlib.pyplot as plt
         import seaborn as sns
 
-        distribution = self.get_distribution()
+        distribution = self.get_practice_distribution() if practice else self.get_distribution()
         mu, sigma = distribution.mu, distribution.sigma
 
         # color_key = "red" if C.APP_NAME == "disruption" and self.is_disrupted() else "ut_orange"
@@ -383,7 +386,7 @@ class Treatment(PydanticModel):
         # xmin = mean - 3 * sigma
         # xmax = mean + 3 * sigma
 
-        xmin, xmax = 0, 1000
+        xmin, xmax = 0, min(1000, 2 * mu)
         # ymax = 0.012 if self.variance_choice == "low" else 0.003
 
         # make distribution curve
