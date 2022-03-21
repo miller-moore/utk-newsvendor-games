@@ -45,7 +45,7 @@ class Player(BasePlayer):
         label="""Are you presently either a Junior or Senior undergraduate or graduate student studying Supply Chain Management or another related field?""",
     )
     gender_identity = models.StringField(
-        max_length=1000, label="If willing, please type your Gender Identity in the box below."
+        label="If willing, please type your Gender Identity in the box below.", initial=None, blank=True
     )
     does_consent = models.BooleanField(
         widget=widgets.CheckboxInput(),

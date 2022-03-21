@@ -117,6 +117,12 @@ class Profitex(Currency):
         return TREATMENT_MAP[treatment.id][3]
 
 
+class Divisor(Currency):
+    @classmethod
+    def from_treatment(cls, treatment: "Treatment") -> "Profitex":
+        return TREATMENT_MAP[treatment.id][4]
+
+
 TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] = {
     # 1: (low mean, high var, low costs, multiplier_i, profitex_i)
     1: (
@@ -124,6 +130,7 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
         UnitCosts.from_args(**UNIT_COSTS[0]),
         Multiplier("0.00130"),
         Profitex(5_000),
+        Divisor(1000),
     ),
     # 2: (low mean, low var, low costs, multiplier_i, profitex_i)
     2: (
@@ -131,6 +138,7 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
         UnitCosts.from_args(**UNIT_COSTS[0]),
         Multiplier("0.00080"),
         Profitex(7_000),
+        Divisor(1000),
     ),
     # 3: (low mean, low var, high costs, multiplier_i, profitex_i)
     3: (
@@ -138,6 +146,7 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
         UnitCosts.from_args(**UNIT_COSTS[1]),
         Multiplier("0.00030"),
         Profitex(19_000),
+        Divisor(3000),
     ),
     # 4: (low mean, high var, high costs, multiplier_i, profitex_i)
     4: (
@@ -145,6 +154,7 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
         UnitCosts.from_args(**UNIT_COSTS[1]),
         Multiplier("0.00030"),
         Profitex(19_000),
+        Divisor(3000),
     ),
     # 5: (high mean, low var, high costs, multiplier_i, profitex_i)
     5: (
@@ -152,6 +162,7 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
         UnitCosts.from_args(**UNIT_COSTS[1]),
         Multiplier("0.00025"),
         Profitex(24_000),
+        Divisor(3000),
     ),
     # 6: (high mean, high var, low costs, multiplier_i, profitex_i)
     6: (
@@ -159,6 +170,7 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
         UnitCosts.from_args(**UNIT_COSTS[0]),
         Multiplier("0.00070"),
         Profitex(8_000),
+        Divisor(1000),
     ),
 }
 
@@ -221,6 +233,9 @@ class Treatment(PydanticModel):
     def get_profitex(self) -> Profitex:
         return Profitex.from_treatment(self)
 
+    def get_divisor(self) -> Divisor:
+        return Divisor.from_treatment(self)
+
     def get_payoff_round(self):
         if self._payoff_round is None:
             self._payoff_round = random.choice(range(C.PRACTICE_ROUNDS + 1, C.NUM_ROUNDS + 1))
@@ -248,7 +263,8 @@ class Treatment(PydanticModel):
         """
         assert_concrete_player(player)
         if player.round_number == player.participant.payoff_round:
-            return Currency(self.get_profitex() * self.get_multiplier())
+            # return Currency(self.get_profitex() * self.get_multiplier())
+            return player.profit / self.get_divisor()
         return Currency(0)
 
     # def get_payoff(self, player: BasePlayer) -> Currency:

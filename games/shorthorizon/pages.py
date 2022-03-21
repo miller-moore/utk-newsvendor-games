@@ -97,6 +97,8 @@ class ShortHorizonPage(Page):
         else:
             distribution = treatment.get_distribution()
 
+        payoff_round = player.participant.vars.get("payoff_round", None)
+
         _vars = dict(
             language_code=LANGUAGE_CODE,
             real_world_currency_code=REAL_WORLD_CURRENCY_CODE,
@@ -154,7 +156,9 @@ class ShortHorizonPage(Page):
             history=player.participant.vars.get("history", None),
             game_results=player.participant.vars.get("game_results", None),
             practice_results=player.participant.vars.get("practice_results", None),
-            payoff_round=player.participant.vars.get("payoff_round", None),
+            payoff_divisor=treatment.get_divisor(),
+            payoff_round=payoff_round,
+            payoff_round_profit=player.in_round(payoff_round).profit if payoff_round else Currency(0.0),
             payoff=player.participant.vars.get("payoff", None),
             treatment_id=treatment.id,
             practice_treatment_id=treatment.practice_treatment_id,
@@ -264,16 +268,18 @@ class PracticeDecide(ShortHorizonPage):
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
 
+        treatment: Treatment = player.participant.treatment
+
         # unit costs
         # unit_costs = player.participant.unit_costs
-        unit_costs = player.participant.treatment.get_practice_unit_costs()
+        unit_costs = treatment.get_practice_unit_costs()
         rcpu = float(unit_costs.rcpu)
         wcpu = float(unit_costs.wcpu)
         scpu = float(unit_costs.scpu)
 
         # Get demand units!
         # NOTE: not randomly means from pre-determined data
-        du = player.participant.treatment.get_demand(randomly=False, player=player)
+        du = treatment.get_demand(randomly=False, player=player)
         # order units
         ou = player.ou
         # stock units
@@ -292,7 +298,7 @@ class PracticeDecide(ShortHorizonPage):
         player.revenue = Currency(revenue)
         player.cost = Currency(cost)
         player.profit = Currency(profit)
-        player.payoff = player.participant.treatment.get_payoff(player)
+        player.payoff = treatment.get_payoff(player)
 
         # update participant's history store corresponding to the current round in the current game
         idx = player.round_number - 1
