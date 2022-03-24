@@ -25,7 +25,7 @@
     <p>
         You have no starting inventory in your warehouse at the beginning of the game. You will order
         which then get delivered before demand is realized. Any leftover inventory after demand is
-        realized will be charged a salvage fee per unit left over.
+        realized will be charged a salvage value per unit left over.
     </p>
     <p>
         {# &nbsp;&nbsp;&nbsp;&nbsp; #}
@@ -46,7 +46,7 @@
         </ul>
     </p>
     <p>
-        Salvage fees are charged for the resulting leftover 10 units that are stocked in inventory.
+        Salvage revenue is earned for the resulting leftover 10 units that are stocked in inventory.
     </p>
     <p>
         If you purchased too few units in a period to fulfill this period’s demand, the unfulfilled demand is
@@ -70,10 +70,10 @@
         You are trying to maximize your profits in this experiment. Profit per round is calculated as follows:
     </p>
     <p>
-        <code class="font-italic">Profit per round = selling price x units sold - purchasing price x order quantity - salvage fee * leftover inventory</code>
+        <code class="font-italic">Profit per round = selling price x units sold - purchasing price x order quantity + salvage value * leftover inventory</code>
     </p>
     <p>
-        Therefore, profit = revenue - purchase costs - salvage costs.
+        Therefore, profit = revenue - purchase costs + salvage revenue.
     </p>
     <p>
         In this experiment, your costs will be displayed on the decision page.
