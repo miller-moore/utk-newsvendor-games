@@ -368,8 +368,8 @@ class Decide(ShortHorizonPage):
         # revenue = rcpu * min(du, ou)
         # cost = wcpu * ou + scpu * su
         # profit = revenue - cost
-        revenue = rcpu * min(du, ou)
-        cost = wcpu * ou + scpu * su
+        revenue = rcpu * min(du, ou) + scpu * su
+        cost = wcpu * ou
         profit = revenue - cost
 
         # update player su, du, revenue, cost, profit, & payoff
