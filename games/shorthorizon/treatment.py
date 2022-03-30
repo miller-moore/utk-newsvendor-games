@@ -204,9 +204,16 @@ class Treatment(PydanticModel):
     @classmethod
     def choose(cls) -> "Treatment":
         # TODO: restore after pilot test is complete
-        # return Treatment(id=random.choice(list(TREATMENT_MAP)), practice_treatment_id=random.choice(list(PracticeTreatmentId)))
-        _id = random.choice(list(PracticeTreatmentId))
-        return Treatment(id=_id, practice_treatment_id=_id)
+        treatment_id = random.choice(list(TREATMENT_MAP))
+        treatment = TREATMENT_MAP[treatment_id]
+        unit_costs: UnitCosts = treatment[1]
+        if unit_costs.category == "high":
+            practice_id = PracticeTreatmentId.FOUR
+        else:
+            practice_id = PracticeTreatmentId.TWO
+        return Treatment(id=treatment_id, practice_treatment_id=practice_id)
+        # _id = random.choice(list(PracticeTreatmentId))
+        # return Treatment(id=_id, practice_treatment_id=_id)
 
     def disrupt(self) -> None:
         # shorthorizon game has no disruptions
