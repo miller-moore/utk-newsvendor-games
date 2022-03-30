@@ -130,7 +130,7 @@ class Player(BasePlayer):
 
     # final questions
     q1 = models.LongStringField(label="How did your decisions change between the two games?")
-    q2 = models.LongStringField(label="How did your decisions change after the disruption?")
+    q2 = models.LongStringField(label="How did your decisions change after the demand shock event?")
     donation_fund = models.StringField(
         widget=widgets.RadioSelect(),
         # label="""To which of the following funds would you like to donate your earnings to:""",
