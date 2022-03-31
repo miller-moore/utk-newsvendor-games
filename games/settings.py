@@ -79,8 +79,8 @@ SESSION_CONFIGS = [
 # Rooms
 ROOMS = [
     dict(
-        name="pilotstudy1",
-        display_name="Student pilot study - 1",
+        name="radiosystems",
+        display_name="Radio Systems Planner Session",
     ),
     dict(
         name="pilotstudy2",
