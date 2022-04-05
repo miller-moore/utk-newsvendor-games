@@ -83,8 +83,8 @@ ROOMS = [
         display_name="Radio Systems Planner Session",
     ),
     dict(
-        name="pilotstudy2",
-        display_name="Student pilot study - 2",
+        name="shaw",
+        display_name="Shaw Industries Planner Session",
     ),
     dict(
         name="pilotstudy3",
