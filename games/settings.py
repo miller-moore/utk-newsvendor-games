@@ -88,7 +88,7 @@ ROOMS = [
     ),
     dict(
         name="sysco",
-        display_name="Sysco Planner Session,
+        display_name="Sysco Planner Session",
     ),
     dict(
         name="pilotstudy4",
