@@ -58,7 +58,7 @@ def validate_is_planner(is_planner: bool) -> Optional[str]:
 
 
 @register_form_field_validator(form_field="gender_identity", expect_type=str)
-def validate_does_consent(gender_identity: str) -> Optional[str]:
+def validate_gender_identity(gender_identity: str) -> Optional[str]:
     # totally optional field provided at the user's will
     # hence, any value is valid (ie., do nothing)
     return
@@ -368,8 +368,8 @@ class Decide(ShortHorizonPage):
         # revenue = rcpu * min(du, ou)
         # cost = wcpu * ou + scpu * su
         # profit = revenue - cost
-        revenue = rcpu * min(du, ou)
-        cost = wcpu * ou + scpu * su
+        revenue = rcpu * min(du, ou) + scpu * su
+        cost = wcpu * ou
         profit = revenue - cost
 
         # update player su, du, revenue, cost, profit, & payoff
