@@ -1,0 +1,36 @@
+{{ block title }}
+    {{ if C.NUM_GAMES > 1 }}
+        Game {{ game_number }} Complete!
+    {# {{ elif }} #}
+    {{ else }}
+        Game Complete!
+    {{ endif }}
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+
+    {{ if is_absolute_final_round }}
+        {{ if C.NUM_GAMES > 1 }}
+            <h5>Congrats, you've completed all games in this survey!</h5>
+        {{ else }}
+            <h5>Congrats, you've completed the survey!</h5>
+        {{ endif }}
+    {{ else }}
+        <h5>Game {{ game_number|add(1) }} begins next.</h5>
+    {{ endif }}
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        allowClickNextOnEnter();
+        renderFinalResultsContainer();
+    </script>
+
+{{ endblock }}

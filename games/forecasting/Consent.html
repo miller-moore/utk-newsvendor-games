@@ -1,0 +1,90 @@
+{{ block title }}
+    Demand Planning Game: Welcome
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <!--
+        @note If needed, a tab system can be used as a hack to recover "back button" functionality to the user in a way that does
+        @note not interfere without interfering with oTree's strict adherence to the order of Page objects in `app_sequence`.
+        @note Source code demonstrating the tab system for this effect is located at https://www.otreehub.com/projects/otree-snippets/.
+    -->
+
+    <div class="row border mb-4" id="disclaimer-container">
+        <div class="card border">
+            <div class="card-body">
+                {# <h5 class="card-title">Some Title</h5> #}
+                <p>
+                A team of researchers at the University of Tennessee is looking to understand ordering decisions in different contexts.
+                You are invited to partake in an economics game to help us better understand the relationships between context and ordering decisions.
+                </p>
+                <p>
+                Participants will receive bonus pay, calculated by performance during a randomly picked round
+                in the game. This bonus pay will be given to you in cash before you leave the room.
+                Please let the instructor at the front of the room know when you have completed the experiment.
+                </p>
+                <p>
+                Your participation in this game is entirely voluntary, and your responses will be kept
+                confidential. We will not ask for your name or any other identifying information.
+                </p>
+                <p>
+                If you have any questions about this research or you feel you need more information, you can
+                contact Anne Dohmen (adohmen@vols.utk.edu) or Lance Saunders (lsaunders@utk.edu). For
+                questions or concerns about the rights of research subjects or the voluntariness of this consent
+                procedure, you may contact our reviewing body: the Institutional Review Board at the University
+                of Tennessee at 865-974-7697 or utkirb@utk.edu.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row border mb-4" id="consent-container">
+        <div class="card border">
+            <div class="card-body">
+                {# <h5 class="card-title">Some Title</h5> #}
+                <p>
+                    {{ formfield 'is_planner' }}
+                </p>
+                <p>
+                    {{ formfield 'gender_identity' }}
+                </p>
+                <p>
+                    {{ formfield 'does_consent' }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        // Consent page, only render the pdf-consent-form-container
+        renderPdfConsentFormContainer();
+
+        function onClickWrapped(event) {
+            console.log(`btnNext clicked`);
+            var target = event.target;
+            var checkbox = $('#id_is_planner')[0];
+            if (checkbox.checked) {
+                this.removeEventListener("click", onClickWrapped);
+                onClickBefore.bind(this)();
+            }
+            return false;
+        }
+
+        var btnNext = $('[class*="otree-btn-next"]');
+        var onClickBefore = btnNext.click;
+
+        /** @note Uncomment the following  code to bind `onClickWrapped()` as the onclick callback executed when the user clicks otree's "Next" button. */
+        //btnNext.click(onClickWrapped);
+    </script>
+
+{{ endblock }}
+

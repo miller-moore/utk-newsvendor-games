@@ -1,0 +1,30 @@
+{{ block title }}
+    Practice<br><br>
+    Results: Period {{ round_number }}/{{ C.PRACTICE_ROUNDS }}
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        // Results page, only render the pdf-instructions-container
+        renderPdfInstructionsContainer();
+
+        allowClickNextOnEnter();
+
+        renderResultsContainer();
+
+        //renderGameHistoryContainer();
+        renderPracticeHistoryContainer();
+    </script>
+
+{{ endblock }}
+
+

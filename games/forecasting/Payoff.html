@@ -1,0 +1,15 @@
+{{ block title }}
+    Get Paid!
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <br>
+    {# <h5>Your payout for participating is {{ participant.payoff }}! Please see the instructor at the front of the room to receive your money.</h5> #}
+    <h5>The randomly chosen earnings round was round {{ payoff_round }}, where you earned {{ payoff_round_profit|cu }} of game money. Your earnings for this game are {{ participant.payoff|cu }}.</h5>
+
+{{ endblock }}
