@@ -21,7 +21,7 @@
     }
   },
   "python.languageServer": "Pylance",
-  "python.pythonPath": "~/gitrepos/my-private/Projects/utk-newsvendor-games/games/venv/bin/python",
+  "python.defaultInterpreterPath": "~/gitrepos/my-private/Projects/utk-newsvendor-games/games/venv/bin/python",
   "python.formatting.provider": "black",
   "python.formatting.blackPath": "black",
   "python.formatting.blackArgs": [
