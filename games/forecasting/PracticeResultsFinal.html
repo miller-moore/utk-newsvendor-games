@@ -1,0 +1,22 @@
+{{ block title }}
+    Practice Complete!
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <h5>Please click next to proceed to the game.</h5>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        allowClickNextOnEnter();
+        renderFinalResultsContainer();
+    </script>
+
+{{ endblock }}

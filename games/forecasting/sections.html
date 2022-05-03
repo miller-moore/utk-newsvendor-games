@@ -1,0 +1,180 @@
+<div class="d-inline-flex row mb-4" id="pdf-container">
+    <div id="pdf-consent-form-container" class="col-auto">
+        <div class="card border">
+            <h6 class="card-title pr-4">
+                <a onclick='window.open("{{ static consent_form_pdf }}","_blank")'>
+                    <i class="far fa-file-pdf fa-2x p-2" style="color:darkred;"></i>
+                    Consent Form
+                </a>
+            </h6>
+        </div>
+    </div>
+    <div id="pdf-instructions-container" class="col-auto">
+        <div class="card border">
+            <h6 class="card-title pr-4">
+                <a onclick='window.open("{{ static instructions_pdf }}","_blank")'>
+                    <i class="far fa-file-pdf fa-2x p-2" style="color:darkred;"></i>
+                    Game Instructions
+                </a>
+            </h6>
+        </div>
+    </div>
+</div>
+
+<!-- results-container-short -->
+<div class="row border mb-4" id="results-container-short">
+    <h4 class="mt-2">Results:</h4>
+        <div class="card border-0">
+            <div class="card-body">
+                <ul>
+                    <li>Demand for <strong __data="month-name"></strong> was <strong __data="results-du"></strong> units.</li>
+                </ul>
+            </div>
+        </div>
+    <br>
+</div>
+
+<!-- results-container -->
+<div class="row border mb-4" id="results-container">
+    <h4 class="mt-2">Results:</h4>
+        <div class="card border-0">
+            <div class="card-body">
+                <ul>
+                    <li>You ordered <strong __data="results-ou"></strong> units for the month of <strong __data="month-name"></strong>.</li>
+                    <!-- li>In <strong __data="month-name-prev-3"></strong>, you ordered <strong __data="results-ou"></strong> units for the month of <strong __data="month-name"></strong>.</ !-->
+                    <li>Demand for <strong __data="month-name"></strong> was <strong __data="results-du"></strong> units.</li>
+                    <li>You salvaged <strong __data="results-su"></strong> units.</li>
+                    <li>Based on your order in <strong __data="month-name-prev-3"></strong>, you earned <strong __data="results-profit"></strong> in profit in <strong __data="month-name"></strong>.</li>
+                </ul>
+            </div>
+        </div>
+    <br>
+</div>
+
+
+<!-- final-results-container (each game has a table of results plus one "overall" table of results) -->
+<div class="row border mb-4 justify-content-around" id="final-results-container">
+    <div class="card border">
+        <div class="card-body" id="final-results-card">
+            <h5 class="card-title">Final Results</h5>
+        </div>
+    </div>
+    <br>
+</div>
+
+
+<!-- game-history-container -->
+<div class="row border mb-4" id="game-history-container">
+    <h4 class="mt-2">Game History Information</h4>
+
+    <!-- hist-quantities-barchart -->
+    <div class="col-auto mb-4">
+        <div class="card" id="hist-quantities-card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Quantities ordered & demanded in prior periods</h6>
+                <div id="hist-quantities-barchart"></div>
+            </div>
+        </div>
+    </div>
+
+    {{ if C.SHOW_SMOKEY_IMAGES }}
+        <!-- fill whitespace with a random image of Smokey the dog -->
+        <div class="col-auto mb-4">
+            <div class="card" id="smokey-img-container">
+                <div class="card-body">
+                    <img id="smokey-img" src="{{ static smokey_img_file }}" >
+                </div>
+            </div>
+        </div>
+    {{ endif }}
+
+    <br>
+
+    <!-- hist-metrics-table -->
+    <div class="col-auto">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Summary of key metrics of prior periods</h6>
+                <div class="table-responsive">
+                    <table id="hist-metrics-table">
+                        <thead>
+                            <tr>
+                                <th scope="row">Period</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr id="row-order">
+                                <th scope="row" style="white-space: nowrap;"><strong>Order quantity</strong></th>
+                            </tr>
+                            <tr id="row-demand">
+                                <th scope="row" style="white-space: nowrap;"><strong>Demand quantity<br>(realized)</strong></th>
+                            </tr>
+                            <tr id="row-stock">
+                                <th scope="row" style="white-space: nowrap;"><strong>Salvaged inventory</strong></th>
+                            </tr>
+                            <tr id="row-profit">
+                                <th scope="row" style="white-space: nowrap;"><strong>Profit</strong></th>
+                            </tr>
+                            {# <tr id="row-cprofit">
+                                <th scope="row" style="white-space: nowrap;"><strong>Cumulative profit</strong></th>
+                            </tr> #}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+</div>
+
+
+<!-- situational-info-container-->
+<div class="row border mb-4" id="situational-info-container">
+    <h4 class="mt-2">Situational Information</h4>
+
+    <!-- unit-costs-table -->
+    <div class="col-6 my-2">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Game Parameters</h6>
+                <div class="table-responsive">
+                    <table id="unit-costs-table">
+                        <thead></thead>
+                        <tbody>
+                            <tr id="row-rcpu">
+                                <th scope="row"><strong>Retail</strong></th>
+                            </tr>
+                            <tr id="row-wcpu">
+                                <th scope="row"><strong>Wholesale</strong></th>
+                            </tr>
+                            <tr id="row-scpu">
+                                <th scope="row"><strong>Salvage</strong></th>
+                            </tr>
+                            <tr id="row-dist">
+                                <th scope="row"><strong>Demand Distribution</strong></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- distribution-curve -->
+    <div class="col-6 my-2">
+        <div class="card" id="distribution-card">
+            <div class="card-body">
+                <h6 class="card-title text-center">Market demand probability distribution</h6>
+                <p id="distribution-curve-loading-message" style="font-size:0.8rem;"><br>&nbsp;Loading Demand Distribution...&nbsp;</p>
+                <!-- Add a slider -->
+                <!-- <input type="range" name="mySlider" id=mySlider min="10" max="100" value="50"> -->
+                <div id="distribution-curve">
+                    <img src="{{ static distribution_png }}" width="100%" height="auto"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+</div>

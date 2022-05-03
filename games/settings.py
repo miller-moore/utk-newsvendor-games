@@ -62,6 +62,12 @@ SESSION_CONFIGS = [
         app_sequence=["disruption"],
     ),
     dict(
+        name="forecasting",
+        display_name="Forecasting Game",
+        num_demo_participants=1,
+        app_sequence=["forecasting"],
+    ),
+    dict(
         name="shorthorizon",
         display_name="Short Horizon Game",
         num_demo_participants=1,
