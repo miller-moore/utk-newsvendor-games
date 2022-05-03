@@ -3,9 +3,21 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/bootstrap-table@1.18.3/dist/bootstrap-table.min.js"></script>
 <script src="https://d3js.org/d3.v6.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.3/moment.min.js">
+    moment.locale(js_vars.language_code);
+</script>
 
 <script>
     var Colors = js_vars.colors;
+
+    function getMonthName(period_number) {
+        // moment.js months range between 0 to 11
+        return moment.utc().month(period_number - 1).format("MMMM")
+    }
+    function getMonthNameShort(period_number) {
+        // moment.js months range between 0 to 11
+        return moment.utc().month(period_number - 1).format("MMM")
+    }
 
     function getBaseURL() {
         var baseUrl = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/').slice(1, 3).join("/");
@@ -157,6 +169,7 @@
     hide($("#situational-info-container"));
     hide($("#game-history-container"));
     hide($("#decision-form-container"));
+    hide($("#results-container-short"));
     hide($("#results-container"));
     hide($("#final-results-container"));
 </script>
@@ -643,35 +656,34 @@
             // @notice: these conditionals allow each period column to be built in the table even if the game isn't done yet
             if (js_vars.page_name.startsWith('Results')) {
                 if (i + 1 > js_vars.period_number) {
-                    //su = i + 1 > js_vars.period_number + 1? '': formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0});
-                    su = '';
-                    ou = '';
+                    ou = !h.ou && h.ou != 0? '': ou;
                     du = '';
-                    profit = '';
+                    su = !h.su && h.su != 0? '': su;
+                    profit = !h.profit && h.profit != 0? '': profit;
                     cumulative_profit = '';
                 }
             } else if (js_vars.page_name.startsWith('Decide')) {
                 if (i + 1 >= js_vars.period_number) {
-                    //if (i > 0 && i + 1 === js_vars.period_number) {
-                    //    su = formatNumber(js_vars.history[i-1].su_after, {minimumFractionDigits: 0, maximumFractionDigits: 0})
-                    //} else if (i > 0) {
-                    //    su = ''
-                    //}
-                    su = '';
-                    ou = '';
+                    ou = !h.ou && h.ou != 0? '': ou;
                     du = '';
+                    su = '';
                     profit = '';
                     cumulative_profit = '';
                 }
             }
 
+            if(i < 3) {
+                ou = '-';
+                su = '-';
+                profit = '-';
+            }
 
-            metricsTheadTr.append(`<th class="period-label" scope="col" data-halign="center" data-align="center" >${period}</th>`);
+            metricsTheadTr.append(`<th class="period-label" scope="col" data-halign="center" data-align="center" >${getMonthNameShort(period)}</th>`);
             metricsTableStockRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${su}</td>`);
             metricsTableOrderRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${ou}</td>`);
             metricsTableDemandRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${du}</td>`);
             metricsTableProfitRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${profit}</td>`);
-            metricsTableCProfitRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${cumulative_profit}</td>`);
+            //metricsTableCProfitRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${cumulative_profit}</td>`);
         }
 
         try {
@@ -710,26 +722,29 @@
             // @notice: these conditionals allow each period column to be built in the table even if the game isn't done yet
             if (js_vars.page_name.startsWith('PracticeResults')) {
                 if (i + 1 > js_vars.period_number) {
-                    ou = '';
                     du = '';
-                    //su = i + 1 > js_vars.period_number + 1? '': formatNumber(js_vars.history[i-1].su, {minimumFractionDigits: 0, maximumFractionDigits: 0});
-                    su = '';
-                    profit = '';
+                    ou = !h.ou && h.ou != 0? '': ou;
+                    su = !h.su && h.su != 0? '': su;
+                    profit = !h.profit && h.profit != 0? '': profit;
                     cumulative_profit = '';
                 }
             } else if (js_vars.page_name.startsWith('PracticeDecide')) {
                 if (i + 1 >= js_vars.period_number) {
-                    ou = '';
+                    ou = !h.ou && h.ou != 0? '': ou;
                     du = '';
-                    //su = i < 1 || js_vars.history.length <= 1? su: formatNumber(js_vars.history[i-1].su, {minimumFractionDigits: 0, maximumFractionDigits: 0})
                     su = '';
                     profit = '';
                     cumulative_profit = '';
                 }
             }
 
+            if(i < 3) {
+                ou = '-';
+                su = '-';
+                profit = '-';
+            }
 
-            metricsTheadTr.append(`<th class="period-label" scope="col" data-halign="center" data-align="center" >${period}</th>`);
+            metricsTheadTr.append(`<th class="period-label" scope="col" data-halign="center" data-align="center" >${getMonthNameShort(period)}</th>`);
             metricsTableStockRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${su}</td>`);
             metricsTableOrderRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${ou}</td>`);
             metricsTableDemandRow.append(`<td style="min-width: 50px; white-space: nowrap; ">${du}</td>`);
@@ -811,12 +826,21 @@
 <!-- results-container -->
 <script>
     function renderResultsContainer() {
-        show($("#results-container"));
+        if (js_vars.period_number <= 3) {
+            show($("#results-container-short"));
+        } else {
+            show($("#results-container"));
+            var monthNamePrev3 = getMonthName(js_vars.period_number - 3);
+            $("[__data='month-name-prev-3']").html(monthNamePrev3);
+        }
 
-        $("#results-du").html(formatNumber(js_vars.du, { maximumFractionDigits: 0 }));
-        $("#results-ou").html(formatNumber(js_vars.ou, { maximumFractionDigits: 0 }));
-        $("#results-su").html(formatNumber(js_vars.su, { maximumFractionDigits: 0 }));
-        $("#results-profit").html(formatCurrency(js_vars.profit, { maximumFractionDigits: 0 }));
+        var monthName = getMonthName(js_vars.period_number);
+        $("[__data='month-name']").html(monthName);
+
+        $("[__data='results-du']").html(formatNumber(js_vars.du, { maximumFractionDigits: 0 }));
+        $("[__data='results-ou']").html(formatNumber(js_vars.history[js_vars.period_number-1].ou, { maximumFractionDigits: 0 }));
+        $("[__data='results-su']").html(formatNumber(js_vars.su, { maximumFractionDigits: 0 }));
+        $("[__data='results-profit']").html(formatCurrency(js_vars.profit, { maximumFractionDigits: 0 }));
     }
 </script>
 

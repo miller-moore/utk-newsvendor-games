@@ -59,7 +59,11 @@ class Player(BasePlayer):
     # demand units, stock units, & order units (see Decide.html)
     du = models.IntegerField(min=0)
     su = models.IntegerField(min=0, initial=0)
-    ou = models.IntegerField(min=0, max=1000, label="How many units will you order?")  # Decide.html
+    ou = models.IntegerField(
+        min=0,
+        max=1000,
+        # label="How many units will you order?"
+    )  # Decide.html
 
     # Optimal order quantity (see treatment.py)
     ooq = models.IntegerField(min=0)

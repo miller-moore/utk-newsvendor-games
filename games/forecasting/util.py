@@ -37,6 +37,13 @@ def initialize_game_history(is_practice: bool = False) -> List[Dict[str, Any]]:
     ]
 
 
+def is_profit_computable(round_number: int) -> bool:
+    if is_practice_round(round_number):
+        return round_number > 3
+    else:
+        return round_number > C.PRACTICE_ROUNDS + 3
+
+
 def as_static_path(path: Path):
     if str(C.STATIC_DIR) + "/" in str(path):
         return str(path).replace(str(C.STATIC_DIR) + "/", C.APP_NAME + "/")
@@ -44,12 +51,10 @@ def as_static_path(path: Path):
 
 
 def call_safe(func: Callable, *args, **kwargs) -> Union[Any, None]:
-    result = None
     try:
-        result = func(*args, **kwargs)
+        return func(*args, **kwargs)
     except:
-        pass
-    return result
+        return None
 
 
 def get_real_round_number(round_number: int) -> int:
@@ -61,6 +66,14 @@ def get_real_round_number(round_number: int) -> int:
 
 def get_game_number(real_round_number: int) -> int:
     return ((real_round_number - 1) - (real_round_number - 1) % C.ROUNDS_PER_GAME) // C.ROUNDS_PER_GAME + 1
+
+
+def get_month_name(real_round_number: int) -> str:
+    assert real_round_number in range(1, 13), (
+        f"invalid 'real round number': {real_round_number}; "
+        f"real round number should always be between 1 and 12 in the 'forecasting' game"
+    )
+    return datetime(1970, real_round_number, 1).strftime("%B")
 
 
 def get_game_rounds(real_round_number: int) -> List[int]:
@@ -133,11 +146,13 @@ def get_room_display_name(player: BasePlayer) -> str:
 
 def get_optimal_order_quantity(player: BasePlayer) -> int:
     from .models import Player
+    from .treatment import Treatment
 
     assert isinstance(player, Player), f"""this function is only valid for player type {Player!r}"""
     if player.participant.vars.get("treatment", None) is None:
         return 0
-    ooq = player.participant.treatment.get_optimal_order_quantity()
+    treatment: Treatment = player.participant.treatment
+    ooq = treatment.get_optimal_order_quantity(player)
     return max(0, round(ooq - player.participant.stock_units))
 
 

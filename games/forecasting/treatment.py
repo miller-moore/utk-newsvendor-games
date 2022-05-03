@@ -7,15 +7,13 @@ from enum import Enum, IntEnum
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
-                    Tuple, Union)
+from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import numpy as np
 import scipy.stats as stats
 from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
-from pydantic import (BaseModel, Field, StrBytes, confloat, conint, constr,
-                      root_validator, typing, validator)
+from pydantic import BaseModel, Field, StrBytes, confloat, conint, constr, root_validator, typing, validator
 from pydantic.main import Extra
 
 from .constants import C
@@ -36,7 +34,7 @@ class PracticeTreatmentId(IntEnum):
     TWO = 2  # high costs
 
 
-MEANS = [500.0, 597.0]
+MEANS = [500.0]
 SIGMAS = [50.0, 100.0]
 
 PRACTICE_MEAN = 100
@@ -147,7 +145,7 @@ TREATMENT_MAP: Dict[int, Tuple[Distribution, UnitCosts, Multiplier, Profitex]] =
 
 class Treatment(PydanticModel):
     id: conint(strict=True, ge=1, le=len(TREATMENT_MAP))
-    practice_treatment_id: PracticeTreatmentId
+    practice_treatment_id: conint(strict=True, ge=1, le=len(PracticeTreatmentId))
     _demand_rvs: List[float] = []
     _disrupted: bool = False
     _distribution: Distribution = None
@@ -174,13 +172,12 @@ class Treatment(PydanticModel):
     @classmethod
     def choose(cls) -> "Treatment":
         treatment_id = random.choice(list(TREATMENT_MAP))
-        treatment = TREATMENT_MAP[treatment_id]
-        unit_costs: UnitCosts = treatment[1]
+        unit_costs: UnitCosts = TREATMENT_MAP[treatment_id][1]
         if unit_costs.category == "high":
             practice_id = PracticeTreatmentId.TWO
         else:
             practice_id = PracticeTreatmentId.ONE
-        return Treatment(id=treatment_id, practice_treatment_id=practice_id)
+        return Treatment(id=treatment_id, practice_treatment_id=int(practice_id))
 
     def disrupt(self) -> None:
         # shorthorizon game has no disruptions
@@ -212,7 +209,8 @@ class Treatment(PydanticModel):
 
     def get_payoff_round(self):
         if self._payoff_round is None:
-            self._payoff_round = random.choice(range(C.PRACTICE_ROUNDS + 1, C.NUM_ROUNDS + 1))
+            # NOTE: +4 because profit is not computable until the 4th month (round) of the game
+            self._payoff_round = random.choice(range(C.PRACTICE_ROUNDS + 4, C.NUM_ROUNDS + 1))
 
         return self._payoff_round
 
@@ -269,13 +267,9 @@ class Treatment(PydanticModel):
             # random selection
             return round(random.choice(self._demand_rvs))
         elif is_practice_round(player.round_number):
-            # each practice round has a pre-defined # of demand units
-            if player.round_number == 1:
-                return 98
-            elif player.round_number == 2:
-                return 86
-            else:
-                return 112
+            # each practice round has pre-defined demand per round
+            practice_demand = {1: 96, 2: 109, 3: 99, 4: 110, 5: 98, 6: 86}
+            return practice_demand[player.round_number]
         else:
             from .models import Player
 
@@ -293,9 +287,13 @@ class Treatment(PydanticModel):
         self._demand_rvs = sample_normal_rvs(distribution.mu, distribution.sigma, size=size)
         return self._demand_rvs
 
-    def get_optimal_order_quantity(self) -> float:
-        unit_costs = self.get_unit_costs()
-        distribution = self.get_distribution()
+    def get_optimal_order_quantity(self, player: BasePlayer) -> float:
+        if is_practice_round(player.round_number):
+            unit_costs = self.get_practice_unit_costs()
+            distribution = self.get_practice_distribution()
+        else:
+            unit_costs = self.get_unit_costs()
+            distribution = self.get_distribution()
         overage_cost = unit_costs.wcpu - unit_costs.scpu
         underage_cost = unit_costs.rcpu - unit_costs.wcpu
         # critical fractile
@@ -306,8 +304,7 @@ class Treatment(PydanticModel):
 
     @staticmethod
     def check_png(png_file: Path) -> bool:
-        from datetime import datetime
-
+        # from datetime import datetime
         # file_mtime_within_24hours = datetime.now().timestamp() - png_file.stat().st_mtime < 86400
 
         return png_file.exists()  # and file_mtime_within_24hours
@@ -420,11 +417,9 @@ class Treatment(PydanticModel):
 
 TREATMENT_DEMAND_DATA_MAP: Dict[int, Tuple[List[float], ...]] = {
     # 1: low mean, low var, low CF
-    1: (
-        [538.7785, 581.5469, 528.2913, 485.1264, 441.1537, 486.3506, 440.1492, 502.098, 483.0678, 545.0162, 434.0178, 518.3234],
-    ),
+    1: ([486, 547, 542, 563, 520, 512, 453, 508, 407, 533, 415, 529],),
     # 2: low mean, high var, high CF
     2: (
-        [538.7785, 581.5469, 528.2913, 485.1264, 441.1537, 486.3506, 440.1492, 502.098, 483.0678, 545.0162, 434.0178, 518.3234],
+        [560.0063, 276.7217, 631.6545, 457.3216, 527.3007, 486.9424, 492.9885, 653.3298, 506.585, 523.7336, 386.587, 487.1515],
     ),
 }

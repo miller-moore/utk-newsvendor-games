@@ -21,21 +21,33 @@
     </div>
 </div>
 
-<!-- results-container -->
-<div class="row border mb-4" id="results-container">
+<!-- results-container-short -->
+<div class="row border mb-4" id="results-container-short">
     <h4 class="mt-2">Results:</h4>
-
         <div class="card border-0">
             <div class="card-body">
                 <ul>
-                    <li>Demand was <strong id="results-du"></strong> units.</li>
-                    <li>You ordered <strong id="results-ou"></strong> units.</li>
-                    <li>You salvaged <strong id="results-su"></strong> units.</li>
-                    <li>You earned <strong id="results-profit"></strong> in profit this round.</li>
+                    <li>Demand for <strong __data="month-name"></strong> was <strong __data="results-du"></strong> units.</li>
                 </ul>
             </div>
         </div>
+    <br>
+</div>
 
+<!-- results-container -->
+<div class="row border mb-4" id="results-container">
+    <h4 class="mt-2">Results:</h4>
+        <div class="card border-0">
+            <div class="card-body">
+                <ul>
+                    <li>You ordered <strong __data="results-ou"></strong> units for the month of <strong __data="month-name"></strong>.</li>
+                    <!-- li>In <strong __data="month-name-prev-3"></strong>, you ordered <strong __data="results-ou"></strong> units for the month of <strong __data="month-name"></strong>.</ !-->
+                    <li>Demand for <strong __data="month-name"></strong> was <strong __data="results-du"></strong> units.</li>
+                    <li>You salvaged <strong __data="results-su"></strong> units.</li>
+                    <li>Based on your order in <strong __data="month-name-prev-3"></strong>, you earned <strong __data="results-profit"></strong> in profit in <strong __data="month-name"></strong>.</li>
+                </ul>
+            </div>
+        </div>
     <br>
 </div>
 

@@ -6,7 +6,7 @@ from otree.constants import BaseConstantsMeta
 from common.utils import get_includable_template_path  # isort:skip
 
 NUM_GAMES = 1
-PRACTICE_ROUNDS = 5
+PRACTICE_ROUNDS = 6
 ROUNDS_PER_GAME = 12
 RVS_SIZE = int(1e4)
 

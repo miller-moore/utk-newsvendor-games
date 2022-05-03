@@ -21,6 +21,7 @@ from .util import (
     get_app_name,
     get_game_number,
     get_game_rounds,
+    get_month_name,
     get_optimal_order_quantity,
     get_page_name,
     get_real_round_number,
@@ -33,6 +34,7 @@ from .util import (
     is_game_over_round,
     is_practice_over_round,
     is_practice_round,
+    is_profit_computable,
 )
 
 from common.colors import COLORS  # isort:skip
@@ -95,6 +97,10 @@ class ForecastingPage(Page):
 
         payoff_round = player.participant.vars.get("payoff_round", None)
 
+        real_round_number = get_real_round_number(player.round_number)
+        month_name = get_month_name(real_round_number)
+        month_name_plus_3 = get_month_name(real_round_number + 3) if 1 <= real_round_number <= 9 else None
+
         _vars = dict(
             language_code=LANGUAGE_CODE,
             real_world_currency_code=REAL_WORLD_CURRENCY_CODE,
@@ -110,7 +116,9 @@ class ForecastingPage(Page):
             page_name=get_page_name(player),
             app_name=get_app_name(player),
             round_number=player.round_number,
-            real_round_number=get_real_round_number(player.round_number),
+            real_round_number=real_round_number,
+            month_name=month_name,
+            month_name_plus_3=month_name_plus_3,
             game_number=player.game_number,  # game_number,
             game_rounds=get_game_rounds(get_real_round_number(player.round_number)),
             period_number=player.period_number,  # starts at 1 and updated via get_round_in_game in page HydratePlayer (below)
@@ -141,7 +149,9 @@ class ForecastingPage(Page):
             does_consent=player.field_maybe_none("does_consent"),  # NOTE: demographic feature
             su=player.field_maybe_none("su"),
             ou=player.field_maybe_none("ou"),
-            du=player.field_maybe_none("du"),
+            du=player.field_maybe_none("du") or player.in_round(player.round_number - 1).du
+            if player.round_number > 1
+            else None,
             ooq=player.field_maybe_none("ooq"),
             rcpu=player.field_maybe_none("rcpu"),
             wcpu=player.field_maybe_none("wcpu"),
@@ -252,45 +262,41 @@ class Instructions3(ForecastingPage):
         return player.round_number == 1
 
 
-class PracticeDecide(ForecastingPage):
+class PracticeCompute(ForecastingPage):
 
-    form_model = "player"
-    form_fields = ["ou"]
+    timeout_seconds = 0
 
     @staticmethod
     def is_displayed(player: Player):
         return is_practice_round(player.round_number)
 
     @staticmethod
-    def before_next_page(player: Player, **kwargs) -> None:
-
+    def before_next_page(player: Player, timeout_happened):
+        # Get demand units. NOTE: randomly=False means from pre-determined data
         treatment: Treatment = player.participant.treatment
+        player.du = treatment.get_demand(randomly=False, player=player)
 
-        # unit costs
-        # unit_costs = player.participant.unit_costs
         unit_costs = treatment.get_practice_unit_costs()
         rcpu = float(unit_costs.rcpu)
         wcpu = float(unit_costs.wcpu)
         scpu = float(unit_costs.scpu)
 
-        # Get demand units!
-        # NOTE: not randomly means from pre-determined data
-        du = treatment.get_demand(randomly=False, player=player)
-        # order units
-        ou = player.ou
-        # stock units
-        su = max(0, ou - du)
+        if is_profit_computable(player.round_number):
+            player_prev3 = player.in_round(player.round_number - 3)
+            ou = player_prev3.ou
+            su = max(0, ou - player.du)
 
-        # revenue = rcpu * min(du, ou) + scpu * su
-        # cost = wcpu * ou
-        # profit = revenue - cost
-        revenue = rcpu * min(du, ou) + scpu * su
-        cost = wcpu * ou
-        profit = revenue - cost
+            # revenue = rcpu * min(player.du, ou) + scpu * su
+            # cost = wcpu * ou
+            # profit = revenue - cost
+            revenue = rcpu * min(player.du, ou) + scpu * su
+            cost = wcpu * ou
+            profit = revenue - cost
+        else:
+            ou = su = revenue = cost = profit = 0
 
         # update player su, du, revenue, cost, profit, & payoff
         player.su = su
-        player.du = du
         player.revenue = Currency(revenue)
         player.cost = Currency(cost)
         player.profit = Currency(profit)
@@ -301,8 +307,8 @@ class PracticeDecide(ForecastingPage):
         hist = player.participant.history[idx]
 
         hist.update(
-            ou=ou,
-            du=du,
+            # ou=player.ou,
+            # du=player.du,
             su=su,
             ooq=player.ooq,
             revenue=float(revenue),
@@ -313,19 +319,54 @@ class PracticeDecide(ForecastingPage):
         player.participant.history[idx] = hist
 
 
-class PracticeResults(ForecastingPage):
+class PracticeDecide(ForecastingPage):
+
+    form_model = "player"
+    form_fields = ["ou"]
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_practice_round(player.round_number) and player.round_number <= C.PRACTICE_ROUNDS - 3
+
+    @staticmethod
+    def before_next_page(player: Player, **kwargs) -> None:
+
+        # update order units in participant history
+        idx = player.round_number - 1
+        if idx + 3 < len(player.participant.history):
+            player.participant.history[idx + 3].update(ou=player.ou)
+
+
+class PracticeStoreDemand(ForecastingPage):
+
+    timeout_seconds = 0
+
     @staticmethod
     def is_displayed(player: Player):
         return is_practice_round(player.round_number)
 
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
+
+        # update demand units & order units in participant history
+        idx = player.round_number - 1
+        player.participant.history[idx].update(du=player.du)
+
+
+class PracticeResults(ForecastingPage):
+    @staticmethod
+    def is_displayed(player: Player):
+        return is_practice_round(player.round_number) and is_profit_computable(player.round_number)
+
+    @staticmethod
+    def before_next_page(player: Player, **kwargs) -> None:
         player.endtime = get_time()
+
         if is_practice_over_round(player.round_number):
             # store game history & flush game state
             # player.participant.game_results.append(player.participant.history)
             player.participant.practice_results.append(player.participant.history)
-            player.participant.history = initialize_game_history()
+            player.participant.history = initialize_game_history(is_practice=False)
 
 
 class PracticeResultsFinal(ForecastingPage):
@@ -334,39 +375,42 @@ class PracticeResultsFinal(ForecastingPage):
         return is_practice_over_round(player.round_number)
 
 
-class Decide(ForecastingPage):
+class Compute(ForecastingPage):
 
-    form_model = "player"
-    form_fields = ["ou"]
+    timeout_seconds = 0
 
     @staticmethod
     def is_displayed(player: Player):
-        return player.round_number > C.PRACTICE_ROUNDS
+        return not is_practice_round(player.round_number)
 
     @staticmethod
-    def before_next_page(player: Player, **kwargs) -> None:
+    def before_next_page(player: Player, timeout_happened):
+        # Get demand units. NOTE: randomly=False means from pre-determined data
+        treatment: Treatment = player.participant.treatment
+        player.du = treatment.get_demand(randomly=False, player=player)
 
-        # unit costs
         # unit_costs = player.participant.unit_costs
-        unit_costs = player.participant.treatment.get_unit_costs()
+        unit_costs = treatment.get_unit_costs()
         rcpu = float(unit_costs.rcpu)
         wcpu = float(unit_costs.wcpu)
         scpu = float(unit_costs.scpu)
 
-        # Get demand units!
-        # NOTE: not randomly means from pre-determined data
+        # Get demand units! NOTE: not randomly means from pre-determined data
         du = player.participant.treatment.get_demand(randomly=False, player=player)
-        # order units
-        ou = player.ou
-        # stock units
-        su = max(0, ou - du)
 
-        # revenue = rcpu * min(du, ou)
-        # cost = wcpu * ou + scpu * su
-        # profit = revenue - cost
-        revenue = rcpu * min(du, ou)
-        cost = wcpu * ou + scpu * su
-        profit = revenue - cost
+        if is_profit_computable(player.round_number):
+            player_prev3 = player.in_round(player.round_number - 3)
+            ou = player_prev3.ou
+            su = max(0, ou - du)
+
+            # revenue = rcpu * min(du, ou) + scpu * su
+            # cost = wcpu * ou
+            # profit = revenue - cost
+            revenue = rcpu * min(du, ou) + scpu * su
+            cost = wcpu * ou
+            profit = revenue - cost
+        else:
+            ou = su = revenue = cost = profit = 0
 
         # update player su, du, revenue, cost, profit, & payoff
         player.su = su
@@ -374,7 +418,7 @@ class Decide(ForecastingPage):
         player.revenue = Currency(revenue)
         player.cost = Currency(cost)
         player.profit = Currency(profit)
-        player.payoff = player.participant.treatment.get_payoff(player)
+        player.payoff = treatment.get_payoff(player)
 
         # update participant's history store corresponding to the current round in the current game
         real_round_number = get_real_round_number(player.round_number)
@@ -382,8 +426,8 @@ class Decide(ForecastingPage):
         hist = player.participant.history[idx]
         round_range = get_game_rounds(real_round_number)[0], player.round_number
         hist.update(
-            ou=ou,
-            du=du,
+            # ou=ou,
+            # du=du,
             su=su,
             ooq=player.ooq,
             revenue=float(revenue),
@@ -394,30 +438,66 @@ class Decide(ForecastingPage):
         player.participant.history[idx] = hist
 
 
+class Decide(ForecastingPage):
+
+    form_model = "player"
+    form_fields = ["ou"]
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return not is_practice_round(player.round_number) and player.round_number <= C.NUM_ROUNDS - 3
+
+    @staticmethod
+    def before_next_page(player: Player, **kwargs) -> None:
+
+        # update order quantity in participant's history
+        real_round_number = get_real_round_number(player.round_number)
+        idx = get_round_in_game(real_round_number) - 1
+        if idx + 3 < len(player.participant.history):
+            player.participant.history[idx + 3].update(ou=player.ou)
+
+
+class StoreDemand(ForecastingPage):
+
+    timeout_seconds = 0
+
+    @staticmethod
+    def is_displayed(player: Player):
+        return not is_practice_over_round(player.round_number)
+
+    @staticmethod
+    def before_next_page(player: Player, **kwargs) -> None:
+
+        # update demand units & order units in participant history
+        real_round_number = get_real_round_number(player.round_number)
+        idx = get_round_in_game(real_round_number) - 1
+        player.participant.history[idx].update(du=player.du)
+
+
 class Results(ForecastingPage):
     @staticmethod
     def is_displayed(player: Player):
-        return player.round_number > C.PRACTICE_ROUNDS
+        return not is_practice_round(player.round_number)
 
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:
         player.endtime = get_time()
-        if player.round_number > C.PRACTICE_ROUNDS and is_game_over_round(player.round_number):
+        if not is_practice_over_round(player.round_number) and is_game_over_round(player.round_number):
             # store game history & flush game state
             player.participant.game_results.append(player.participant.history)
-            player.participant.history = initialize_game_history()
+            player.participant.history = initialize_game_history(is_practice=False)
 
 
 class ResultsFinal(ForecastingPage):
     @staticmethod
     def is_displayed(player: Player):
-        return player.round_number > C.PRACTICE_ROUNDS and is_game_over_round(player.round_number)
+        return not is_practice_round(player.round_number) and is_game_over_round(player.round_number)
 
 
 class Payoff(ForecastingPage):
     @staticmethod
     def is_displayed(player: Player):
-        return player.round_number > C.PRACTICE_ROUNDS and is_absolute_final_round(player.round_number)
+        return not is_practice_round(player.round_number) and is_absolute_final_round(player.round_number)
 
 
 # main sequence of pages for this otree app
@@ -428,10 +508,16 @@ page_sequence = [
     Instructions1,
     Instructions2,
     Instructions3,
+    # Practice
+    PracticeCompute,
     PracticeDecide,
+    PracticeStoreDemand,
     PracticeResults,
     PracticeResultsFinal,
+    # Game(s)
+    Compute,
     Decide,
+    StoreDemand,
     Results,
     ResultsFinal,
     Payoff,

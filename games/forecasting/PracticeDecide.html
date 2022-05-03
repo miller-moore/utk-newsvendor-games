@@ -1,6 +1,6 @@
 {{ block title }}
     Practice<br><br>
-    Order Quantity: Round {{ round_number }}/{{ C.PRACTICE_ROUNDS }}
+    Order Decision: Round {{ round_number }}/{{ C.PRACTICE_ROUNDS }}
 {{ endblock }}
 
 {{ block content }}
@@ -13,7 +13,7 @@
         <div class="card border">
             <div class="card-body">
                 <h5 class="card-title">Decision</h5>
-                {{ formfield 'ou' }}
+                {{ formfield 'ou' label="Is it currently the month of <span __data='month-name'></span>. How many units will you order for the month of <span __data='month-name-plus-3'></span>?" }}
             </div>
         </div>
         <br>
@@ -25,12 +25,13 @@
 
     <script>
         // Decide page, only render the pdf-instructions-container
+        $("[__data='month-name']").html(js_vars.month_name);
+        $("[__data='month-name-plus-3']").html(js_vars.month_name_plus_3);
         renderPdfInstructionsContainer();
 
         allowClickNextOnEnterIfOrderUnitsInput();
 
-        // renderGameHistoryContainer();
-        renderPracticeHistoryContainer();
+        renderPracticeHistoryContainer(); // practice
 
         renderDecisionFormContainer();
         renderSituationalInfoContainer();
