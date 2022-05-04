@@ -85,6 +85,10 @@ SESSION_CONFIGS = [
 # Rooms
 ROOMS = [
     dict(
+        name="advcomps",
+        display_name="Advanced Composites Planner Session",
+    ),
+    dict(
         name="radiosystems",
         display_name="Radio Systems Planner Session",
     ),
