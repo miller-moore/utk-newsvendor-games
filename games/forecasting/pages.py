@@ -12,30 +12,17 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
 from .constants import PRACTICE_ROUNDS, C
-from .formvalidation import default_error_message, register_form_field_validator
+from .formvalidation import (default_error_message,
+                             register_form_field_validator)
 from .models import Player
 from .treatment import Distribution, Treatment
-from .util import (
-    as_static_path,
-    call_safe,
-    get_app_name,
-    get_game_number,
-    get_game_rounds,
-    get_month_name,
-    get_optimal_order_quantity,
-    get_page_name,
-    get_real_round_number,
-    get_room_display_name,
-    get_room_name,
-    get_round_in_game,
-    get_time,
-    initialize_game_history,
-    is_absolute_final_round,
-    is_game_over_round,
-    is_practice_over_round,
-    is_practice_round,
-    is_profit_computable,
-)
+from .util import (as_static_path, call_safe, get_app_name, get_game_number,
+                   get_game_rounds, get_month_name, get_optimal_order_quantity,
+                   get_page_name, get_real_round_number, get_room_display_name,
+                   get_room_name, get_round_in_game, get_time,
+                   initialize_game_history, is_absolute_final_round,
+                   is_game_over_round, is_practice_over_round,
+                   is_practice_round, is_profit_computable)
 
 from common.colors import COLORS  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
@@ -80,12 +67,9 @@ class ForecastingPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (
-            LANGUAGE_CODE,
-            LANGUAGE_CODE_ISO,
-            REAL_WORLD_CURRENCY_CODE,
-            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
-        )
+        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
+                                    REAL_WORLD_CURRENCY_CODE,
+                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
 
         treatment: Treatment = player.participant.treatment
         is_practice = is_practice_round(player.round_number)
@@ -120,7 +104,7 @@ class ForecastingPage(Page):
             month_name=month_name,
             month_name_plus_3=month_name_plus_3,
             game_number=player.game_number,  # game_number,
-            game_rounds=get_game_rounds(get_real_round_number(player.round_number)),
+            game_rounds=get_game_rounds(real_round_number),
             period_number=player.period_number,  # starts at 1 and updated via get_round_in_game in page HydratePlayer (below)
             session_code=player.session.code,
             participant_code=player.participant.code,
@@ -164,6 +148,7 @@ class ForecastingPage(Page):
             practice_results=player.participant.vars.get("practice_results", None),
             payoff_divisor=treatment.get_divisor(),
             payoff_round=payoff_round,
+            # payoff_round=get_real_round_number(payoff_round),
             payoff_round_profit=player.in_round(payoff_round).profit if payoff_round else Currency(0.0),
             payoff=player.participant.vars.get("payoff", None),
             treatment_id=treatment.id,
@@ -191,12 +176,12 @@ class ForecastingPage(Page):
 
 
 class HydratePlayer(ForecastingPage):
+    """Hydrates player from participant. The participant is hydrated in `creating_subsession` (in models.py)."""
 
     timeout_seconds = 0
 
     @staticmethod
     def before_next_page(player: Player, **kwargs):
-        """Hydrates player from participant. The participant is hydrated in `creating_subsession` (in models.py)."""
         print(f"Round {player.round_number}: {get_page_name(player)} Page")
 
         player.uuid = player.participant.uuid
@@ -353,10 +338,11 @@ class PracticeStoreDemand(ForecastingPage):
         player.participant.history[idx].update(du=player.du)
 
 
+# TODO
 class PracticeResults(ForecastingPage):
     @staticmethod
     def is_displayed(player: Player):
-        return is_practice_round(player.round_number) and is_profit_computable(player.round_number)
+        return is_practice_round(player.round_number)  # and is_profit_computable(player.round_number)
 
     @staticmethod
     def before_next_page(player: Player, **kwargs) -> None:

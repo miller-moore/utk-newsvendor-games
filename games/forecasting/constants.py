@@ -7,7 +7,7 @@ from common.utils import get_includable_template_path  # isort:skip
 
 NUM_GAMES = 1
 PRACTICE_ROUNDS = 6
-ROUNDS_PER_GAME = 12
+ROUNDS_PER_GAME = 15
 RVS_SIZE = int(1e4)
 
 APP_DIR = Path(__file__).resolve().parent

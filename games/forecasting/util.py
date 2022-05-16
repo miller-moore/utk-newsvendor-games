@@ -69,11 +69,12 @@ def get_game_number(real_round_number: int) -> int:
 
 
 def get_month_name(real_round_number: int) -> str:
-    assert real_round_number in range(1, 13), (
+    assert real_round_number in range(1, C.ROUNDS_PER_GAME + 1), (
         f"invalid 'real round number': {real_round_number}; "
-        f"real round number should always be between 1 and 12 in the 'forecasting' game"
+        f"real round number should always be between 1 and {C.ROUNDS_PER_GAME} in the forecasting game"
     )
-    return datetime(1970, real_round_number, 1).strftime("%B")
+    month = (real_round_number - 1) % 12 + 1
+    return datetime(1970, month, 1).strftime("%B")
 
 
 def get_game_rounds(real_round_number: int) -> List[int]:

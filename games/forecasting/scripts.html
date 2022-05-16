@@ -11,11 +11,11 @@
     var Colors = js_vars.colors;
 
     function getMonthName(period_number) {
-        // moment.js months range between 0 to 11
+        // moment.js months are indexed from 0
         return moment.utc().month(period_number - 1).format("MMMM")
     }
     function getMonthNameShort(period_number) {
-        // moment.js months range between 0 to 11
+        // moment.js months are indexed from 0
         return moment.utc().month(period_number - 1).format("MMM")
     }
 
@@ -837,7 +837,8 @@
         var monthName = getMonthName(js_vars.period_number);
         $("[__data='month-name']").html(monthName);
 
-        $("[__data='results-du']").html(formatNumber(js_vars.du, { maximumFractionDigits: 0 }));
+        //$("[__data='results-du']").html(formatNumber(js_vars.du, { maximumFractionDigits: 0 }));
+        $("[__data='results-du']").html(formatNumber(js_vars.history[js_vars.period_number-1].du, { maximumFractionDigits: 0 }));
         $("[__data='results-ou']").html(formatNumber(js_vars.history[js_vars.period_number-1].ou, { maximumFractionDigits: 0 }));
         $("[__data='results-su']").html(formatNumber(js_vars.su, { maximumFractionDigits: 0 }));
         $("[__data='results-profit']").html(formatCurrency(js_vars.profit, { maximumFractionDigits: 0 }));

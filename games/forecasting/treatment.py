@@ -7,13 +7,15 @@ from enum import Enum, IntEnum
 from functools import lru_cache
 from itertools import product
 from pathlib import Path
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import (AbstractSet, Any, Callable, Dict, List, Mapping, Optional,
+                    Tuple, Union)
 
 import numpy as np
 import scipy.stats as stats
 from otree.api import BasePlayer, Currency
 from otree.currency import _CurrencyEncoder
-from pydantic import BaseModel, Field, StrBytes, confloat, conint, constr, root_validator, typing, validator
+from pydantic import (BaseModel, Field, StrBytes, confloat, conint, constr,
+                      root_validator, typing, validator)
 from pydantic.main import Extra
 
 from .constants import C
@@ -417,9 +419,10 @@ class Treatment(PydanticModel):
 
 TREATMENT_DEMAND_DATA_MAP: Dict[int, Tuple[List[float], ...]] = {
     # 1: low mean, low var, low CF
-    1: ([486, 547, 542, 563, 520, 512, 453, 508, 407, 533, 415, 529],),
+    1: ([559, 515, 490, 540, 544, 423, 512, 396, 446, 526, 513, 535, 568, 470, 460],),
     # 2: low mean, high var, high CF
     2: (
-        [560.0063, 276.7217, 631.6545, 457.3216, 527.3007, 486.9424, 492.9885, 653.3298, 506.585, 523.7336, 386.587, 487.1515],
+        [522, 615, 344, 656, 427, 673, 436, 608, 409, 516, 559, 466, 523, 320, 525],
     ),
 }
+
