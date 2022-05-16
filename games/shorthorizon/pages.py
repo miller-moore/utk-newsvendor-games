@@ -98,6 +98,7 @@ class ShortHorizonPage(Page):
             distribution = treatment.get_distribution()
 
         payoff_round = player.participant.vars.get("payoff_round", None)
+        real_round_number = get_real_round_number(player.round_number)
 
         _vars = dict(
             language_code=LANGUAGE_CODE,
@@ -114,9 +115,9 @@ class ShortHorizonPage(Page):
             page_name=get_page_name(player),
             app_name=get_app_name(player),
             round_number=player.round_number,
-            real_round_number=get_real_round_number(player.round_number),
+            real_round_number=real_round_number,
             game_number=player.game_number,  # game_number,
-            game_rounds=get_game_rounds(get_real_round_number(player.round_number)),
+            game_rounds=get_game_rounds(real_round_number),
             period_number=player.period_number,  # starts at 1 and updated via get_round_in_game in page HydratePlayer (below)
             session_code=player.session.code,
             participant_code=player.participant.code,
@@ -157,7 +158,8 @@ class ShortHorizonPage(Page):
             game_results=player.participant.vars.get("game_results", None),
             practice_results=player.participant.vars.get("practice_results", None),
             payoff_divisor=treatment.get_divisor(),
-            payoff_round=payoff_round,
+            # payoff_round=payoff_round,
+            payoff_round=get_real_round_number(payoff_round) if payoff_round else None,
             payoff_round_profit=player.in_round(payoff_round).profit if payoff_round else Currency(0.0),
             payoff=player.participant.vars.get("payoff", None),
             treatment_id=treatment.id,
