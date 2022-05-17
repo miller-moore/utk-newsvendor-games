@@ -17,15 +17,25 @@
         order quantity.
     </p>
     <p>
-        You are making your decision under uncertainty. This means at the time of the order decision
-        you do not know the exact demand of the period. However, you do know the probability
-        distribution of the demand. The demand for your product will be shown by a distribution curve,
+        You are making your decision under uncertainty, 3 months in advance of actual realized demand.
+        This means at the time of the order decision you do not know the exact demand of the period. However, you do
+        know the probability distribution of the demand of the period you are ordering for, which is 3 months out.
+        The demand for your product will be shown by a distribution curve,
         shown on the decision-making page. Demand is independent between rounds.
     </p>
     <p>
+        The game will start in January, where the demand for January will be displayed. Because you
+        did not order this product, profit from this round will not be shown. You will decide how much
+        product you want to order for April (3 months out). The same will happen in February, where
+        February demand will be shown, and you will then order for May. This continues until April,
+        where demand for April will be shown, your profit from the order you made in January will be
+        calculated, and then you will order product for July. This will continue through December, where
+        you will make your last ordering decision, to be realized in March of the following year.
+   </p>
+   <p>
         You have no starting inventory in your warehouse at the beginning of the game. You will order
-        which then get delivered before demand is realized. Any leftover inventory after demand is
-        realized will be charged a salvage value per unit left over.
+        units three months in advance, which then get delivered before demand is realized.
+        Any leftover inventory after demand is realized will earn a salvage value per unit left over.
     </p>
     <p>
         {# &nbsp;&nbsp;&nbsp;&nbsp; #}
@@ -34,7 +44,7 @@
         <ul>
             <code>
                 <li>
-                    Available inventory: 90 units
+                    Purchased inventory: 90 units
                 </li>
                 <li>
                     Demand: 80 units
