@@ -206,7 +206,7 @@ class Treatment(PydanticModel):
         # TODO: restore after pilot test is complete
         # treatment_id = random.choice(list(TREATMENT_MAP))
         probs = [0.17, 0.42, 0.07, 0.09, 0.25, 0]
-        treatment_id = random.choices(list(TREATMENT_MAP), probs)
+        treatment_id = random.choices(list(TREATMENT_MAP), probs)[0]
         treatment = TREATMENT_MAP[treatment_id]
         unit_costs: UnitCosts = treatment[1]
         if unit_costs.category == "high":
