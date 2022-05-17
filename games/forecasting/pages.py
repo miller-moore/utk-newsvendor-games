@@ -12,17 +12,30 @@ from otree.lookup import PageLookup, _get_session_lookups
 from otree.models import Participant
 
 from .constants import PRACTICE_ROUNDS, C
-from .formvalidation import (default_error_message,
-                             register_form_field_validator)
+from .formvalidation import default_error_message, register_form_field_validator
 from .models import Player
 from .treatment import Distribution, Treatment
-from .util import (as_static_path, call_safe, get_app_name, get_game_number,
-                   get_game_rounds, get_month_name, get_optimal_order_quantity,
-                   get_page_name, get_real_round_number, get_room_display_name,
-                   get_room_name, get_round_in_game, get_time,
-                   initialize_game_history, is_absolute_final_round,
-                   is_game_over_round, is_practice_over_round,
-                   is_practice_round, is_profit_computable)
+from .util import (
+    as_static_path,
+    call_safe,
+    get_app_name,
+    get_game_number,
+    get_game_rounds,
+    get_month_name,
+    get_optimal_order_quantity,
+    get_page_name,
+    get_real_round_number,
+    get_room_display_name,
+    get_room_name,
+    get_round_in_game,
+    get_time,
+    initialize_game_history,
+    is_absolute_final_round,
+    is_game_over_round,
+    is_practice_over_round,
+    is_practice_round,
+    is_profit_computable,
+)
 
 from common.colors import COLORS  # isort:skip
 from common.google_image_downloader import GoogleImageDownloader  # isort:skip
@@ -67,9 +80,12 @@ class ForecastingPage(Page):
     @staticmethod
     def vars_for_template(player: Player) -> dict:
 
-        from otree.settings import (LANGUAGE_CODE, LANGUAGE_CODE_ISO,
-                                    REAL_WORLD_CURRENCY_CODE,
-                                    REAL_WORLD_CURRENCY_DECIMAL_PLACES)
+        from otree.settings import (
+            LANGUAGE_CODE,
+            LANGUAGE_CODE_ISO,
+            REAL_WORLD_CURRENCY_CODE,
+            REAL_WORLD_CURRENCY_DECIMAL_PLACES,
+        )
 
         treatment: Treatment = player.participant.treatment
         is_practice = is_practice_round(player.round_number)
@@ -83,7 +99,7 @@ class ForecastingPage(Page):
 
         real_round_number = get_real_round_number(player.round_number)
         month_name = get_month_name(real_round_number)
-        month_name_plus_3 = get_month_name(real_round_number + 3) if 1 <= real_round_number <= 9 else None
+        month_name_plus_3 = get_month_name(real_round_number + 3)
 
         _vars = dict(
             language_code=LANGUAGE_CODE,

@@ -877,9 +877,9 @@
             var total_demanded = 0;
             var total_salvaged = 0;
             for (var j=0; j < results[i].length; j++) {
-                total_ordered += results[i][j].ou? results[i][j].ou: 0;
-                total_demanded += results[i][j].du? results[i][j].du: 0;
-                total_salvaged += results[i][j].su? results[i][j].su: 0;
+                total_ordered += results[i][j].ou && j >= 3? results[i][j].ou: 0;
+                total_demanded += results[i][j].du && j >= 3? results[i][j].du: 0;
+                total_salvaged += results[i][j].su && j >= 3? results[i][j].su: 0;
             }
 
             overallResults.cumulative_profit += cumulative_profit;
