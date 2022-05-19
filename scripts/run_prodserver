@@ -1,12 +1,22 @@
 #!/usr/bin/env bash
 
+PROJECT_ROOT="$( cd "$(dirname "${0}")/.." >/dev/null 2>&1 ; pwd -P )"
+cd "${PROJECT_ROOT}"
+
 if [ ! "$(hostname)" = "scmotree" ]; then
   echo Host is not scmotree. Exiting.
   exit 1
 fi
 
-PROJECT_ROOT="$( cd "$(dirname "${0}")/.." >/dev/null 2>&1 ; pwd -P )"
-cd "${PROJECT_ROOT}"
+if [ ! -d ${PROJECT_ROOT}/games ]; then
+  echo "Directory '${PROJECT_ROOT}/games' appears missing. Please check the otree project directory structure."
+  exit 2
+fi
+
+if [ ! -f ~/.pgpass ]; then
+  echo "File system is missing ~/.pgpass (PGPASSFILE). See https://www.postgresql.org/docs/12/libpq-pgpass.html for details."
+  exit 3
+fi
 
 # Ensure environment is setup, virtual env is created, deps installed, etc
 ${PROJECT_ROOT}/scripts/setup
@@ -17,19 +27,21 @@ ${PROJECT_ROOT}/scripts/setup
 [ -f "requirements-prod.txt" ] && pip install -r "requirements-prod.txt"
 
 
-cd games
+mkdir -p "games/logs"
 
-mkdir -p "${PWD}/logs"
+BROADCAST_IP=$(ifconfig | grep broadcast | grep -Po 'inet \K[\d.]+')
 
 # Well, we should kill any prodserver jobs that currently exist... there can only be one prodserver (unless we're in the cloud & have distributed databases with all the fancy bells & whistles)
 [ -x ${PROJECT_ROOT}/scripts/kill_prodserver ] && ${PROJECT_ROOT}/scripts/kill_prodserver
 
-BROADCAST_IP=$(ifconfig | grep broadcast | grep -Po 'inet \K[\d.]+')
+cd games
 
 OTREE_PRODUCTION=1 \
   OTREE_AUTH_LEVEL=${OTREE_AUTH_LEVEL} \
   OTREE_ADMIN_USERNAME=${OTREE_ADMIN_USERNAME} \
   OTREE_ADMIN_PASSWORD=${OTREE_ADMIN_PASSWORD} \
   SERPAPI_KEY=${SERPAPI_KEY} \
-  otree prodserver "$BROADCAST_IP:8000" > "${PWD}/logs/prodserver.log" 2>&1 & disown
+  PGPASSFILE=~/.pgpass \
+  DATABASE_URL=postgres://otreeadmin@localhost/otree_production \
+  otree prodserver "$BROADCAST_IP:8000" > "logs/prodserver.log" 2>&1 & disown
 
