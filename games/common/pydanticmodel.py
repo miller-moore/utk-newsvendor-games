@@ -1,5 +1,9 @@
+from enum import Enum
+from typing import (AbstractSet, Any, Callable, Dict, Iterable, List, Mapping,
+                    Optional, Set, Tuple, Union)
+
+import pandas as pd
 from pydantic import BaseModel, Extra
-from typing import AbstractSet, Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 IntStr = Union[int, str]
 AbstractSetIntStr = AbstractSet[IntStr]
@@ -9,6 +13,11 @@ MappingIntStrAny = Mapping[IntStr, Any]
 
 
 class PydanticModel(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
+        extra = Extra.allow
+        json_encoders = {Enum: lambda v: v.value, pd.DataFrame: lambda df: df.to_dict("records")}
+
     def tuple(self: BaseModel) -> Tuple[Any]:
         """Return a tuple of the pydantic model's attribute values."""
         return tuple(self.dict().values())
@@ -22,6 +31,16 @@ class PydanticModel(BaseModel):
     def __repr_args__(self) -> Any:
         return self.dict().items()
 
+    def _format_include_or_exclude(self, arg: Any) -> Set:
+        if arg is None:
+            return arg
+        elif isinstance(arg, Mapping):
+            return arg
+        elif isinstance(arg, Iterable):
+            return set(arg)
+        else:
+            return {arg}
+
     def dict(
         self,
         *,
@@ -33,9 +52,10 @@ class PydanticModel(BaseModel):
         exclude_defaults: bool = False,
         exclude_none: bool = False,
     ) -> "DictStrAny":
+
         return super().dict(
-            include=include or set([c for c in self.__fields__]),
-            exclude=exclude,
+            include=self._format_include_or_exclude(include) or set([c for c in self.__fields__]),
+            exclude=self._format_include_or_exclude(exclude),
             by_alias=by_alias,
             skip_defaults=skip_defaults,
             exclude_unset=exclude_unset,
@@ -53,12 +73,12 @@ class PydanticModel(BaseModel):
         exclude_unset: bool = False,
         exclude_defaults: bool = False,
         exclude_none: bool = False,
-        encoder: Optional[Callable[[Any], Any]] = None,
+        encoder: Callable[[Any], Any] = None,
         **dumps_kwargs: Any,
     ) -> str:
         return super().json(
-            include=include or set([c for c in self.__fields__]),  # self.__fields__ does not include "extra" fields
-            exclude=exclude,
+            include=self._format_include_or_exclude(include) or set([c for c in self.__fields__]),
+            exclude=self._format_include_or_exclude(exclude),
             by_alias=by_alias,
             skip_defaults=skip_defaults,
             exclude_unset=exclude_unset,
