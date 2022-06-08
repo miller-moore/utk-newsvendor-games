@@ -23,8 +23,8 @@
                 <br>
                 <code>Profit = {{ 20 | cu }} * 20 units [units sold = Minimum of demand and order quantity]</code>
                 <br><code class="ml-5">&nbsp;&nbsp;- {{ 7.5 | cu }} * 50 units [order quantity]</code>
-                <br><code class="ml-5">&nbsp;&nbsp;- {{ 5 | cu }} * 30 units [salvage inventory= order quantity - units sold]</code>
-                <br><code class="ml-5"><span style="color:red;">&nbsp;&nbsp;= - {{ 125 | cu }}</span></code>
+                <br><code class="ml-5">&nbsp;&nbsp;+ {{ 5 | cu }} * 30 units [salvage inventory= order quantity - units sold]</code>
+                <br><code class="ml-5"><span style="color:red;">&nbsp;&nbsp;= {{ 175 | cu }}</span></code>
             </li>
 
             <li class="mt-4">
@@ -37,7 +37,7 @@
                 <br>
                 <code>Profit = {{ 20 | cu }} * 50 units [units sold = Minimum of demand and order quantity]</code>
                 <br><code class="ml-5">&nbsp;&nbsp;- {{ 7.5 | cu }} * 50 units [order quantity]</code>
-                <br><code class="ml-5">&nbsp;&nbsp;- {{ 5 | cu }} * 0 units [final inventory= 0]</code>
+                <br><code class="ml-5">&nbsp;&nbsp;+ {{ 5 | cu }} * 0 units [final inventory= 0]</code>
                 <br><code class="ml-5"><span>&nbsp;&nbsp;= {{ 625 | cu }}</span></code>
             </li>
         </ol>

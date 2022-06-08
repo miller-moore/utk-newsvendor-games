@@ -25,17 +25,18 @@
     </p>
     <p>
         The game will start in January, where the demand for January will be displayed. Because you
-        did not order this product, profit from this round will not be shown. You will decide how much
+        did not order this product you are not responsible for how profitable this month is,
+        so profit from this round will not be shown. You will decide how much
         product you want to order for April (3 months out). The same will happen in February, where
-        February demand will be shown, and you will then order for May. This continues until April,
+        February demand will be shown, but not profits, and you will then order for May. This continues until April,
         where demand for April will be shown, your profit from the order you made in January will be
         calculated, and then you will order product for July. This will continue through December, where
         you will make your last ordering decision, to be realized in March of the following year.
    </p>
    <p>
-        You have no starting inventory in your warehouse at the beginning of the game. You will order
+        You have no starting units in your warehouse at the beginning of the game. You will order
         units three months in advance, which then get delivered before demand is realized.
-        Any leftover inventory after demand is realized will earn a salvage value per unit left over.
+        Any leftover units after demand is realized will earn a salvage value per unit left over.
     </p>
     <p>
         {# &nbsp;&nbsp;&nbsp;&nbsp; #}
@@ -44,19 +45,19 @@
         <ul>
             <code>
                 <li>
-                    Purchased inventory: 90 units
+                    Purchased units: 90 units
                 </li>
                 <li>
                     Demand: 80 units
                 </li>
                 <li>
-                    Leftover inventory: 90-80=10 units
+                    Leftover units: 90-80=10 units
                 </li>
             </code>
         </ul>
     </p>
     <p>
-        Salvage revenue is earned for the resulting leftover 10 units that are stocked in inventory.
+        Salvage revenue is earned for the resulting leftover 10 units.
     </p>
     <p>
         If you purchased too few units in a period to fulfill this period’s demand, the unfulfilled demand is
@@ -80,7 +81,7 @@
         You are trying to maximize your profits in this experiment. Profit per round is calculated as follows:
     </p>
     <p>
-        <code class="font-italic">Profit per round = selling price x units sold - purchasing price x order quantity + salvage value * leftover inventory</code>
+        <code class="font-italic">Profit per round = selling price x units sold - purchasing price x order quantity + salvage value x leftover inventory</code>
     </p>
     <p>
         Therefore, profit = revenue - purchase costs + salvage revenue.
