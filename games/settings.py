@@ -101,8 +101,8 @@ ROOMS = [
         display_name="Tractor Supply Planner Session",
     ),
     dict(
-        name="pilotstudy3",
-        display_name="Student pilot study - 3",
+        name="forecasting",
+        display_name="Forecasting",
     ),
     dict(
         name="pilotstudy1",
