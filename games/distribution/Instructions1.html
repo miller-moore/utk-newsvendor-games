@@ -1,0 +1,91 @@
+{{ block title }}
+    Game Instructions
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <p>
+        In this experiment, you have the role of an inventory manager. You must decide how many units of a
+        product you want to order and stock to sell to your customers.
+    </p>
+    <p>
+        You are making these decisions over multiple rounds. In each round, you are deciding on an
+        order quantity.
+    </p>
+    <p>
+        You are making your decision under uncertainty. This means at the time of the order decision
+        you do not know the exact demand of the period. However, you do know the probability
+        distribution of the demand. The demand for your product will be shown by a distribution curve,
+        shown on the decision-making page. Demand is independent between rounds.
+    </p>
+    <p>
+        You have no starting inventory in your warehouse at the beginning of the game. You will order
+        which then get delivered before demand is realized. Any leftover inventory after demand is
+        realized will earn a salvage value per unit left over.
+    </p>
+    <p>
+        {# &nbsp;&nbsp;&nbsp;&nbsp; #}
+        For example:
+        <br>
+        <ul>
+            <code>
+                <li>
+                    Available inventory: 90 units
+                </li>
+                <li>
+                    Demand: 80 units
+                </li>
+                <li>
+                    Leftover inventory: 90-80=10 units
+                </li>
+            </code>
+        </ul>
+    </p>
+    <p>
+        Salvage revenue is earned for the resulting leftover 10 units that are stocked in inventory.
+    </p>
+    <p>
+        If you purchased too few units in a period to fulfill this period’s demand, the unfulfilled demand is
+        lost. You cannot reorder within a period or shift demand to later periods. For example:
+
+        <code>
+            <ul>
+                <li>
+                    Purchased inventory: 30 units
+                </li>
+                <li>
+                    Demand: 80 units
+                </li>
+                <li>
+                    Units sold: 30 units
+                </li>
+            </ul>
+        </code>
+    </p>
+    <p>
+        You are trying to maximize your profits in this experiment. Profit per round is calculated as follows:
+    </p>
+    <p>
+        <code class="font-italic">Profit per round = selling price x units sold - purchasing price x order quantity + salvage value * leftover inventory</code>
+    </p>
+    <p>
+        Therefore, profit = revenue - purchase costs + salvage revenue.
+    </p>
+    <p>
+        In this experiment, your costs will be displayed on the decision page.
+    </p>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        allowClickNextOnEnter();
+    </script>
+
+{{ endblock }}
+

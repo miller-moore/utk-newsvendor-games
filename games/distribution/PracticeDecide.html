@@ -1,0 +1,40 @@
+{{ block title }}
+    Practice<br><br>
+    Order Quantity: Round {{ round_number }}/{{ C.PRACTICE_ROUNDS }}
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <div class="row mb-4" id="decision-form-container">
+        <div class="card border">
+            <div class="card-body">
+                <h5 class="card-title">Decision</h5>
+                {{ formfield 'ou' }}
+            </div>
+        </div>
+        <br>
+    </div>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        // Decide page, only render the pdf-instructions-container
+        renderPdfInstructionsContainer();
+
+        allowClickNextOnEnterIfOrderUnitsInput();
+
+        // renderGameHistoryContainer();
+        renderPracticeHistoryContainer();
+
+        renderDecisionFormContainer();
+        renderSituationalInfoContainer();
+    </script>
+
+{{ endblock }}
+

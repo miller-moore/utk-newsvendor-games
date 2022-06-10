@@ -1,0 +1,56 @@
+{{ block title }}
+    Game Instructions (cont'd)
+{{ endblock }}
+
+{{ block content }}
+
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <p>
+        Here are 2 examples of calculating the profit of a round:
+        <ol>
+            <li>
+                Example 1:
+                <ul>
+                    <li>selling price = {{ 20 | cu }} / unit</li>
+                    <li>purchasing price = {{ 7.5 | cu }} / unit</li>
+                    <li>salvage value = {{ 5 | cu }} / unit</li>
+                    <li>your order quantity = 50 units</li>
+                    <li>demand = 20 units</li>
+                </ul>
+                <br>
+                <code>Profit = {{ 20 | cu }} * 20 units [units sold = Minimum of demand and order quantity]</code>
+                <br><code class="ml-5">&nbsp;&nbsp;- {{ 7.5 | cu }} * 50 units [order quantity]</code>
+                <br><code class="ml-5">&nbsp;&nbsp;+ {{ 5 | cu }} * 30 units [salvage inventory= order quantity - units sold]</code>
+                <br><code class="ml-5"><span>&nbsp;&nbsp;= {{ 175 | cu }}</span></code>
+            </li>
+
+            <li class="mt-4">
+                Example 2:
+                <ul>
+                    <li>Prices of Example 1 apply here.</li>
+                    <li>your order quantity = 50 units</li>
+                    <li>demand = 100 units</li>
+                </ul>
+                <br>
+                <code>Profit = {{ 20 | cu }} * 50 units [units sold = Minimum of demand and order quantity]</code>
+                <br><code class="ml-5">&nbsp;&nbsp;- {{ 7.5 | cu }} * 50 units [order quantity]</code>
+                <br><code class="ml-5">&nbsp;&nbsp;+ {{ 5 | cu }} * 0 units [final inventory= 0]</code>
+                <br><code class="ml-5"><span>&nbsp;&nbsp;= {{ 625 | cu }}</span></code>
+            </li>
+        </ol>
+    </p>
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        allowClickNextOnEnter();
+    </script>
+
+{{ endblock }}
+

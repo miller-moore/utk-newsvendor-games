@@ -19,7 +19,7 @@ italic() {
 PATTERN=
 ROOT_PATH=""
 FILE_PATTERN="\(.*[.]\)\(js\|jsx\|ts\|tsx\|sh\|json\|sql\|html\|css\|scss\|ejs\|p[xy][xd]*\|sol\)"
-FILE_PATTERN_EXCLUSION="\([.]git\|[.]vscode\|[.]yarn\|[.]ipynb\|__pycache__\|dist\|images\|logs\|node_modules\).*"
+FILE_PATTERN_EXCLUSION="\([.]git\|[.]vscode\|[.]yarn\|[.]ipynb\|__pycache__\|images\|logs\|node_modules\).*"
 
 help() {
     cat << EOF

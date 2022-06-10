@@ -73,6 +73,12 @@ SESSION_CONFIGS = [
         num_demo_participants=1,
         app_sequence=["shorthorizon"],
     ),
+    dict(
+        name="distribution",
+        display_name="Distribution Game",
+        num_demo_participants=1,
+        app_sequence=["distribution"],
+    ),
     # dict(
     #     name="back_button",
     #     display_name="Back button for multiple instructions pages",

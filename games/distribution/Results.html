@@ -1,0 +1,29 @@
+{{ block title }}
+    Game {{ game_number }}<br><br>
+    Results: Period {{ period_number }}/{{ C.ROUNDS_PER_GAME }}
+{{ endblock }}
+
+{{ block content }}
+
+    {{ include C.STYLE_TEMPLATE }}
+    {{ include C.SECTIONS_TEMPLATE }}
+    {{ include C.SCRIPTS_TEMPLATE }}
+
+    <center class="w-100 m-4">
+        {{ next_button }}
+    </center>
+
+    <script>
+        // Results page, only render the pdf-instructions-container
+        renderPdfInstructionsContainer();
+
+        allowClickNextOnEnter();
+
+        renderResultsContainer();
+
+        renderGameHistoryContainer();
+    </script>
+
+{{ endblock }}
+
+
