@@ -101,8 +101,8 @@ ROOMS = [
         display_name="Westrock Planner Session",
     ),
     dict(
-        name="forecasting",
-        display_name="Forecasting",
+        name="se",
+        display_name="Schneider Electric Planner Session",
     ),
     dict(
         name="pilotstudy1",
