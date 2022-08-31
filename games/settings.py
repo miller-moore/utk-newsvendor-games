@@ -97,8 +97,8 @@ ROOMS = [
         display_name="Shaw Industries Planner Session",
     ),
     dict(
-        name="tsc",
-        display_name="Tractor Supply Planner Session",
+        name="westrock",
+        display_name="Westrock Planner Session",
     ),
     dict(
         name="forecasting",
